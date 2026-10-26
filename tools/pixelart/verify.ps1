@@ -2,13 +2,18 @@
 # 檢查項目：
 #   1. 單張 PNG:區塊數 = PNG 數、尺寸、每像素顏色與 D01 HEX 完全相同、`.` 的 alpha 為 0、×8 為最近鄰
 #   2. 精靈圖：尺寸、所有像素都在 D01 內、正常幀與破壞幀依換色表換色後與設計稿一致、
-#      被擊中幀符合規則、多層磚數字位置與 D12 範例一致、魔王 F1 = 正常圖疊上裂痕層、×6 為最近鄰
+#      被擊中幀符合規則、魔王 F1 = 正常圖疊上裂痕層、×6 為最近鄰;
+#      多層磚(D12 新規則)70 列、與 4 張範例逐像素一致;D17 功能型磚 5 種 × 數字 1~9、與 3 張 _n5 範例一致;
+#      垂直光束 6 張(旋轉、鏡射);D18 爆炸、彩虹磚與挑色環 7 色 × 3 幀;抽樣像素;sprites/ 沒有多餘檔案;
+#      layer_map.json 層 1~69 對照
 #   3. 示意盤面：尺寸 360×640、左右邊框、×3 為最近鄰
-# 為了獨立，本腳本不沿用 md_to_png.gd 的檔名與規則解析：區塊依標題開頭查找，
-# 磚種色階、層與數字對應、數字位置依 PM 交付的 D12 規格寫在下方常數。
-# 用法:powershell -ExecutionPolicy Bypass -File tools\pixelart\verify.ps1 [-OutDir <輸出資料夾>]
+#   4. 資訊(不計失敗):D12 對比表(七色 T3 對 `W`、`K`)以 WCAG 公式重算，與設計稿手算值並列
+# 為了獨立，本腳本不沿用 md_to_png.gd 的檔名與規則解析：區塊依標題開頭或 id 查找，
+# 層數對應、數字位置、描邊、裂痕範圍依 PM 交付的 D12、D17 規格寫在下方常數。
+# 用法:powershell -ExecutionPolicy Bypass -File tools\pixelart\verify.ps1 [-OutDir <輸出資料夾>] [-Md <設計稿路徑>]
 #   -OutDir 預設為 docs\design\preview;反向測試時可指向複製出來的資料夾
-param([string]$OutDir = '')
+#   -Md 預設為 docs\design\pixel-art-bricks.md;驗證設計稿副本的輸出時指定
+param([string]$OutDir = '', [string]$Md = '')
 Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @'
 using System;
@@ -130,7 +135,7 @@ public class Img {
 '@
 
 $root = Resolve-Path (Join-Path $PSScriptRoot "..\..")
-$md = Join-Path $root "docs\design\pixel-art-bricks.md"
+$md = if ($Md -ne '') { $Md } else { Join-Path $root "docs\design\pixel-art-bricks.md" }
 $out = if ($OutDir -ne '') { $OutDir } else { Join-Path $root "docs\design\preview" }
 $spr = Join-Path $out "sprites"
 $lines = [IO.File]::ReadAllLines($md, [Text.Encoding]::UTF8)
@@ -138,7 +143,9 @@ $lines = [IO.File]::ReadAllLines($md, [Text.Encoding]::UTF8)
 # ---- PM 交付的 D12 規格(驗證基準，刻意不從設計稿解析)
 $CW = 32; $CH = 16; $BW = 128; $BH = 48
 $colorOrder = '紅', '橙', '黃', '綠', '藍', '靛', '紫'
-$digitX = 13; $digitY = 4                     # 依 D12 範例網格，0 起算
+$digitX = 13; $digitY = 4                     # D12 多層磚數字左上角，0 起算
+$funcDigitX = 21; $funcDigitY = 4             # D17 功能型磚數字左上角，0 起算
+$LAYERS = 69                                  # 實際使用的最高層數;圖產生到 70(紫 9)
 $fail = 0
 function Fail($msg) { $script:fail++; Write-Output "FAIL $msg" }
 
@@ -220,34 +227,77 @@ foreach ($f in Get-ChildItem $out -Filter 'D*.png') {
 $master = Get-Grid '一般磚正常'
 $f = @((Get-Grid 'F1'), (Get-Grid 'F2'), (Get-Grid 'F3'), (Get-Grid 'F4'))
 $digits = @(0..9 | ForEach-Object { , (Get-Grid "數字 $_") })
-$crackFree = [string[]]$master.Clone()
-# 多層磚去裂痕(D12:第 25~27 欄、第 3~7 列的 T5 換成 T3);這裡只用來比對範例以外的列
-for ($y = 3; $y -le 7; $y++) { $cs = $crackFree[$y].ToCharArray(); for ($x = 25; $x -le 27; $x++) { if ($cs[$x] -ceq $red[4]) { $cs[$x] = $red[2] } }; $crackFree[$y] = New-Object string (, $cs) }
+# 依 id 找區塊(標題含「(id: 代號)」)
+function Get-ById($item, $id) {
+    $m = @($blocks | Where-Object { $_.Item -eq $item -and $_.Title -match ('id\s*[:：]\s*' + [regex]::Escape($id) + '\s*[)）]') })
+    if ($m.Count -ne 1) { Fail "$item 標題含 id「$id」的區塊有 $($m.Count) 個"; return $null }
+    return , $m[0].Grid
+}
+function To-Grid($cs) { return , [string[]]@($cs | ForEach-Object { New-Object string (, $_) }) }
 
 # 每張精靈圖的期望：列 -> 6 格網格;$null 表示該格只做被擊中規則檢查
-function Generic($color) { $t = $tiers[$color]; return @($f | ForEach-Object { , [Img]::Swap($_, $red, $t) }) }
-function Multi($layer) {
-    if ($layer -le 9) { $c = '藍'; $d = $layer } else { $c = '綠'; $d = $layer - 10 }
-    $n = [Img]::Swap($crackFree, $red, $tiers[$c])
+function Generic($color) { $tt = $tiers[$color]; return @($f | ForEach-Object { , [Img]::Swap($_, $red, $tt) }) }
+
+# D12 多層磚新規則(獨立寫法：以「鄰格是否有筆畫」判斷描邊，而非把描邊蓋上去)
+#   層 n:顏色 = (n − 1) mod 7、數字 = (n − 1) div 7;數字 0 = 母版換色(保留裂痕)
+#   數字 1~9:裂痕(第 25~27 欄、第 3~7 列 T5)與磨損(第 12 列第 16~17 欄 T2)改 T3,
+#   再把第 12~18 欄、第 3~11 列內：字形筆畫 → W;非筆畫但 8 鄰格有筆畫 → K
+function Multi-Normal($layer) {
+    $ci = ($layer - 1) % 7; $d = [math]::Floor(($layer - 1) / 7)
+    $tt = $tiers[$colorOrder[$ci]]
+    $n = [Img]::Swap($master, $red, $tt)
+    if ($d -eq 0) { return , $n }
     $cs = @($n | ForEach-Object { , $_.ToCharArray() })
-    for ($y = 0; $y -lt 7; $y++) { for ($x = 0; $x -lt 5; $x++) { if ($digits[$d][$y][$x] -ne '.') { $cs[$digitY + $y][$digitX + $x] = 'K' } } }
-    $n = [string[]]@($cs | ForEach-Object { New-Object string (, $_) })
-    return , (@(, $n) + @($null) + (Generic $c))
+    for ($y = 3; $y -le 7; $y++) { for ($x = 25; $x -le 27; $x++) { if ($cs[$y][$x] -ceq $tt[4]) { $cs[$y][$x] = $tt[2] } } }
+    for ($x = 16; $x -le 17; $x++) { if ($cs[12][$x] -ceq $tt[1]) { $cs[12][$x] = $tt[2] } }
+    $glyph = $digits[$d]
+    $isInk = { param($gx, $gy) $gx -ge 0 -and $gx -lt 5 -and $gy -ge 0 -and $gy -lt 7 -and $glyph[$gy][$gx] -ne '.' }
+    for ($y = $digitY - 1; $y -le $digitY + 7; $y++) {
+        for ($x = $digitX - 1; $x -le $digitX + 5; $x++) {
+            $gx = $x - $digitX; $gy = $y - $digitY
+            if (& $isInk $gx $gy) { $cs[$y][$x] = 'W'; continue }
+            $near = $false
+            foreach ($dy in -1, 0, 1) { foreach ($dx in -1, 0, 1) { if (& $isInk ($gx + $dx) ($gy + $dy)) { $near = $true } } }
+            if ($near) { $cs[$y][$x] = 'K' }
+        }
+    }
+    return To-Grid $cs
 }
+# D17:底圖在第 21 欄、第 4 列疊上 `K` 數字(只蓋筆畫)
+function Func-Normal($base, $d) {
+    $cs = @($base | ForEach-Object { , $_.ToCharArray() })
+    for ($y = 0; $y -lt 7; $y++) { for ($x = 0; $x -lt 5; $x++) { if ($digits[$d][$y][$x] -ne '.') { $cs[$funcDigitY + $y][$funcDigitX + $x] = 'K' } } }
+    return To-Grid $cs
+}
+
 $boss = Get-Grid '魔王正常'
 $expect = [ordered]@{
     'bricks_normal' = @{ W = $CW; H = $CH; Rows = @($colorOrder | ForEach-Object { , (@(, [Img]::Swap($master, $red, $tiers[$_])) + @($null) + (Generic $_)) }) }
-    'bricks_multi'  = @{ W = $CW; H = $CH; Rows = @(1..14 | ForEach-Object { Multi $_ }) }
+    'bricks_multi'  = @{ W = $CW; H = $CH; Rows = @(1..70 | ForEach-Object { , (@(, (Multi-Normal $_)) + @($null) + (Generic $colorOrder[($_ - 1) % 7])) }) }
     'brick_chest'   = @{ W = $CW; H = $CH; Rows = @(, (@(, (Get-Grid '寶箱正常')) + @($null) + (Generic '橙'))) }
     'brick_coin'    = @{ W = $CW; H = $CH; Rows = @(, (@(, (Get-Grid '金幣正常')) + @($null) + (Generic '黃'))) }
     'brick_round'   = @{ W = $CW; H = $CH; Rows = @(, (@((Get-Grid '圓形正常'), $null, (Get-Grid '圓形 F1'), (Get-Grid '圓形 F2')) + @((Generic '紫')[2..3]))) }
     'brick_boss'    = @{ W = $BW; H = $BH; Rows = @(, @($boss, $null, [Img]::Overlay($boss, (Get-Grid '魔王裂痕疊加')), (Get-Grid '魔王 F2'), (Get-Grid '魔王 F3'), (Get-Grid '魔王 F4'))) }
 }
+# D17 功能型磚：5 種 × 數字 1~9;破壞幀依 D17 換色表
+$funcSpec = [ordered]@{ 'brick_laser_h' = @('laser_brick_h', '雷射（洋紅）'); 'brick_laser_v' = @('laser_brick_v', '雷射（洋紅）'); 'brick_laser_x' = @('laser_brick_x', '雷射（洋紅）')
+                        'brick_lightning' = @('lightning_brick', '閃電（電青）'); 'brick_reaper' = @('reaper_brick', '死神（骨白）') }
+foreach ($name in $funcSpec.Keys) {
+    $base = Get-ById 'D17' $funcSpec[$name][0]; $tierName = $funcSpec[$name][1]
+    if (-not $tiers.ContainsKey($tierName)) { Fail "設計稿找不到換色表列「$tierName」"; continue }
+    $expect[$name] = @{ W = $CW; H = $CH; Rows = @(1..9 | ForEach-Object { , (@(, (Func-Normal $base $_)) + @($null) + (Generic $tierName)) }) }
+}
+# D18 爆炸、彩虹磚
+foreach ($p in @(@('brick_explosion', 'explosion_brick', '爆炸（炸藥褐）'), @('brick_rainbow', 'rainbow_brick', '彩虹（珍珠白）'))) {
+    if (-not $tiers.ContainsKey($p[2])) { Fail "設計稿找不到換色表列「$($p[2])」"; continue }
+    $expect[$p[0]] = @{ W = $CW; H = $CH; Rows = @(, (@(, (Get-ById 'D18' $p[1])) + @($null) + (Generic $p[2]))) }
+}
 
+$sheetImg = @{}
 foreach ($name in $expect.Keys) {
     $e = $expect[$name]; $path = Join-Path $spr "$name.png"
     if (-not (Test-Path $path)) { Fail "缺少 sprites/$name.png"; continue }
-    $img = [Img]::Load($path)
+    $img = [Img]::Load($path); $sheetImg[$name] = $img
     $rows = $e.Rows.Count
     if ($img.W -ne $e.W * 6 -or $img.H -ne $e.H * $rows) { Fail "$name 尺寸 $($img.W)x$($img.H),應為 $($e.W * 6)x$($e.H * $rows)"; continue }
     $r = $img.AllInPalette($colors); if ($r -ne '') { Fail "$name $r" }
@@ -262,20 +312,112 @@ foreach ($name in $expect.Keys) {
         if ($r -ne '') { Fail "$name 第 $($row + 1) 列: $r" }
     }
     $r = $img.IsScaledBy([Img]::Load((Join-Path $spr "${name}_x6.png")), 6); if ($r -ne '') { Fail "$name x6: $r" }
-    "精靈圖 ${name}: $($img.W)x$($img.H)"
+    "精靈圖 ${name}: $($img.W)x$($img.H)(正常 $rows、被擊中 $rows)"
 }
 
-# 多層磚數字位置：數字區(第 13~17 欄、第 4~10 列)只有筆畫是 K;並與 D12 兩張範例逐像素相同
-$multi = [Img]::Load((Join-Path $spr 'bricks_multi.png'))
-for ($layer = 1; $layer -le 14; $layer++) {
-    $d = if ($layer -le 9) { $layer } else { $layer - 10 }
-    for ($y = 0; $y -lt 7; $y++) { for ($x = 0; $x -lt 5; $x++) {
-        $isK = $multi.At($digitX + $x, ($layer - 1) * $CH + $digitY + $y) -eq $COLOR_K
-        if ($isK -ne ($digits[$d][$y][$x] -ne '.')) { Fail "多層磚層 $layer 數字 ($x,$y) 位置不符" }
-    } }
+# 範例網格必須與本腳本的期望(也就是與輸出)逐像素相同:D12 四張多層磚範例、D17 三張數字 5 範例
+$layerExamples = [ordered]@{ 'layer_example_red1' = 8; 'layer_example_indigo2' = 20; 'layer_example_blue8' = 61; 'layer_example_yellow3' = 24 }
+foreach ($id in $layerExamples.Keys) {
+    $g = Get-ById 'D12' $id; $layer = $layerExamples[$id]
+    if ($null -eq $g) { continue }
+    if (((Multi-Normal $layer) -join "`n") -cne ($g -join "`n")) { Fail "驗證腳本依新規則算出的層 $layer 與範例 $id 不同" }
+    if ($sheetImg['bricks_multi']) { $r = $sheetImg['bricks_multi'].Compare($g, 0, ($layer - 1) * $CH, $pal); if ($r -ne '') { Fail "bricks_multi 層 $layer 與範例 $id 不同: $r" } }
 }
-$r = $multi.Compare((Get-Grid '層 7 藍範例'), 0, 6 * $CH, $pal); if ($r -ne '') { Fail "多層磚層 7 與「層 7 藍範例」不同: $r" }
-$r = $multi.Compare((Get-Grid '層 3 綠範例'), 0, 12 * $CH, $pal); if ($r -ne '') { Fail "多層磚層 13 與「層 3 綠範例」不同: $r" }
+foreach ($p in @(@('brick_laser_h', 'laser_brick_h_n5'), @('brick_laser_v', 'laser_brick_v_n5'), @('brick_laser_x', 'laser_brick_x_n5'))) {
+    $g = Get-ById 'D17' $p[1]
+    if ($null -eq $g -or -not $sheetImg[$p[0]]) { continue }
+    $r = $sheetImg[$p[0]].Compare($g, 0, 4 * $CH, $pal); if ($r -ne '') { Fail "$($p[0]) 數字 5 與範例 $($p[1]) 不同: $r" }
+}
+"範例比對：多層磚 $($layerExamples.Count) 張、功能型磚 3 張"
+
+# 垂直光束：逆時針轉 90 度(新[r][c] = 原[c][15 − r]);往下端點 = 往上端點上下鏡射
+function Rot-Ccw($g) { $n = $g.Count; return , [string[]]@(0..($n - 1) | ForEach-Object { $rr = $_; -join @(0..($n - 1) | ForEach-Object { $g[$_][$n - 1 - $rr] }) }) }
+$beams = [ordered]@{}
+foreach ($k in 'thin', 'full') {
+    $beams["laser_beam_v_mid_$k"] = Rot-Ccw (Get-ById 'D17' "laser_beam_mid_$k")
+    $up = Rot-Ccw (Get-ById 'D17' "laser_beam_block_$k")
+    $beams["laser_beam_v_block_up_$k"] = $up
+    $beams["laser_beam_v_block_down_$k"] = [string[]]@($up[($up.Count - 1)..0])
+}
+foreach ($name in $beams.Keys) {
+    $path = Join-Path $spr "$name.png"
+    if (-not (Test-Path $path)) { Fail "缺少 sprites/$name.png"; continue }
+    $img = [Img]::Load($path)
+    if ($img.W -ne 16 -or $img.H -ne 16) { Fail "$name 尺寸 $($img.W)x$($img.H),應為 16x16"; continue }
+    $r = $img.Compare($beams[$name], 0, 0, $pal); if ($r -ne '') { Fail "${name}: $r" }
+    $r = $img.IsScaledBy([Img]::Load((Join-Path $spr "${name}_x6.png")), 6); if ($r -ne '') { Fail "$name x6: $r" }
+}
+"垂直光束：$($beams.Count) 張"
+
+# 彩虹挑色環：7 列(紅橙黃綠藍靛紫)× 3 幀(48×32),依 D12 換色表;沒有白色版(高度剛好 7 列)
+$pick = @(1..3 | ForEach-Object { , (Get-ById 'D18' "rainbow_pick_f$_") })
+$path = Join-Path $spr 'rainbow_pick.png'
+if (-not (Test-Path $path)) { Fail '缺少 sprites/rainbow_pick.png' } else {
+    $img = [Img]::Load($path); $sheetImg['rainbow_pick'] = $img
+    if ($img.W -ne 48 * 3 -or $img.H -ne 32 * 7) { Fail "rainbow_pick 尺寸 $($img.W)x$($img.H),應為 144x224(7 色 × 3 幀，不含白色版)" } else {
+        for ($ci = 0; $ci -lt 7; $ci++) { for ($k = 0; $k -lt 3; $k++) {
+            $r = $img.Compare([Img]::Swap($pick[$k], $red, $tiers[$colorOrder[$ci]]), $k * 48, $ci * 32, $pal)
+            if ($r -ne '') { Fail "rainbow_pick $($colorOrder[$ci]) F$($k + 1): $r" }
+        } }
+        $r = $img.IsScaledBy([Img]::Load((Join-Path $spr 'rainbow_pick_x6.png')), 6); if ($r -ne '') { Fail "rainbow_pick x6: $r" }
+        "精靈圖 rainbow_pick: $($img.W)x$($img.H)(7 色 × 3 幀 = 21 張)"
+    }
+}
+
+# 抽樣像素(依 PM 交付規格直接寫出座標與期望代號;sheet、列、欄、x、y、代號)
+$samples = @(
+    @('bricks_multi', 0, 0, 27, 3, 'o'),    # 層 1 紅(第 0 輪)保留裂痕
+    @('bricks_multi', 7, 0, 27, 3, 'R'),    # 層 8 紅 1:裂痕改 T3
+    @('bricks_multi', 7, 0, 16, 12, 'R'),   # 層 8:第 12 列磨損改 T3
+    @('bricks_multi', 0, 0, 16, 12, 'r'),   # 層 1:磨損保留
+    @('bricks_multi', 7, 0, 15, 4, 'W'),    # 層 8:數字 1 頂端白字
+    @('bricks_multi', 7, 0, 14, 4, 'K'),    # 層 8:描邊
+    @('bricks_multi', 60, 1, 13, 4, 'K'),   # 層 61 藍 8 被擊中：描邊仍為 K
+    @('bricks_multi', 60, 1, 20, 8, 'W'),   # 層 61 被擊中：磚面全白
+    @('bricks_multi', 60, 2, 3, 3, 'U'),    # 層 61 F1:藍色階 T3
+    @('bricks_multi', 69, 0, 15, 4, 'W'),   # 層 70 紫 9 有產生
+    @('brick_laser_h', 0, 0, 23, 4, 'K'),   # 數字 1 頂端 `K`(第 21 + 2 欄)
+    @('brick_laser_h', 0, 0, 21, 4, '#'),   # 數字 1 左上角不是筆畫，維持底色
+    @('brick_lightning', 8, 2, 3, 3, '~'),  # 閃電 F1:電青 T3
+    @('brick_reaper', 8, 2, 3, 3, '$'),     # 死神 F1:骨白 T3
+    @('brick_laser_v', 0, 2, 3, 3, '#'),    # 雷射 F1:洋紅 T3
+    @('brick_explosion', 0, 2, 1, 2, '-'),  # 爆炸 F1:褐 T2
+    @('brick_rainbow', 0, 2, 1, 2, '1'),    # 彩虹 F1:珍珠白 T2
+    @('brick_rainbow', 0, 2, 1, 1, 'W')     # 彩虹 F1:珍珠白 T1 = W
+)
+$sampleN = 0
+foreach ($s in $samples) {
+    $img = $sheetImg[$s[0]]; if ($null -eq $img) { continue }
+    $cw = $CW; $ch = $CH
+    $got = $img.At($s[2] * $cw + $s[3], $s[1] * $ch + $s[4])
+    if ($got -ne $pal[[char]$s[5]]) { Fail "抽樣 $($s[0]) 第 $($s[1]) 列第 $($s[2]) 格 ($($s[3]),$($s[4])) 應為 $($s[5])" }
+    $sampleN++
+}
+# 挑色環抽樣：藍色 F1 左上角環(第 5 欄第 4 列)= 藍 T1 `M`;F2 中央亮點(第 23 欄第 1 列)= `W` 不換色
+if ($sheetImg['rainbow_pick']) {
+    if ($sheetImg['rainbow_pick'].At(5, 4 * 32 + 4) -ne $pal[[char]'M']) { Fail '抽樣 rainbow_pick 藍 F1 (5,4) 應為 M' }
+    if ($sheetImg['rainbow_pick'].At(48 + 23, 4 * 32 + 1) -ne $WHITE) { Fail '抽樣 rainbow_pick 藍 F2 (23,1) 應為 W' }
+    $sampleN += 2
+}
+"抽樣像素：$sampleN 點"
+
+# 層數對照表：層 1~69 → (顏色, 數字),列號 = 層 − 1
+$lmPath = Join-Path $spr 'layer_map.json'
+if (-not (Test-Path $lmPath)) { Fail '缺少 sprites/layer_map.json' } else {
+    $lm = [IO.File]::ReadAllText($lmPath, [Text.Encoding]::UTF8) | ConvertFrom-Json
+    $slug = @{ '紅' = 'red'; '橙' = 'orange'; '黃' = 'yellow'; '綠' = 'green'; '藍' = 'blue'; '靛' = 'indigo'; '紫' = 'violet' }
+    if ($lm.max_layer -ne $LAYERS -or @($lm.layers).Count -ne $LAYERS) { Fail "layer_map.json 應有層 1~$LAYERS" } else {
+        for ($n = 1; $n -le $LAYERS; $n++) {
+            $e = $lm.layers[$n - 1]; $cn = $colorOrder[($n - 1) % 7]
+            if ($e.layer -ne $n -or $e.color -ne $slug[$cn] -or $e.color_name -ne $cn -or $e.digit -ne [math]::Floor(($n - 1) / 7) -or $e.row -ne $n - 1) { Fail "layer_map.json 層 $n 對應錯誤" }
+        }
+    }
+    # 設計稿「層數對應」表的例子
+    foreach ($p in @(@(1, 'red', 0), @(7, 'violet', 0), @(8, 'red', 1), @(14, 'violet', 1), @(20, 'indigo', 2), @(24, 'yellow', 3), @(61, 'blue', 8), @(69, 'indigo', 9))) {
+        $e = $lm.layers[$p[0] - 1]; if ($e.color -ne $p[1] -or $e.digit -ne $p[2]) { Fail "layer_map.json 層 $($p[0]) 應為 $($p[1]) $($p[2])" }
+    }
+    "層數對照表：$(@($lm.layers).Count) 層"
+}
 
 # ================================================================ 2b. 擋板(D13)
 # PM 交付的規格(第 2 版):本體高 8、兩端各寬 8、中段圖塊寬 16、槍左右端 8×12、各段底部對齊、長度清單、最大 320
@@ -336,6 +478,13 @@ foreach ($name in $psets.Keys) {
     "精靈圖 ${name}: $($img.W)x$($img.H)"
 }
 
+# sprites/ 只能有上面驗過的檔案(含 _x6 放大版與兩個 JSON),舊產物或多餘的版本(如挑色環白色版)都算失敗
+$allowed = @{ 'layer_map.json' = $true; 'laser_beam_layout.json' = $true }
+foreach ($n in @($expect.Keys) + @($beams.Keys) + @('rainbow_pick') + @($psets.Keys)) { $allowed["$n.png"] = $true; $allowed["${n}_x6.png"] = $true }
+$sprFiles = @(Get-ChildItem $spr -File)
+foreach ($file in $sprFiles) { if (-not $allowed[$file.Name]) { Fail "sprites/ 有多餘或殘留的檔案 $($file.Name)" } }
+"sprites/ 檔案：$($sprFiles.Count) 個(PNG $(@($sprFiles | Where-Object { $_.Extension -eq '.png' -and $_.Name -notmatch '_x\d+\.png$' }).Count) 張 + 放大版 + JSON)"
+
 # ================================================================ 3. 示意盤面
 foreach ($n in 'overview.png', 'board_sample.png', 'board_sample_x3.png') { if (-not (Test-Path (Join-Path $out $n))) { Fail "缺少 $n" } }
 $b1 = [Img]::Load((Join-Path $out 'board_sample.png'))
@@ -347,6 +496,28 @@ $r = $b1.IsScaledBy([Img]::Load((Join-Path $out 'board_sample_x3.png')), 3); if 
 # 盤面擋板:64 px 正常版，水平置中(x = (360 − 64) / 2 = 148),上緣 y = 600(PM 指示由工程師選定)
 $r = $b1.CompareOpaque((Build-Paddle $pp['normal_left'] $pp['normal_mid'] $pp['normal_right'] 64), 148, 600, $pal); if ($r -ne '') { Fail "盤面擋板: $r" }
 foreach ($old in Get-ChildItem $out -Filter 'board_sample_x*.png') { if ($old.Name -ne 'board_sample_x3.png') { Fail "殘留舊檔 $($old.Name)" } }
+
+# ================================================================ 4. 資訊:D12 對比表複核(不計失敗)
+# WCAG 2 相對亮度：通道 c/255 ≤ 0.03928 時 /12.92,否則 ((c + 0.055)/1.055)^2.4;對比 = (亮 + 0.05)/(暗 + 0.05)
+function Lum([int]$argb) {
+    $sum = 0.0
+    foreach ($p in @(@(16, 0.2126), @(8, 0.7152), @(0, 0.0722))) {
+        $c = (($argb -shr $p[0]) -band 0xFF) / 255.0
+        $lin = if ($c -le 0.03928) { $c / 12.92 } else { [math]::Pow(($c + 0.055) / 1.055, 2.4) }
+        $sum += $p[1] * $lin
+    }
+    return $sum
+}
+function Ratio($a, $b) { $la = Lum $a; $lb = Lum $b; return ([math]::Max($la, $lb) + 0.05) / ([math]::Min($la, $lb) + 0.05) }
+# 設計稿 D12「對比數值」表的手算值(`W` 對底、`K` 對底)
+$stated = [ordered]@{ 'R' = @(5.72, 2.97); 'd' = @(3.01, 5.65); 'Y' = @(1.41, 12.06); 'L' = @(1.68, 10.12); 'U' = @(3.63, 4.68); 'I' = @(9.46, 1.80); 'V' = @(5.63, 3.02) }
+"D12 對比複核(工具算 / 設計稿):"
+foreach ($c in $stated.Keys) {
+    $w = Ratio $WHITE $pal[[char]$c]; $kk = Ratio $COLOR_K $pal[[char]$c]
+    $note = if ([math]::Abs([math]::Round($w, 2) - $stated[$c][0]) -gt 0.005 -or [math]::Abs([math]::Round($kk, 2) - $stated[$c][1]) -gt 0.005) { '  <- 與設計稿不同' } else { '' }
+    "  {0}  W {1:N3} / {2:N2}   K {3:N3} / {4:N2}   較高 {5:N3}{6}" -f $c, $w, $stated[$c][0], $kk, $stated[$c][1], [math]::Max($w, $kk), $note
+}
+"  W 對 K {0:N3} / 17.02" -f (Ratio $WHITE $COLOR_K)
 
 "檢查完成：區塊 $($blocks.Count) 個，調色盤 $($pal.Count) 色，失敗 $fail 項"
 exit [int]($fail -ne 0)

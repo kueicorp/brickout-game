@@ -1,0 +1,101 @@
+{
+  "pieces": {
+    "laser_beam_mid_thin": {
+      "file": "D17_laser_beam_mid_thin.png",
+      "w": 16,
+      "h": 16
+    },
+    "laser_beam_mid_full": {
+      "file": "D17_laser_beam_mid_full.png",
+      "w": 16,
+      "h": 16
+    },
+    "laser_beam_block_thin": {
+      "file": "D17_laser_beam_block_thin.png",
+      "w": 16,
+      "h": 16
+    },
+    "laser_beam_block_full": {
+      "file": "D17_laser_beam_block_full.png",
+      "w": 16,
+      "h": 16
+    },
+    "laser_beam_origin_thin": {
+      "file": "D17_laser_beam_origin_thin.png",
+      "w": 32,
+      "h": 16
+    },
+    "laser_beam_origin_full": {
+      "file": "D17_laser_beam_origin_full.png",
+      "w": 32,
+      "h": 16
+    },
+    "laser_beam_v_origin_thin": {
+      "file": "D17_laser_beam_v_origin_thin.png",
+      "w": 32,
+      "h": 16
+    },
+    "laser_beam_v_origin_full": {
+      "file": "D17_laser_beam_v_origin_full.png",
+      "w": 32,
+      "h": 16
+    },
+    "laser_beam_x_origin_thin": {
+      "file": "D17_laser_beam_x_origin_thin.png",
+      "w": 32,
+      "h": 16
+    },
+    "laser_beam_x_origin_full": {
+      "file": "D17_laser_beam_x_origin_full.png",
+      "w": 32,
+      "h": 16
+    },
+    "laser_beam_v_mid_thin": {
+      "file": "sprites/laser_beam_v_mid_thin.png",
+      "w": 16,
+      "h": 16,
+      "from": "laser_beam_mid_thin",
+      "transform": "rotate_ccw_90"
+    },
+    "laser_beam_v_mid_full": {
+      "file": "sprites/laser_beam_v_mid_full.png",
+      "w": 16,
+      "h": 16,
+      "from": "laser_beam_mid_full",
+      "transform": "rotate_ccw_90"
+    },
+    "laser_beam_v_block_up_thin": {
+      "file": "sprites/laser_beam_v_block_up_thin.png",
+      "w": 16,
+      "h": 16,
+      "from": "laser_beam_block_thin",
+      "transform": "rotate_ccw_90"
+    },
+    "laser_beam_v_block_up_full": {
+      "file": "sprites/laser_beam_v_block_up_full.png",
+      "w": 16,
+      "h": 16,
+      "from": "laser_beam_block_full",
+      "transform": "rotate_ccw_90"
+    },
+    "laser_beam_v_block_down_thin": {
+      "file": "sprites/laser_beam_v_block_down_thin.png",
+      "w": 16,
+      "h": 16,
+      "from": "laser_beam_v_block_up_thin",
+      "transform": "flip_v"
+    },
+    "laser_beam_v_block_down_full": {
+      "file": "sprites/laser_beam_v_block_down_full.png",
+      "w": 16,
+      "h": 16,
+      "from": "laser_beam_v_block_up_full",
+      "transform": "flip_v"
+    }
+  },
+  "mirror": {
+    "left_block": "laser_beam_block_* 水平鏡射(左側被擋下)"
+  },
+  "vertical_offset_x": 8,
+  "note": "水平中段可左右平鋪;垂直分段圖左緣 x = 磚左緣 x + 8;起點圖 32×16 覆蓋雷射磚整格"
+}

@@ -4,10 +4,14 @@ extends SceneTree
 ## 讀取設計稿 pixel-art-bricks.md:
 ##   1. 每個 ```text 區塊(一字元 = 一像素)轉成單張 PNG 與 ×8 放大版;
 ##   2. 依 D12「自動產生規則」與換色對照表，由母版產生各磚種的精靈圖(sprites/);
-##   3. 依 D13 拼接規則，由擋板分段拼出各長度、各狀態的擋板圖(sprites/paddle_*.png);
-##   4. 產生總覽圖 overview.png 與示意盤面 board_sample.png。
-## 調色盤、換色表、被擊中規則、數字位置、裂痕範圍、層與數字對應、擋板長度與拼接參數都從設計稿解析，
-## 設計稿改了重新執行即可更新。任何解析或檢查錯誤都會在刪檔、寫檔之前擋下。
+##      多層磚依 D12「多層磚層數(新規則)」產生 70 種外觀(7 色 ×(無數字 + 數字 1~9))與層數對照表 layer_map.json;
+##   3. 依 D17、D18「需轉檔工具新增的自動產生規則」產生功能型磚(數字合成、被擊中、破壞幀)、
+##      垂直雷射光束(由水平圖旋轉、鏡射)與彩虹挑色環七色版;
+##   4. 依 D13 拼接規則，由擋板分段拼出各長度、各狀態的擋板圖(sprites/paddle_*.png);
+##   5. 產生總覽圖 overview.png 與示意盤面 board_sample.png。
+## 調色盤、換色表、被擊中規則、擋板長度與拼接參數從設計稿解析;設計稿標明「寫死在轉檔工具」的規則
+## (多層磚數字位置、裂痕範圍、功能型磚數字位置、垂直光束轉換等)寫在下方常數，並以設計稿的範例網格逐像素核對。
+## 任何解析或檢查錯誤都會在刪檔、寫檔之前擋下。
 ##
 ## 執行方式(不需要 project.godot):
 ##   Godot_console.exe --headless --script md_to_png.gd -- <md 路徑> <輸出資料夾>
@@ -27,6 +31,60 @@ const CELL_H := 16
 const BOSS_W := 128
 const BOSS_H := 48
 const DIGIT_COUNT := 10
+const DIGIT_W := 5
+const DIGIT_H := 7
+
+## 換色時一律不變的字元(換色只替換母版色階代號，此清單用來檢查母版沒有規則外的代號)
+const SWAP_KEEP := ["K", "W", "G", "."]
+## 寶箱、金幣、圓形的破壞幀色階(D12:寶箱橙、金幣黃、圓形紫維持原外觀)
+const FRAME_COLORS := {"寶箱": "橙", "金幣": "黃", "圓形": "紫"}
+
+# ---- D12「多層磚層數(新規則)」:設計稿標明寫死在轉檔工具;欄列從 0 起算
+const LAYER_MAX := 69          # 實際使用的最高層數(靛 9)
+const ROUND_COUNT := 10        # 輪數 0~9;第 0 輪不畫數字
+const MULTI_DIGIT_X := 13      # 數字字形左上角
+const MULTI_DIGIT_Y := 4
+const MULTI_FILL := "W"        # 字形填色
+const MULTI_OUTLINE := "K"     # 字形 8 鄰格描邊
+## 有數字的磚要改成 T3 的區域:[x0, x1, y0, y1, 原色階, 新色階](色階 1 起算，含端點)
+## 裂痕:第 25~27 欄、第 3~7 列的 T5;磨損：第 12 列第 16~17 欄的 T2
+const MULTI_FIXES := [[25, 27, 3, 7, 5, 3], [16, 17, 12, 12, 2, 3]]
+
+# ---- D17 功能型磚(第 1 批):數字 `K` 疊在第 21 欄、第 4 列
+const FUNC_ITEM := "D17"
+const FUNC_DIGIT_X := 21
+const FUNC_DIGIT_Y := 4
+const FUNC_DIGIT_INK := "K"
+## [底圖 id, 精靈圖檔名, 破壞幀色階(D17 換色表「目標」欄;解析時全形括號已轉半形)]
+const FUNC_BRICKS := [
+	["laser_brick_h", "brick_laser_h", "雷射(洋紅)"],
+	["laser_brick_v", "brick_laser_v", "雷射(洋紅)"],
+	["laser_brick_x", "brick_laser_x", "雷射(洋紅)"],
+	["lightning_brick", "brick_lightning", "閃電(電青)"],
+	["reaper_brick", "brick_reaper", "死神(骨白)"],
+]
+const FUNC_TIERS := ["雷射(洋紅)", "閃電(電青)", "死神(骨白)"]
+## 垂直光束：[輸出 id, 來源 id, 做法];ccw = 逆時針轉 90 度，flip_v = 上下鏡射(來源為已產生的垂直圖)
+const BEAM_SIZE := 16
+const BEAM_V := [
+	["laser_beam_v_mid_thin", "laser_beam_mid_thin", "ccw"],
+	["laser_beam_v_mid_full", "laser_beam_mid_full", "ccw"],
+	["laser_beam_v_block_up_thin", "laser_beam_block_thin", "ccw"],
+	["laser_beam_v_block_up_full", "laser_beam_block_full", "ccw"],
+	["laser_beam_v_block_down_thin", "laser_beam_v_block_up_thin", "flip_v"],
+	["laser_beam_v_block_down_full", "laser_beam_v_block_up_full", "flip_v"],
+]
+
+# ---- D18 功能型磚(第 2 批)
+const FUNC2_ITEM := "D18"
+## [底圖 id, 精靈圖檔名, 破壞幀色階(D18 換色表「目標」欄)]
+const FUNC2_BRICKS := [
+	["explosion_brick", "brick_explosion", "爆炸(炸藥褐)"],
+	["rainbow_brick", "brick_rainbow", "彩虹(珍珠白)"],
+]
+const PICK_FRAMES := ["rainbow_pick_f1", "rainbow_pick_f2", "rainbow_pick_f3"]
+const PICK_W := 48
+const PICK_H := 32
 
 const PADDLE_ITEM := "D13"  # 擋板分段與拼接規則所在的設計稿項目
 ## 各擋板圖使用的分段 id(左端、中段、右端)。設計稿的「槍」「吸附」「同時有槍與吸附」規則
@@ -71,17 +129,17 @@ const BOARD_PADDLE_LEN := 64   # 示意盤面的擋板長度(基準長度)
 const BOARD_PADDLE_Y := 600    # 擋板上緣 y;離畫布底 32 px,示意球拍位置
 
 ## 示意盤面(10 欄)。每格一個代號，以空白分隔：
-##   R O Y G B I V = 一般磚紅橙黃綠藍靛紫;數字 1~14 = 多層磚層數;C = 寶箱;$ = 金幣;
+##   R O Y G B I V = 一般磚紅橙黃綠藍靛紫(= 多層磚層 1~7);數字 1~69 = 多層磚層數;C = 寶箱;$ = 金幣;
 ##   @ = 圓形;X = 魔王左上角(佔 4×3 格;置中須放在從 0 起算的第 3 欄，即 D12 的「第 4~7 欄」);- = 被魔王覆蓋;. = 空格
 const BOARD_LAYOUT := [
 	"R O Y X - - - G B I",
 	"V R O - - - - Y G B",
 	"I V R - - - - O Y G",
-	"1 2 3 C 5 $ 9 10 13 14",
+	"8 9 10 C 12 $ 20 24 61 69",
 	"B I V @ R @ O Y G R",
-	"G C Y 10 11 12 Y $ O V",
+	"G C Y 15 16 17 Y $ O V",
 	"R O Y G B I V R O Y",
-	". 4 . 7 @ 13 . 6 . 8",
+	". 32 . 40 @ 48 . 55 . 66",
 	"Y G B I V R O Y G B",
 	". . C . $ . @ . . .",
 ]
@@ -202,10 +260,20 @@ func run(md_path: String, out_dir: String) -> int:
 			errors.append("%s (設計稿第 %d 行): %s" % [b["name"], b["line"], msg])
 
 	var sheets := {}
+	var layer_map := {}
+	var beam_layout := {}
 	if errors.is_empty():
 		var rules := parse_rules(section_lines(lines, RULE_ITEM), palette, errors)
 		if errors.is_empty():
+			parse_func_rules(lines, palette, rules, errors)
+		if errors.is_empty():
 			sheets = build_sprite_sheets(blocks, rules, palette, errors)
+		if errors.is_empty():
+			var fsheets := build_func_sheets(blocks, rules, palette, errors)
+			for k in fsheets:
+				sheets[k] = fsheets[k]
+			layer_map = build_layer_map()
+			beam_layout = build_beam_layout(blocks)
 		# 擋板規則與磚塊規則各自獨立，兩邊的錯誤一起列出
 		var prules := parse_paddle_rules(section_lines(lines, PADDLE_ITEM), errors)
 		if not prules.is_empty():
@@ -240,6 +308,12 @@ func run(md_path: String, out_dir: String) -> int:
 		if save(scaled(img, SCALE_SPRITE), sprite_dir.path_join("%s_x%d.png" % [sheet_name, SCALE_SPRITE])) != OK:
 			return 1
 		print("%-26s %dx%d" % [SPRITE_DIR + "/" + sheet_name, img.get_width(), img.get_height()])
+
+	# 對照資料(給遊戲程式用):層數 → (顏色, 數字)、雷射光束分段尺寸與鏡射方式
+	for pair in [["layer_map.json", layer_map], ["laser_beam_layout.json", beam_layout]]:
+		if save_json(pair[1], sprite_dir.path_join(pair[0])) != OK:
+			return 1
+		print("%-26s" % [SPRITE_DIR + "/" + pair[0]])
 
 	if save(build_overview(blocks, images, palette), out_dir.path_join("overview.png")) != OK:
 		return 1
@@ -462,11 +536,10 @@ func find_rule(rule_rows: Dictionary, keyword: String, errors: PackedStringArray
 
 
 ## 解析 D12 的自動產生規則表與換色對照表。回傳規則 Dictionary;錯誤附加到 errors。
-## 回傳欄位：
-##   source(母版色階代號陣列，T1~T5)、tiers({顏色名: 5 個代號})、
-##   hit_keep(被擊中不變的字元)、hit_to(被擊中改成的字元)、swap_keep(換色時不變的字元)、
-##   frame_colors({寶箱/金幣/圓形: 顏色名})、digit_ink、digit_w、digit_h、digit_x、digit_y、
-##   crack(x0,x1,y0,y1,from,to)、layers(Array[{from,to,digit_from,color}])
+## 回傳欄位:source(母版色階代號陣列，T1~T5)、tiers({顏色名: 5 個代號})、
+##   hit_keep(被擊中不變的字元)、hit_to(被擊中改成的字元)。
+## 舊規則列(一般磚七色、通用破壞、多層磚組合、數字與層對應、多層磚破壞、扣層)已由
+## 「多層磚層數(新規則)」取代，相關參數改用本檔常數、不再解析;所以那些列存在或被刪除都不影響轉檔。
 func parse_rules(sec: PackedStringArray, palette: Dictionary, errors: PackedStringArray) -> Dictionary:
 	var rules := {}
 	if sec.is_empty():
@@ -480,7 +553,13 @@ func parse_rules(sec: PackedStringArray, palette: Dictionary, errors: PackedStri
 		if cells.size() == 2 and not cells[0].begins_with("---"):
 			rule_rows[cells[0]] = cells[1]
 
-	parse_swap_table(sec, palette, rules, errors)
+	var swap := parse_swap_table(sec, palette, errors, RULE_ITEM, "目標", COLOR_ORDER)
+	if not swap.is_empty():
+		var tiers: Dictionary = swap["tiers"]
+		if tiers.has("紅") and tiers["紅"] != swap["source"]:
+			errors.append("%s 換色對照表矛盾：「紅」列 %s 與表頭母版欄 %s 不同" % [RULE_ITEM, " ".join(tiers["紅"]), " ".join(swap["source"])])
+		rules["source"] = swap["source"]
+		rules["tiers"] = tiers
 
 	# 被擊中：「除 `K`、`.` 以外的像素全部改成 `W`」
 	var text := find_rule(rule_rows, "被擊中", errors)
@@ -491,129 +570,37 @@ func parse_rules(sec: PackedStringArray, palette: Dictionary, errors: PackedStri
 		else:
 			rules["hit_keep"] = backticks(m.get_string(1))
 			rules["hit_to"] = m.get_string(2)
-
-	# 一般磚七色：「`K`、`W`、`G`、`.` 不變」
-	text = find_rule(rule_rows, "一般磚七色", errors)
-	if text != "":
-		var m := RegEx.create_from_string("((?:`.`\\s*" + RE_COMMA + "?\\s*)+)不變").search(text)
-		if m == null:
-			errors.append("%s 規則「一般磚七色」找不到「…不變」的字元清單: %s" % [RULE_ITEM, text])
-		else:
-			rules["swap_keep"] = backticks(m.get_string(1))
-
-	# 通用破壞：基準色階須與換色表母版欄一致;各特殊磚的色階
-	text = find_rule(rule_rows, "通用破壞", errors)
-	if text != "":
-		var m := RegEx.create_from_string("以\\S*色階\\s*`([^`]+)`").search(text)
-		if m == null:
-			errors.append("%s 規則「通用破壞」找不到基準色階: %s" % [RULE_ITEM, text])
-		elif rules.has("source") and m.get_string(1).split(" ", false) != rules["source"]:
-			errors.append("%s 規則矛盾：通用破壞的基準色階 `%s` 與換色對照表母版欄 %s 不同" % [RULE_ITEM, m.get_string(1), " ".join(rules["source"])])
-		var colors := {}
-		var re := RegEx.create_from_string("(寶箱|金幣|圓形)\\s*" + RE_LPAREN + "\\s*([^)\uFF09]+?)\\s*" + RE_RPAREN)
-		for mm in re.search_all(text):
-			colors[mm.get_string(1)] = mm.get_string(2)
-		for need in ["寶箱", "金幣", "圓形"]:
-			if not colors.has(need):
-				errors.append("%s 規則「通用破壞」沒有寫明%s的色階(預期如「%s(%s)」)" % [RULE_ITEM, need, need, {"寶箱": "橙", "金幣": "黃", "圓形": "紫"}[need]])
-			elif rules.has("tiers") and not rules["tiers"].has(colors[need]):
-				errors.append("%s 規則「通用破壞」的%s色階「%s」不在換色對照表內" % [RULE_ITEM, need, colors[need]])
-		rules["frame_colors"] = colors
-
-	# 多層磚組合：數字墨色、字形尺寸、左上角位置、裂痕範圍
-	text = find_rule(rule_rows, "多層磚組合", errors)
-	if text != "":
-		var m := RegEx.create_from_string("數字墨色\\s*`(.)`").search(text)
-		if m == null:
-			errors.append("%s 規則「多層磚組合」找不到「數字墨色 `K`」" % RULE_ITEM)
-		else:
-			rules["digit_ink"] = m.get_string(1)
-		m = RegEx.create_from_string("字形\\s*(\\d+)\\s*[×x\u00D7]\\s*(\\d+)").search(text)
-		if m == null:
-			errors.append("%s 規則「多層磚組合」找不到「字形 5×7」" % RULE_ITEM)
-		else:
-			rules["digit_w"] = m.get_string(1).to_int()
-			rules["digit_h"] = m.get_string(2).to_int()
-		m = RegEx.create_from_string("左上角放在第\\s*(\\d+)\\s*欄" + RE_COMMA + "\\s*第\\s*(\\d+)\\s*列").search(text)
-		if m == null:
-			errors.append("%s 規則「多層磚組合」找不到「左上角放在第 N 欄、第 N 列」" % RULE_ITEM)
-		else:
-			# 欄列編號為 0 起算：依 D12「層 7 藍範例」「層 3 綠範例」網格反推(第 13 欄 = 索引 13)
-			rules["digit_x"] = m.get_string(1).to_int()
-			rules["digit_y"] = m.get_string(2).to_int()
-		m = RegEx.create_from_string("第\\s*(\\d+)\\s*" + RE_TILDE + "\\s*(\\d+)\\s*欄" + RE_COMMA + "\\s*第\\s*(\\d+)\\s*" + RE_TILDE + "\\s*(\\d+)\\s*列的\\s*T(\\d)\\s*像素\\S*\\s*換成\\s*T(\\d)").search(text)
-		if m == null:
-			errors.append("%s 規則「多層磚組合」找不到裂痕範圍(預期「第 a~b 欄、第 c~d 列的 T5 像素)換成 T3」)" % RULE_ITEM)
-		else:
-			rules["crack"] = {"x0": m.get_string(1).to_int(), "x1": m.get_string(2).to_int(),
-				"y0": m.get_string(3).to_int(), "y1": m.get_string(4).to_int(),
-				"from_tier": m.get_string(5).to_int(), "to_tier": m.get_string(6).to_int()}
-
-	# 數字與層對應：「層 1~9 顯示 1~9(藍);層 10~14 顯示 0~4(綠)」
-	text = find_rule(rule_rows, "數字與層對應", errors)
-	if text != "":
-		var re := RegEx.create_from_string("層\\s*(\\d+)\\s*" + RE_TILDE + "\\s*(\\d+)\\s*顯示\\s*(\\d+)\\s*" + RE_TILDE + "\\s*(\\d+)\\s*" + RE_LPAREN + "\\s*([^)\uFF09]+?)\\s*" + RE_RPAREN)
-		var layers := []
-		for mm in re.search_all(text):
-			var seg := {"from": mm.get_string(1).to_int(), "to": mm.get_string(2).to_int(),
-				"digit_from": mm.get_string(3).to_int(), "digit_to": mm.get_string(4).to_int(), "color": mm.get_string(5)}
-			if seg["to"] - seg["from"] != seg["digit_to"] - seg["digit_from"]:
-				errors.append("%s 規則矛盾：層 %d~%d 有 %d 層，但數字 %d~%d 有 %d 個" % [RULE_ITEM, seg["from"], seg["to"], seg["to"] - seg["from"] + 1, seg["digit_from"], seg["digit_to"], seg["digit_to"] - seg["digit_from"] + 1])
-			if seg["digit_from"] < 0 or seg["digit_to"] >= DIGIT_COUNT:
-				errors.append("%s 規則「數字與層對應」的數字超出 0~9" % RULE_ITEM)
-			if rules.has("tiers") and not rules["tiers"].has(seg["color"]):
-				errors.append("%s 規則「數字與層對應」的顏色「%s」不在換色對照表內" % [RULE_ITEM, seg["color"]])
-			layers.append(seg)
-		# 層須從 1 開始連續、不重疊
-		layers.sort_custom(func(a, b): return a["from"] < b["from"])
-		var expect := 1
-		for seg in layers:
-			if seg["from"] != expect:
-				errors.append("%s 規則「數字與層對應」的層數不連續：預期從層 %d 開始，實際為層 %d" % [RULE_ITEM, expect, seg["from"]])
-			expect = seg["to"] + 1
-		if layers.is_empty():
-			errors.append("%s 規則「數字與層對應」格式無法解析(預期「層 1~9 顯示 1~9(藍)」): %s" % [RULE_ITEM, text])
-		rules["layers"] = layers
-
-	# 裂痕的 T 階換成實際代號(母版為紅色階)
-	if rules.has("crack") and rules.has("source"):
-		var c: Dictionary = rules["crack"]
-		for k in ["from_tier", "to_tier"]:
-			if c[k] < 1 or c[k] > rules["source"].size():
-				errors.append("%s 規則「多層磚組合」的裂痕色階 T%d 超出範圍" % [RULE_ITEM, c[k]])
-				return rules
-		c["from"] = rules["source"][c["from_tier"] - 1]
-		c["to"] = rules["source"][c["to_tier"] - 1]
 	return rules
 
 
-## 解析換色對照表：表頭第一欄為「目標」,其後各欄含 `T 階` 與母版代號(如「T1(`h`)」)。
-## 結果寫入 rules["source"] 與 rules["tiers"]。
-func parse_swap_table(sec: PackedStringArray, palette: Dictionary, rules: Dictionary, errors: PackedStringArray) -> void:
+## 解析換色對照表：表頭第一欄為 header_first,其後各欄為母版代號(「T1(`h`)」或「`h`」;寫了 T 階就必須與欄位順序一致)。
+## 列名的全形括號轉成半形(「雷射（洋紅）」→「雷射(洋紅)」),方便與本檔常數比對。
+## required:必須出現的列名。回傳 {"source": 母版代號陣列, "tiers": {列名: 代號陣列}};無法解析時回傳空字典。
+func parse_swap_table(sec: PackedStringArray, palette: Dictionary, errors: PackedStringArray, item: String, header_first: String, required: Array) -> Dictionary:
 	var header_at := -1
 	for k in sec.size():
 		var cells := table_cells(sec[k])
-		if cells.size() > 0 and cells[0] == "目標":
+		if cells.size() > 0 and cells[0] == header_first:
 			if header_at >= 0:
-				errors.append("%s 有兩個以上「目標」開頭的換色對照表" % RULE_ITEM)
-				return
+				errors.append("%s 有兩個以上「%s」開頭的換色對照表" % [item, header_first])
+				return {}
 			header_at = k
 	if header_at < 0:
-		errors.append("%s 找不到換色對照表(表頭第一欄應為「目標」)" % RULE_ITEM)
-		return
+		errors.append("%s 找不到換色對照表(表頭第一欄應為「%s」)" % [item, header_first])
+		return {}
 
 	var header := table_cells(sec[header_at])
 	var source := PackedStringArray()
 	for k in range(1, header.size()):
 		var codes := backticks(header[k])
 		var tm := RegEx.create_from_string("T(\\d)").search(header[k])
-		if codes.size() != 1 or codes[0].length() != 1 or tm == null or tm.get_string(1).to_int() != k:
-			errors.append("%s 換色對照表表頭(從 0 起算)第 %d 欄格式錯誤(預期「T%d(`代號`)」): %s" % [RULE_ITEM, k, k, header[k]])
-			return
+		if codes.size() != 1 or codes[0].length() != 1 or (tm != null and tm.get_string(1).to_int() != k):
+			errors.append("%s 換色對照表表頭(從 0 起算)第 %d 欄格式錯誤(預期「T%d(`代號`)」或「`代號`」): %s" % [item, k, k, header[k]])
+			return {}
 		source.append(codes[0])
 	if source.is_empty():
-		errors.append("%s 換色對照表表頭沒有色階欄" % RULE_ITEM)
-		return
+		errors.append("%s 換色對照表表頭沒有色階欄" % item)
+		return {}
 
 	var tiers := {}
 	var k2 := header_at + 1
@@ -624,30 +611,84 @@ func parse_swap_table(sec: PackedStringArray, palette: Dictionary, rules: Dictio
 		k2 += 1
 		if cells[0].begins_with("---"):
 			continue
+		var name := cells[0].replace(FW_LPAREN, "(").replace(FW_RPAREN, ")")
 		if cells.size() != source.size() + 1:
-			errors.append("%s 換色對照表「%s」列有 %d 欄，應為 %d 欄" % [RULE_ITEM, cells[0], cells.size(), source.size() + 1])
+			errors.append("%s 換色對照表「%s」列有 %d 欄，應為 %d 欄" % [item, name, cells.size(), source.size() + 1])
 			continue
 		var codes := PackedStringArray()
 		for c in range(1, cells.size()):
 			var b := backticks(cells[c])
 			if b.size() != 1 or b[0].length() != 1:
-				errors.append("%s 換色對照表「%s」列(從 0 起算)第 %d 欄格式錯誤: %s" % [RULE_ITEM, cells[0], c, cells[c]])
+				errors.append("%s 換色對照表「%s」列(從 0 起算)第 %d 欄格式錯誤: %s" % [item, name, c, cells[c]])
 				break
 			if not palette.has(b[0]):
-				errors.append("%s 換色對照表「%s」列的代號 `%s` 不在 D01 調色盤" % [RULE_ITEM, cells[0], b[0]])
+				errors.append("%s 換色對照表「%s」列的代號 `%s` 不在 D01 調色盤" % [item, name, b[0]])
 			codes.append(b[0])
 		if codes.size() != source.size():
 			continue
-		if tiers.has(cells[0]):
-			errors.append("%s 換色對照表的「%s」重複出現" % [RULE_ITEM, cells[0]])
-		tiers[cells[0]] = codes
-	for name in COLOR_ORDER:
+		if tiers.has(name):
+			errors.append("%s 換色對照表的「%s」重複出現" % [item, name])
+		tiers[name] = codes
+	for name in required:
 		if not tiers.has(name):
-			errors.append("%s 換色對照表缺少「%s」" % [RULE_ITEM, name])
-	if tiers.has("紅") and tiers["紅"] != source:
-		errors.append("%s 換色對照表矛盾：「紅」列 %s 與表頭母版欄 %s 不同" % [RULE_ITEM, " ".join(tiers["紅"]), " ".join(source)])
-	rules["source"] = source
-	rules["tiers"] = tiers
+			errors.append("%s 換色對照表缺少「%s」" % [item, name])
+	return {"source": source, "tiers": tiers}
+
+
+## 取出某個 D 項目的所有行。與 section_lines 不同，不因項目內「縮排」的分隔線(如 D17 效果之間的「    ---」)中斷;
+## 到下一個 D 項目、頂格的「---」或「## 」標題為止。
+func item_lines(lines: PackedStringArray, item: String) -> PackedStringArray:
+	var item_re := RegEx.create_from_string("\\[(D\\d+)\\]")
+	var out := PackedStringArray()
+	var inside := false
+	for raw in lines:
+		var m := item_re.search(raw)
+		if m:
+			inside = m.get_string(1) == item
+		elif raw.rstrip(" \t") == "---" or raw.begins_with("## "):
+			inside = false
+		if inside:
+			out.append(raw)
+	return out
+
+
+## 解析 D17、D18 的破壞幀換色表，結果寫入 rules["func_tiers"]({列名: 代號陣列},列名已轉半形括號)。
+## 兩表的母版欄必須與 D12 相同;D18 的挑色環換色表(表頭「中選色」)若存在，必須與 D12 換色表完全一致。
+func parse_func_rules(lines: PackedStringArray, palette: Dictionary, rules: Dictionary, errors: PackedStringArray) -> void:
+	var func2_tiers := []
+	for spec in FUNC2_BRICKS:
+		if not func2_tiers.has(spec[2]):
+			func2_tiers.append(spec[2])
+	var all := {}
+	for spec in [[FUNC_ITEM, FUNC_TIERS], [FUNC2_ITEM, func2_tiers]]:
+		var sec := item_lines(lines, spec[0])
+		if sec.is_empty():
+			errors.append("設計稿找不到 %s 項目" % spec[0])
+			continue
+		var t := parse_swap_table(sec, palette, errors, spec[0], "目標", spec[1])
+		if t.is_empty():
+			continue
+		if t["source"] != rules["source"]:
+			errors.append("%s 換色對照表的母版欄 %s 與 D12 母版色階 %s 不同" % [spec[0], " ".join(t["source"]), " ".join(rules["source"])])
+		for name in t["tiers"]:
+			all[name] = t["tiers"][name]
+	rules["func_tiers"] = all
+
+	# 挑色環換色表「與 D12 同表，另列出」:兩表不一致就是設計稿矛盾
+	var sec2 := item_lines(lines, FUNC2_ITEM)
+	var has_pick := false
+	for raw in sec2:
+		var cells := table_cells(raw)
+		if cells.size() > 0 and cells[0] == "中選色":
+			has_pick = true
+	if has_pick:
+		var p := parse_swap_table(sec2, palette, errors, FUNC2_ITEM, "中選色", COLOR_ORDER)
+		if not p.is_empty():
+			if p["source"] != rules["source"]:
+				errors.append("%s 挑色環換色表的母版欄 %s 與 D12 母版色階 %s 不同" % [FUNC2_ITEM, " ".join(p["source"]), " ".join(rules["source"])])
+			for name in COLOR_ORDER:
+				if p["tiers"].has(name) and p["tiers"][name] != rules["tiers"][name]:
+					errors.append("%s 挑色環換色表「%s」列 %s 與 D12 換色對照表 %s 不同" % [FUNC2_ITEM, name, " ".join(p["tiers"][name]), " ".join(rules["tiers"][name])])
 
 
 # ---------------------------------------------------------------- 精靈圖產生(字元網格運算)
@@ -711,13 +752,96 @@ func compose_sheet(rows: Array) -> PackedStringArray:
 	return out
 
 
-## 依規則產生所有精靈圖。回傳 {檔名: {"grid": 網格, "frames": Array[Array[網格]]}};錯誤附加到 errors。
-## 每張圖每列 6 格：正常、被擊中、F1、F2、F3、F4。
-func build_sprite_sheets(blocks: Array, rules: Dictionary, palette: Dictionary, errors: PackedStringArray) -> Dictionary:
+## 取出某個 D 項目的所有母版網格：{檔名去掉「Dxx_」的部分: 網格}。
+func item_grids(blocks: Array, item: String) -> Dictionary:
 	var g := {}
 	for b in blocks:
-		if b["item"] == RULE_ITEM:
-			g[b["name"].trim_prefix(RULE_ITEM + "_")] = b["grid"]
+		if b["item"] == item:
+			g[b["name"].trim_prefix(item + "_")] = b["grid"]
+	return g
+
+
+## 檢查 need({名稱: [寬, 高]})列出的母版都存在且尺寸正確;錯誤附加到 errors。
+func check_masters(g: Dictionary, need: Dictionary, item: String, errors: PackedStringArray) -> void:
+	for n in need:
+		if not g.has(n):
+			errors.append("%s 缺少母版區塊 %s_%s(依標題命名，見 id_from_title、slug_from_title)" % [item, item, n])
+		elif g[n][0].length() != need[n][0] or g[n].size() != need[n][1]:
+			errors.append("%s_%s 尺寸 %dx%d,應為 %dx%d" % [item, n, g[n][0].length(), g[n].size(), need[n][0], need[n][1]])
+
+
+## 由「母版色階 → 目標色階」建立換色表 {母版代號: 目標代號}。
+func tier_map(source: PackedStringArray, target: PackedStringArray) -> Dictionary:
+	var mp := {}
+	for k in source.size():
+		mp[source[k]] = target[k]
+	return mp
+
+
+## D12 通用破壞 F1~F4 依 map 換色後的 4 幀。
+func generic_frames(g12: Dictionary, map: Dictionary) -> Array:
+	return [swap_grid(g12["f1"], map), swap_grid(g12["f2"], map), swap_grid(g12["f3"], map), swap_grid(g12["f4"], map)]
+
+
+## 數字疊加圖(CELL_W×CELL_H,`.` 透明):字形非 `.` 像素改成 fill,字形以外的 8 鄰格畫 outline。
+## (ox, oy) 為字形左上角;描邊超出磚格的部分捨棄(呼叫端已確認不會發生)。
+func outlined_digit(glyph: PackedStringArray, ox: int, oy: int, fill: String, outline: String) -> PackedStringArray:
+	var cells := []
+	for y in CELL_H:
+		var row := []
+		row.resize(CELL_W)
+		row.fill(".")
+		cells.append(row)
+	# 先畫描邊再畫字形，字形像素才不會被相鄰筆畫的描邊蓋掉
+	for pass_fill in [false, true]:
+		for y in glyph.size():
+			for x in glyph[y].length():
+				if glyph[y][x] == ".":
+					continue
+				if pass_fill:
+					cells[oy + y][ox + x] = fill
+					continue
+				for dy in [-1, 0, 1]:
+					for dx in [-1, 0, 1]:
+						var yy: int = oy + y + dy
+						var xx: int = ox + x + dx
+						if yy >= 0 and yy < CELL_H and xx >= 0 and xx < CELL_W:
+							cells[yy][xx] = outline
+	var out := PackedStringArray()
+	for row in cells:
+		out.append("".join(PackedStringArray(row)))
+	return out
+
+
+## 多層磚正常圖(D12「多層磚層數(新規則)」):母版換色;digit > 0 時再把 MULTI_FIXES 區域改 T3、疊上白字加描邊。
+## overlays:數字 1~9 的疊加圖(索引 = 數字)。
+func multi_normal(master: PackedStringArray, map: Dictionary, target: PackedStringArray, digit: int, overlays: Array) -> PackedStringArray:
+	var out := swap_grid(master, map)
+	if digit == 0:
+		return out
+	for fx in MULTI_FIXES:
+		# 換色後再改：原色階、新色階都用目標色的代號
+		out = replace_in_rect(out, fx[0], fx[1], fx[2], fx[3], target[fx[4] - 1], target[fx[5] - 1])
+	return overlay_grid(out, overlays[digit], 0, 0)
+
+
+## 回傳兩張同尺寸網格第一個不同的像素說明;相同回傳 ""。
+func grid_diff(a: PackedStringArray, b: PackedStringArray) -> String:
+	if a.size() != b.size() or a[0].length() != b[0].length():
+		return "尺寸 %dx%d 與 %dx%d 不同" % [a[0].length(), a.size(), b[0].length(), b.size()]
+	for y in a.size():
+		for x in a[y].length():
+			if a[y][x] != b[y][x]:
+				return "(從 0 起算)第 %d 欄第 %d 列：產生 `%s`、範例 `%s`" % [x, y, a[y][x], b[y][x]]
+	return ""
+
+
+## 依規則產生 D12 各磚種精靈圖。回傳 {檔名: {"grid": 網格, "frames": Array[Array[網格]]}};錯誤附加到 errors。
+## 每張圖每列 6 格：正常、被擊中、F1、F2、F3、F4。
+## bricks_multi:依層數由上到下 70 列(層 1~70;層 70 = 紫 9,產生但遊戲不使用),
+## 層 L 的顏色 = (L − 1) mod 7、數字 = (L − 1) div 7;破壞幀依顏色換色、與數字無關。
+func build_sprite_sheets(blocks: Array, rules: Dictionary, palette: Dictionary, errors: PackedStringArray) -> Dictionary:
+	var g := item_grids(blocks, RULE_ITEM)
 
 	# 母版需求：名稱 → 尺寸
 	var need := {"brick_normal": [CELL_W, CELL_H], "chest_normal": [CELL_W, CELL_H], "coin_normal": [CELL_W, CELL_H],
@@ -726,87 +850,97 @@ func build_sprite_sheets(blocks: Array, rules: Dictionary, palette: Dictionary, 
 		"boss_normal": [BOSS_W, BOSS_H], "boss_overlay": [BOSS_W, BOSS_H], "boss_f2": [BOSS_W, BOSS_H],
 		"boss_f3": [BOSS_W, BOSS_H], "boss_f4": [BOSS_W, BOSS_H]}
 	for d in DIGIT_COUNT:
-		need["digit%d" % d] = [rules["digit_w"], rules["digit_h"]]
-	for n in need:
-		if not g.has(n):
-			errors.append("%s 缺少母版區塊 %s_%s(依標題命名，見 slug_from_title)" % [RULE_ITEM, RULE_ITEM, n])
-		elif g[n][0].length() != need[n][0] or g[n].size() != need[n][1]:
-			errors.append("%s_%s 尺寸 %dx%d,應為 %dx%d" % [RULE_ITEM, n, g[n][0].length(), g[n].size(), need[n][0], need[n][1]])
+		need["digit%d" % d] = [DIGIT_W, DIGIT_H]
+	check_masters(g, need, RULE_ITEM, errors)
 	if not errors.is_empty():
 		return {}
 
 	var source: PackedStringArray = rules["source"]
 	var keep: PackedStringArray = rules["hit_keep"]
 	var hit_to: String = rules["hit_to"]
-	var swap_keep: PackedStringArray = rules["swap_keep"]
 
 	# 換色前檢查：會換色的母版只能含母版色階與「不變」清單內的字元，否則換色結果不明確
 	for n in ["brick_normal", "f1", "f2", "f3", "f4"]:
 		for row in g[n]:
 			for c in row:
-				if not source.has(c) and not swap_keep.has(c):
-					errors.append("%s_%s 含換色規則未涵蓋的代號 `%s`(不在母版色階 %s,也不在「不變」清單)" % [RULE_ITEM, n, c, " ".join(source)])
+				if not source.has(c) and not SWAP_KEEP.has(c):
+					errors.append("%s_%s 含換色規則未涵蓋的代號 `%s`(不在母版色階 %s,也不在不變清單 %s)" % [RULE_ITEM, n, c, " ".join(source), " ".join(SWAP_KEEP)])
 					return {}
 
 	var maps := {}
 	for name in rules["tiers"]:
-		var mp := {}
-		for k in source.size():
-			mp[source[k]] = rules["tiers"][name][k]
-		maps[name] = mp
-	var generic := func(color: String) -> Array:
-		return [swap_grid(g["f1"], maps[color]), swap_grid(g["f2"], maps[color]), swap_grid(g["f3"], maps[color]), swap_grid(g["f4"], maps[color])]
+		maps[name] = tier_map(source, rules["tiers"][name])
 
-	# 數字：只能有 `.` 與墨色
-	var ink: String = rules["digit_ink"]
+	# 數字字形：只能有 `.` 與墨色
 	for d in DIGIT_COUNT:
 		for row in g["digit%d" % d]:
 			for c in row:
-				if c != "." and c != ink:
-					errors.append("%s_digit%d 含墨色 `%s` 以外的字元 `%s`" % [RULE_ITEM, d, ink, c])
+				if c != "." and c != FUNC_DIGIT_INK:
+					errors.append("%s_digit%d 含墨色 `%s` 以外的字元 `%s`" % [RULE_ITEM, d, FUNC_DIGIT_INK, c])
 					return {}
-	var dx: int = rules["digit_x"]
-	var dy: int = rules["digit_y"]
-	if dx < 0 or dy < 0 or dx + rules["digit_w"] > CELL_W or dy + rules["digit_h"] > CELL_H:
-		errors.append("%s 數字位置(從 0 起算第 %d 欄、第 %d 列)加上字形 %dx%d 超出磚格 %dx%d" % [RULE_ITEM, dx, dy, rules["digit_w"], rules["digit_h"], CELL_W, CELL_H])
-	var crack: Dictionary = rules["crack"]
-	if crack["x0"] < 0 or crack["x1"] >= CELL_W or crack["y0"] < 0 or crack["y1"] >= CELL_H or crack["x0"] > crack["x1"] or crack["y0"] > crack["y1"]:
-		errors.append("%s 裂痕範圍(從 0 起算第 %d~%d 欄、第 %d~%d 列)超出磚格" % [RULE_ITEM, crack["x0"], crack["x1"], crack["y0"], crack["y1"]])
-	if not errors.is_empty():
+	# 數字加描邊(7×9)必須在磚格內
+	if MULTI_DIGIT_X < 1 or MULTI_DIGIT_Y < 1 or MULTI_DIGIT_X + DIGIT_W + 1 > CELL_W or MULTI_DIGIT_Y + DIGIT_H + 1 > CELL_H:
+		errors.append("多層磚數字位置(第 %d 欄、第 %d 列)加描邊超出磚格" % [MULTI_DIGIT_X, MULTI_DIGIT_Y])
 		return {}
 
 	var sheets := {}
 
-	# 一般磚七色
+	# 一般磚七色(= 多層磚第 0 輪)
 	var rows := []
 	for color in COLOR_ORDER:
 		var normal := swap_grid(g["brick_normal"], maps[color])
-		rows.append([normal, hit_grid(normal, keep, hit_to)] + generic.call(color))
+		rows.append([normal, hit_grid(normal, keep, hit_to)] + generic_frames(g, maps[color]))
 	sheets["bricks_normal"] = rows
 
-	# 多層磚：母版去裂痕 → 換色 → 疊數字
-	var plain := replace_in_rect(g["brick_normal"], crack["x0"], crack["x1"], crack["y0"], crack["y1"], crack["from"], crack["to"])
+	# 多層磚：層 1~(輪數 × 7)
+	var overlays := [PackedStringArray()]
+	for d in range(1, DIGIT_COUNT):
+		overlays.append(outlined_digit(g["digit%d" % d], MULTI_DIGIT_X, MULTI_DIGIT_Y, MULTI_FILL, MULTI_OUTLINE))
 	rows = []
-	for seg in rules["layers"]:
-		for layer in range(seg["from"], seg["to"] + 1):
-			var digit: int = seg["digit_from"] + layer - seg["from"]
-			var normal := overlay_grid(swap_grid(plain, maps[seg["color"]]), g["digit%d" % digit], dx, dy, ink)
-			rows.append([normal, hit_grid(normal, keep, hit_to)] + generic.call(seg["color"]))
+	for layer in range(1, ROUND_COUNT * COLOR_ORDER.size() + 1):
+		var color: String = COLOR_ORDER[(layer - 1) % COLOR_ORDER.size()]
+		var digit: int = (layer - 1) / COLOR_ORDER.size()
+		var normal := multi_normal(g["brick_normal"], maps[color], rules["tiers"][color], digit, overlays)
+		rows.append([normal, hit_grid(normal, keep, hit_to)] + generic_frames(g, maps[color]))
 	sheets["bricks_multi"] = rows
+
+	# 設計稿的範例網格(id: layer_example_<顏色><數字>)必須與產生結果逐像素相同
+	var ex_re := RegEx.create_from_string("^layer_example_([a-z]+)(\\d)$")
+	for n in g:
+		var m := ex_re.search(n)
+		if m == null:
+			continue
+		var color := ""
+		for c in COLOR_SLUG:
+			if COLOR_SLUG[c] == m.get_string(1):
+				color = c
+		var digit := m.get_string(2).to_int()
+		if color == "":
+			errors.append("%s_%s:看不懂範例的顏色「%s」" % [RULE_ITEM, n, m.get_string(1)])
+			continue
+		var layer: int = digit * COLOR_ORDER.size() + COLOR_ORDER.find(color) + 1
+		var diff := grid_diff(rows[layer - 1][0], g[n])
+		if diff != "":
+			errors.append("依多層磚新規則產生的層 %d(%s %d)與範例 %s_%s 不同：%s" % [layer, color, digit, RULE_ITEM, n, diff])
 
 	# 寶箱、金幣：正常與被擊中用專屬母版，破壞用通用幀換色
 	for pair in [["brick_chest", "chest_normal", "寶箱"], ["brick_coin", "coin_normal", "金幣"]]:
 		var normal: PackedStringArray = g[pair[1]]
-		sheets[pair[0]] = [[normal, hit_grid(normal, keep, hit_to)] + generic.call(rules["frame_colors"][pair[2]])]
+		sheets[pair[0]] = [[normal, hit_grid(normal, keep, hit_to)] + generic_frames(g, maps[FRAME_COLORS[pair[2]]])]
 
 	# 圓形：F1、F2 專用幀，F3、F4 通用幀
-	var round_frames: Array = generic.call(rules["frame_colors"]["圓形"])
+	var round_frames: Array = generic_frames(g, maps[FRAME_COLORS["圓形"]])
 	sheets["brick_round"] = [[g["round_normal"], hit_grid(g["round_normal"], keep, hit_to), g["round_f1"], g["round_f2"], round_frames[2], round_frames[3]]]
 
 	# 魔王:F1 = 正常圖疊上裂痕層
 	sheets["brick_boss"] = [[g["boss_normal"], hit_grid(g["boss_normal"], keep, hit_to),
 		overlay_grid(g["boss_normal"], g["boss_overlay"], 0, 0), g["boss_f2"], g["boss_f3"], g["boss_f4"]]]
 
+	return finish_sheets(sheets, palette, errors)
+
+
+## 把每張精靈圖的影格拼成網格並檢查;回傳 {檔名: {"grid", "frames"}}。
+func finish_sheets(sheets: Dictionary, palette: Dictionary, errors: PackedStringArray) -> Dictionary:
 	var out := {}
 	for name in sheets:
 		var grid := compose_sheet(sheets[name])
@@ -815,6 +949,139 @@ func build_sprite_sheets(blocks: Array, rules: Dictionary, palette: Dictionary, 
 			errors.append("產生的 %s: %s" % [name, msg])
 		out[name] = {"grid": grid, "frames": sheets[name]}
 	return out
+
+
+## 逆時針轉 90 度(正方形網格):新圖第 r 列第 c 欄 = 原圖第 c 列第 (n − 1 − r) 欄(D17「垂直光束轉換」)。
+func rotate_ccw(grid: PackedStringArray) -> PackedStringArray:
+	var n := grid.size()
+	var out := PackedStringArray()
+	for r in n:
+		var s := ""
+		for c in n:
+			s += grid[c][n - 1 - r]
+		out.append(s)
+	return out
+
+
+## 上下鏡射：新圖第 r 列 = 原圖第 (n − 1 − r) 列。
+func flip_v(grid: PackedStringArray) -> PackedStringArray:
+	var out := grid.duplicate()
+	out.reverse()
+	return out
+
+
+## 依 D17、D18「需轉檔工具新增的自動產生規則」產生功能型磚精靈圖。回傳格式同 build_sprite_sheets。
+##   brick_laser_h/v/x、brick_lightning、brick_reaper:9 列(數字 1~9)× [正常、被擊中、F1~F4];
+##   laser_beam_v_*:由水平光束旋轉、鏡射的 6 張 16×16 單張圖;
+##   brick_explosion、brick_rainbow:1 列 × [正常、被擊中、F1~F4];
+##   rainbow_pick:7 列(紅橙黃綠藍靛紫)× 3 幀(F1~F3),依 D12 換色表換色;不產生「沒有多層磚」用的白色版(使用者決定)。
+func build_func_sheets(blocks: Array, rules: Dictionary, palette: Dictionary, errors: PackedStringArray) -> Dictionary:
+	var g12 := item_grids(blocks, RULE_ITEM)
+	var g17 := item_grids(blocks, FUNC_ITEM)
+	var g18 := item_grids(blocks, FUNC2_ITEM)
+	var before := errors.size()
+
+	var need17 := {}
+	for spec in FUNC_BRICKS:
+		need17[spec[0]] = [CELL_W, CELL_H]
+	for spec in BEAM_V:
+		if spec[2] == "ccw":
+			need17[spec[1]] = [BEAM_SIZE, BEAM_SIZE]
+	check_masters(g17, need17, FUNC_ITEM, errors)
+	var need18 := {}
+	for spec in FUNC2_BRICKS:
+		need18[spec[0]] = [CELL_W, CELL_H]
+	for n in PICK_FRAMES:
+		need18[n] = [PICK_W, PICK_H]
+	check_masters(g18, need18, FUNC2_ITEM, errors)
+	if errors.size() > before:
+		return {}
+
+	var source: PackedStringArray = rules["source"]
+	var keep: PackedStringArray = rules["hit_keep"]
+	var hit_to: String = rules["hit_to"]
+	var fmaps := {}
+	for name in rules["func_tiers"]:
+		fmaps[name] = tier_map(source, rules["func_tiers"][name])
+
+	var sheets := {}
+
+	# D17 功能型磚：底圖疊上 `K` 數字(`K` 覆蓋底圖、`.` 不動)
+	for spec in FUNC_BRICKS:
+		var base: PackedStringArray = g17[spec[0]]
+		var frames := generic_frames(g12, fmaps[spec[2]])
+		var rows := []
+		for d in range(1, DIGIT_COUNT):
+			var normal := overlay_grid(base, g12["digit%d" % d], FUNC_DIGIT_X, FUNC_DIGIT_Y, FUNC_DIGIT_INK)
+			rows.append([normal, hit_grid(normal, keep, hit_to)] + frames)
+			# 設計稿的對照範例(id: <底圖>_n<數字>)必須與產生結果逐像素相同
+			var ex_id := "%s_n%d" % [spec[0], d]
+			if g17.has(ex_id):
+				var diff := grid_diff(normal, g17[ex_id])
+				if diff != "":
+					errors.append("依 %s 規則產生的 %s 數字 %d 與範例 %s_%s 不同：%s" % [FUNC_ITEM, spec[0], d, FUNC_ITEM, ex_id, diff])
+		sheets[spec[1]] = rows
+
+	# 垂直光束：中段、往上端點由水平圖逆時針轉 90 度;往下端點 = 往上端點上下鏡射
+	var made := {}
+	for spec in BEAM_V:
+		var src: PackedStringArray = g17[spec[1]] if spec[2] == "ccw" else made[spec[1]]
+		made[spec[0]] = rotate_ccw(src) if spec[2] == "ccw" else flip_v(src)
+		sheets[spec[0]] = [[made[spec[0]]]]
+
+	# D18 爆炸、彩虹磚
+	for spec in FUNC2_BRICKS:
+		var normal: PackedStringArray = g18[spec[0]]
+		sheets[spec[1]] = [[normal, hit_grid(normal, keep, hit_to)] + generic_frames(g12, fmaps[spec[2]])]
+
+	# 彩虹挑色環：只能含母版色階、`W`、`.`,否則換色結果不明確
+	for n in PICK_FRAMES:
+		for row in g18[n]:
+			for c in row:
+				if not source.has(c) and c != "W" and c != ".":
+					errors.append("%s_%s 含挑色環換色規則未涵蓋的代號 `%s`" % [FUNC2_ITEM, n, c])
+					return {}
+	var pick_rows := []
+	for color in COLOR_ORDER:
+		var mp := tier_map(source, rules["tiers"][color])
+		var row := []
+		for n in PICK_FRAMES:
+			row.append(swap_grid(g18[n], mp))
+		pick_rows.append(row)
+	sheets["rainbow_pick"] = pick_rows
+
+	if errors.size() > before:
+		return {}
+	return finish_sheets(sheets, palette, errors)
+
+
+## 層數對照表(D12「圖與層數對應」):層 1~LAYER_MAX → (顏色, 數字) 與 bricks_multi 的列號。
+func build_layer_map() -> Dictionary:
+	var layers := []
+	for layer in range(1, LAYER_MAX + 1):
+		var color: String = COLOR_ORDER[(layer - 1) % COLOR_ORDER.size()]
+		layers.append({"layer": layer, "color": COLOR_SLUG[color], "color_name": color,
+			"digit": (layer - 1) / COLOR_ORDER.size(), "row": layer - 1})
+	return {"sheet": "bricks_multi.png", "cell": [CELL_W, CELL_H],
+		"columns": ["normal", "hit", "f1", "f2", "f3", "f4"],
+		"note": "digit 0 = 第 0 輪，不畫數字;bricks_multi 第 70 列(紫 9)有產生但不使用",
+		"max_layer": LAYER_MAX, "layers": layers}
+
+
+## 雷射光束排版資料(D17「雷射分段拼接」):各分段的檔案、尺寸、由來與鏡射方式。拼接本身由遊戲程式處理。
+func build_beam_layout(blocks: Array) -> Dictionary:
+	var pieces := {}
+	for b in blocks:
+		var id: String = b["name"].trim_prefix(FUNC_ITEM + "_")
+		if b["item"] == FUNC_ITEM and id.begins_with("laser_beam_"):
+			pieces[id] = {"file": b["name"] + ".png", "w": b["grid"][0].length(), "h": b["grid"].size()}
+	for spec in BEAM_V:
+		pieces[spec[0]] = {"file": SPRITE_DIR + "/" + spec[0] + ".png", "w": BEAM_SIZE, "h": BEAM_SIZE,
+			"from": spec[1], "transform": "rotate_ccw_90" if spec[2] == "ccw" else "flip_v"}
+	return {"pieces": pieces,
+		"mirror": {"left_block": "laser_beam_block_* 水平鏡射(左側被擋下)"},
+		"vertical_offset_x": BEAM_SIZE / 2,
+		"note": "水平中段可左右平鋪;垂直分段圖左緣 x = 磚左緣 x + 8;起點圖 32×16 覆蓋雷射磚整格"}
 
 
 # ---------------------------------------------------------------- 擋板(D13)
@@ -1174,9 +1441,22 @@ func save(img: Image, path: String) -> int:
 	return err
 
 
+## 寫出 JSON(UTF-8,保留鍵的插入順序)。回傳 OK 或錯誤碼。
+func save_json(data: Dictionary, path: String) -> int:
+	var f := FileAccess.open(path, FileAccess.WRITE)
+	if f == null:
+		var err := FileAccess.get_open_error()
+		printerr("寫入失敗: %s (%s)" % [path, error_string(err)])
+		return err
+	f.store_string(JSON.stringify(data, "  ", false) + "\n")
+	f.close()
+	return OK
+
+
 ## 只刪除本工具產生的檔名格式，避免設計稿改名後留下過期的 PNG;其他檔案不動。
 func clean_old_outputs(out_dir: String, sprite_dir: String) -> void:
-	var targets := [[out_dir, "^(D\\d+_.+|overview|board_sample(_x\\d+)?)\\.png$"], [sprite_dir, "^(bricks?|paddle)_[a-z_]+(_x\\d+)?\\.png$"]]
+	var targets := [[out_dir, "^(D\\d+_.+|overview|board_sample(_x\\d+)?)\\.png$"],
+		[sprite_dir, "^((bricks?|paddle|laser_beam|rainbow)_[a-z0-9_]+(_x\\d+)?\\.png|layer_map\\.json|laser_beam_layout\\.json)$"]]
 	for t in targets:
 		var own_re := RegEx.create_from_string(t[1])
 		var dir := DirAccess.open(t[0])
@@ -1268,7 +1548,7 @@ func build_overview(blocks: Array, images: Dictionary, palette: Dictionary) -> I
 	return out
 
 
-## 檢查 BOARD_LAYOUT:每列 10 格、代號有效、層數在 1~14、魔王 4×3 範圍完整且置中於第 4~7 欄、
+## 檢查 BOARD_LAYOUT:每列 10 格、代號有效、層數在 1~LAYER_MAX、魔王 4×3 範圍完整且置中於第 4~7 欄、
 ## 不超出畫布。回傳錯誤訊息列表(沒問題為空)。在寫任何檔案之前呼叫。
 func check_board_requirements() -> PackedStringArray:
 	var errors := PackedStringArray()
@@ -1299,8 +1579,8 @@ func check_board_requirements() -> PackedStringArray:
 			var t: String = cells[r][c]
 			if t == "-" and not covered.has(Vector2i(c, r)):
 				errors.append("BOARD_LAYOUT(從 0 起算)第 %d 列第 %d 欄的「-」不在任何魔王範圍內" % [r, c])
-			elif t.is_valid_int() and (t.to_int() < 1 or t.to_int() > 14):
-				errors.append("BOARD_LAYOUT(從 0 起算)第 %d 列第 %d 欄的層數 %s 超出 1~14" % [r, c, t])
+			elif t.is_valid_int() and (t.to_int() < 1 or t.to_int() > LAYER_MAX):
+				errors.append("BOARD_LAYOUT(從 0 起算)第 %d 列第 %d 欄的層數 %s 超出 1~%d" % [r, c, t, LAYER_MAX])
 			elif not t.is_valid_int() and not BOARD_COLOR_TOKENS.has(t) and not (t in ["C", "$", "@", "X", "-", "."]):
 				errors.append("BOARD_LAYOUT(從 0 起算)第 %d 列第 %d 欄的代號「%s」無效" % [r, c, t])
 	if BOARD_TOP + cells.size() * CELL_H > BOARD_H:

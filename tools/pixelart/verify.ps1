@@ -1,14 +1,17 @@
 ﻿# 驗證 docs/design/preview/ 的輸出是否與設計稿一致(獨立於 md_to_png.gd 的第二套實作)。
 # 檢查項目：
 #   1. 單張 PNG:區塊數 = PNG 數、尺寸、每像素顏色與 D01 HEX 完全相同、`.` 的 alpha 為 0、×8 為最近鄰
+#       有「區塊調色盤」的網格以 D01 + 區塊調色盤比對
 #   1b. 道具 F2(D20 13 張、D21 14 張):依底板 F1/F2 獨立重算後逐像素比對、×8 為最近鄰
+#   1c. D23 主題邊框：依對照表獨立推算 5 階後逐像素比對、×8 為最近鄰;T3 灰階 Y 與飽和度檢查
 #   2. 精靈圖：尺寸、所有像素都在 D01 內、正常幀與破壞幀依換色表換色後與設計稿一致、
 #      被擊中幀符合規則、魔王 F1 = 正常圖疊上裂痕層、×6 為最近鄰;
 #      多層磚(D12 新規則)70 列、與 4 張範例逐像素一致;D17 功能型磚 5 種 × 數字 1~9、與 3 張 _n5 範例一致;
 #      垂直光束 6 張(旋轉、鏡射);D18 爆炸、彩虹磚與挑色環 7 色 × 3 幀;抽樣像素;sprites/ 沒有多餘檔案;
 #      layer_map.json 層 1~69 對照
 #   3. 示意盤面：尺寸 360×640、左右邊框、×3 為最近鄰
-#   4. 資訊(不計失敗):D12 對比表(七色 T3 對 `W`、`K`)以 WCAG 公式重算，與設計稿手算值並列
+#   4. 資訊(不計失敗):D12 對比表(七色 T3 對 `W`、`K`)以 WCAG 公式重算，與設計稿手算值並列;
+#      D23 各主題 T3 與七色 T3、魔王 `Z` 的 RGB 歐氏距離
 # 為了獨立，本腳本不沿用 md_to_png.gd 的檔名與規則解析：區塊依標題開頭或 id 查找，
 # 層數對應、數字位置、描邊、裂痕範圍依 PM 交付的 D12、D17 規格寫在下方常數。
 # 用法:powershell -ExecutionPolicy Bypass -File tools\pixelart\verify.ps1 [-OutDir <輸出資料夾>] [-Md <設計稿路徑>]
@@ -164,16 +167,31 @@ foreach ($l in $lines) {
 # PowerShell 變數不分大小寫，迴圈變數 $k 會蓋掉 $K,所以取較長的名稱
 $COLOR_K = $pal[[char]'K']; $WHITE = $pal[[char]'W']
 
-# ---- 區塊：依出現順序，記下所屬 D 項目與標題
+# ---- 區塊：依出現順序，記下所屬 D 項目、標題與該區塊用的調色盤
+# PM 交付的區塊調色盤規格:「圖寬」行正上方「區塊調色盤：a #RRGGBB；b #RRGGBB」,只對下一個網格有效，
+# 疊在 D01 上(同名覆蓋),不可定義 `.`、`K`;不加入 $pal(不影響調色盤色數)
 $blocks = @()
-$section = ''; $title = ''
+$section = ''; $title = ''; $region = $null
 for ($i = 0; $i -lt $lines.Count; $i++) {
     $s = $lines[$i].Trim()
     if ($s -match '\[(D\d+)\]') { $section = $Matches[1] }
     if ($s -eq '```text') {
         $g = New-Object System.Collections.Generic.List[string]; $i++
         while ($lines[$i].Trim() -ne '```') { $g.Add($lines[$i].Trim()); $i++ }
-        $blocks += [pscustomobject]@{ Item = $section; Title = $title; Grid = [string[]]$g.ToArray() }
+        $bp = if ($null -ne $region) { $region } else { $pal }
+        $blocks += [pscustomobject]@{ Item = $section; Title = $title; Grid = [string[]]$g.ToArray(); Pal = $bp }
+        $region = $null
+    } elseif ($s.StartsWith('區塊調色盤')) {
+        $region = New-Object 'System.Collections.Generic.Dictionary[char,int]' $pal
+        if ($i + 1 -ge $lines.Count -or -not $lines[$i + 1].Trim().StartsWith('圖寬')) { Fail "設計稿第 $($i + 1) 行的區塊調色盤不在「圖寬」行正上方" }
+        if ($s -notmatch '^區塊調色盤：(.+)$') { Fail "設計稿第 $($i + 1) 行的區塊調色盤格式錯誤"; continue }
+        $seen = @{}
+        foreach ($part in $Matches[1].Split('；')) {
+            # -cmatch:字元區分大小寫，才能分辨 `K` 與 `k`
+            if ($part.Trim() -cnotmatch '^([!-~]) #([0-9A-Fa-f]{6})$' -or $Matches[1] -ceq '.' -or $Matches[1] -ceq 'K' -or $seen.ContainsKey([int][char]$Matches[1])) { Fail "設計稿第 $($i + 1) 行的區塊調色盤項目「$part」不合規格"; continue }
+            $seen[[int][char]$Matches[1]] = $true
+            $region[[char]$Matches[1]] = [Convert]::ToInt32("FF" + $Matches[2], 16)
+        }
     } elseif ($s -ne '') { $title = $s }
 }
 function Get-Grid($prefix) {
@@ -223,9 +241,50 @@ foreach ($it in $itemSpec.Keys) {
     if ($n -ne $itemSpec[$it][2]) { Fail "$it 道具數 $n,應為 $($itemSpec[$it][2])" }
 }
 
+# ---- PM 交付的 D23 主題邊框規格：對照表(表頭第一欄「序」)中「邊框材質」含「A 苔石」且「做法」=「換色」的列，
+#      以 T3 推算 T1~T5 = T3 逐通道 × 147、116、90、67、46 ÷ 90(四捨五入，上限 255),替換 3 張苔石網格的槽位 ( ) [ ] {;
+#      T3 灰階 Y(0.299R + 0.587G + 0.114B)在 80~95、三通道最大減最小 ≤ 45;輸出 D23_<id>_t<序號兩位>
+$mossIds = 'border_moss_tile', 'border_moss_top_tile', 'border_moss_corner_tl'
+$mossGrids = @{}; foreach ($id in $mossIds) { $mossGrids[$id] = Get-ById 'D23' $id }
+$themeOut = [ordered]@{}   # 輸出檔名(不含 .png)-> 期望網格與調色盤
+$themeT3 = [ordered]@{}    # 序號 -> T3 ARGB(資訊用)
+$themeSkip = 0
+$section = ''; $hdr = $null
+foreach ($l in $lines) {
+    $s = $l.Trim()
+    if ($s -match '\[(D\d+)\]') { $section = $Matches[1] }
+    if ($section -ne 'D23') { $hdr = $null; continue }
+    if ($s -match '^\|\s*序\s*\|') { $hdr = @($s.Trim('|').Split('|') | ForEach-Object { $_.Trim() }); continue }
+    if ($null -eq $hdr) { continue }
+    if (-not $s.StartsWith('|')) { $hdr = $null; continue }
+    $c = @($s.Trim('|').Split('|') | ForEach-Object { $_.Trim() })
+    if ($c[0] -match '^-+$') { continue }
+    $iT3 = @(0..($hdr.Count - 1) | Where-Object { $hdr[$_].StartsWith('T3') })[0]
+    if (-not ($c[[array]::IndexOf($hdr, '邊框材質')].Contains('A 苔石') -and $c[[array]::IndexOf($hdr, '做法')] -eq '換色')) { $themeSkip++; continue }
+    if ($c[$iT3] -notmatch '^#([0-9A-Fa-f]{6})(?![0-9A-Za-z])') { Fail "D23 主題 $($c[0]) 的 T3 HEX 格式錯誤: $($c[$iT3])"; continue }
+    $hex = $Matches[1]; $seq = [int]$c[0]
+    $rgb = @(0, 2, 4 | ForEach-Object { [Convert]::ToInt32($hex.Substring($_, 2), 16) })
+    # 以 ×1000 的整數比較：浮點會把正好 80 的值(如 #454F72)算成 79.999… 而誤擋
+    $y1000 = 299 * $rgb[0] + 587 * $rgb[1] + 114 * $rgb[2]
+    if ($y1000 -lt 80000 -or $y1000 -gt 95000) { Fail "D23 主題 $seq T3 #$hex 灰階 Y $(($y1000 / 1000).ToString('F3')) 不在 80~95" }
+    $spread = ($rgb | Measure-Object -Maximum -Minimum); if ($spread.Maximum - $spread.Minimum -gt 45) { Fail "D23 主題 $seq T3 #$hex 飽和度(最大減最小)超過 45" }
+    # 鍵用字串：[ordered] 以整數索引時會被當成位置
+    $themeT3["$seq"] = [Convert]::ToInt32("FF$hex", 16)
+    $tp = New-Object 'System.Collections.Generic.Dictionary[char,int]' $pal
+    $ratio = 147, 116, 90, 67, 46; $slots = '()[]{'
+    for ($t = 0; $t -lt 5; $t++) {
+        # 浮點除法後 +0.5 取 Floor = .5 進位(PowerShell [math]::Round 預設是銀行家捨入，不能用)
+        # 變數名不可用 $ch:PowerShell 不分大小寫，會蓋掉 $CH
+        $chan = @($rgb | ForEach-Object { [math]::Min(255, [int][math]::Floor($_ * $ratio[$t] / 90 + 0.5)) })
+        $tp[$slots[$t]] = [Convert]::ToInt32(('FF{0:X2}{1:X2}{2:X2}' -f $chan[0], $chan[1], $chan[2]), 16)
+    }
+    foreach ($id in $mossIds) { if ($null -ne $mossGrids[$id]) { $themeOut[('D23_{0}_t{1:D2}' -f $id, $seq)] = [pscustomobject]@{ Grid = $mossGrids[$id]; Pal = $tp } } }
+}
+if ($themeT3.Count + $themeSkip -eq 0) { Fail 'D23 邊框依主題對照表解析不到任何列' }
+
 # ================================================================ 1. 單張 PNG
-# 道具 F2 不是設計稿區塊，另在 1b 驗證
-$files = @(Get-ChildItem $out -Filter 'D*.png' | Where-Object { $_.Name -notmatch '_x\d+\.png$' -and -not $itemF2.Contains($_.BaseName) })
+# 道具 F2、D23 主題邊框不是設計稿區塊，另在 1b、1c 驗證
+$files = @(Get-ChildItem $out -Filter 'D*.png' | Where-Object { $_.Name -notmatch '_x\d+\.png$' -and -not $itemF2.Contains($_.BaseName) -and -not $themeOut.Contains($_.BaseName) })
 if ($files.Count -ne $blocks.Count) { Fail "區塊數 $($blocks.Count) 與單張 PNG 數 $($files.Count) 不一致" }
 $used = @{}
 foreach ($f in $files) {
@@ -234,7 +293,7 @@ foreach ($f in $files) {
     for ($k = 0; $k -lt $blocks.Count; $k++) {
         $g = $blocks[$k].Grid
         if ($used[$k] -or $img.W -ne $g[0].Length -or $img.H -ne $g.Count) { continue }
-        if ($img.Compare($g, 0, 0, $pal) -eq '') {
+        if ($img.Compare($g, 0, 0, $blocks[$k].Pal) -eq '') {
             $big = $f.FullName -replace '\.png$', '_x8.png'
             $r = if (Test-Path $big) { $img.IsScaledBy([Img]::Load($big), 8) } else { '缺少 _x8 放大版' }
             if ($r -ne '') { Fail "$($f.Name) x8: $r" }
@@ -264,6 +323,19 @@ foreach ($name in $itemF2.Keys) {
     if ($r -ne '') { Fail "$name x8: $r" }
 }
 "道具 F2:$($itemF2.Count) 張"
+
+# ================================================================ 1c. D23 主題邊框
+foreach ($name in $themeOut.Keys) {
+    $path = Join-Path $out "$name.png"
+    if (-not (Test-Path $path)) { Fail "缺少 $name.png"; continue }
+    $img = [Img]::Load($path); $e = $themeOut[$name]
+    if ($img.W -ne $e.Grid[0].Length -or $img.H -ne $e.Grid.Count) { Fail "$name 尺寸 $($img.W)x$($img.H) 與網格不符"; continue }
+    $r = $img.Compare($e.Grid, 0, 0, $e.Pal); if ($r -ne '') { Fail "${name}: $r" }
+    $big = Join-Path $out "${name}_x8.png"
+    $r = if (Test-Path $big) { $img.IsScaledBy([Img]::Load($big), 8) } else { '缺少 _x8 放大版' }
+    if ($r -ne '') { Fail "$name x8: $r" }
+}
+"D23 主題邊框：$($themeOut.Count) 張(苔石換色 $($themeT3.Count) 個主題，略過 $themeSkip 列)"
 
 # ================================================================ 2. 精靈圖
 $master = Get-Grid '一般磚正常'
@@ -554,6 +626,16 @@ foreach ($c in $stated.Keys) {
     "  {0}  W {1:N3} / {2:N2}   K {3:N3} / {4:N2}   較高 {5:N3}{6}" -f $c, $w, $stated[$c][0], $kk, $stated[$c][1], [math]::Max($w, $kk), $note
 }
 "  W 對 K {0:N3} / 17.02" -f (Ratio $WHITE $COLOR_K)
+
+# ---- D23 主題 T3 與七色磚 T3、魔王 `Z` 的 RGB 歐氏距離(資訊，不計失敗;是否「太接近」由 PM 判斷)
+function Dist([int]$a, [int]$b) { $sq = 0; foreach ($sh in 16, 8, 0) { $d = (($a -shr $sh) -band 0xFF) - (($b -shr $sh) -band 0xFF); $sq += $d * $d }; return [math]::Sqrt($sq) }
+"D23 主題 T3 距離(七色取最近者 / 魔王 Z):"
+foreach ($seq in $themeT3.Keys) {
+    $t3v = $themeT3[$seq]
+    $near = @($colorOrder | ForEach-Object { [pscustomobject]@{ N = $_; D = (Dist $t3v $pal[$tiers[$_][2]]) } } | Sort-Object D)[0]
+    $yy = 0.299 * (($t3v -shr 16) -band 0xFF) + 0.587 * (($t3v -shr 8) -band 0xFF) + 0.114 * ($t3v -band 0xFF)
+    "  主題 {0,2}  #{1:X6}  Y {2:N1}  最近七色 {3} {4:N1}  Z {5:N1}" -f $seq, ($t3v -band 0xFFFFFF), $yy, $near.N, $near.D, (Dist $t3v $pal[[char]'Z'])
+}
 
 "檢查完成：區塊 $($blocks.Count) 個，調色盤 $($pal.Count) 色，失敗 $fail 項"
 exit [int]($fail -ne 0)

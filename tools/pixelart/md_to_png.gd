@@ -3,11 +3,13 @@ extends SceneTree
 ##
 ## 讀取設計稿 pixel-art-bricks.md:
 ##   1. 每個 ```text 區塊(一字元 = 一像素)轉成單張 PNG 與 ×8 放大版;
+##      網格「圖寬」行正上方可有「區塊調色盤：a #RRGGBB；…」,只對該網格疊在 D01 上生效;
 ##   2. 依 D12「自動產生規則」與換色對照表，由母版產生各磚種的精靈圖(sprites/);
 ##      多層磚依 D12「多層磚層數(新規則)」產生 70 種外觀(7 色 ×(無數字 + 數字 1~9))與層數對照表 layer_map.json;
 ##   3. 依 D17、D18「需轉檔工具新增的自動產生規則」產生功能型磚(數字合成、被擊中、破壞幀)、
 ##      垂直雷射光束(由水平圖旋轉、鏡射)與彩虹挑色環七色版;
 ##   3b. 依 D20、D21「F2 規則」由道具 F1 與底板產生各道具的 F2(單張圖 <項目>_<道具 id>_f2,不放進總覽圖);
+##   3c. 依 D23「邊框依主題對照表」把苔石邊框網格換成各主題色(單張圖 D23_<網格 id>_t<序號>,不放進總覽圖);
 ##   4. 依 D13 拼接規則，由擋板分段拼出各長度、各狀態的擋板圖(sprites/paddle_*.png);
 ##   5. 產生總覽圖 overview.png 與示意盤面 board_sample.png。
 ## 調色盤、換色表、被擊中規則、擋板長度與拼接參數從設計稿解析;設計稿標明「寫死在轉檔工具」的規則
@@ -94,6 +96,18 @@ const ITEM_F2_SPECS := [
 	["D21", "item_plate_debuff_f1", "item_plate_debuff_f2"],
 ]
 const ITEM_SIZE := 16
+
+# ---- D23 邊框依主題換色(設計稿「邊框依主題：顏色限制與做法」與「邊框依主題對照表」)
+const BORDER_ITEM := "D23"
+const BORDER_GRIDS := ["border_moss_tile", "border_moss_top_tile", "border_moss_corner_tl"]
+const BORDER_SLOTS := ["(", ")", "[", "]", "{"]    # 槽位 T1~T5
+const BORDER_RATIO := [147, 116, 90, 67, 46]        # T1~T5 = T3 逐通道 × 此值 ÷ 90(四捨五入，上限 255)
+const BORDER_Y_MIN := 80                            # T3 灰階 Y 範圍(含端點)
+const BORDER_Y_MAX := 95
+const BORDER_SPREAD_MAX := 45                       # T3 三通道最大減最小的上限
+
+## 區塊調色盤：網格「圖寬：…　圖高：…」行正上方的一行，只對緊接在下方的網格有效
+const REGION_PREFIX := "區塊調色盤"
 
 const PADDLE_ITEM := "D13"  # 擋板分段與拼接規則所在的設計稿項目
 ## 各擋板圖使用的分段 id(左端、中段、右端)。設計稿的「槍」「吸附」「同時有槍與吸附」規則
@@ -229,6 +243,7 @@ const FONT := {
 const FW_COLON := "\uFF1A"
 const FW_LPAREN := "\uFF08"
 const FW_RPAREN := "\uFF09"
+const FW_SEMI := "\uFF1B"
 const RE_TILDE := "[~\uFF5E\u301C]"
 const RE_COMMA := "[,\u3001\uFF0C]"
 const RE_LPAREN := "[(\uFF08]"
@@ -264,7 +279,13 @@ func run(md_path: String, out_dir: String) -> int:
 	if blocks.is_empty() and errors.is_empty():
 		errors.append("找不到任何 ```text 區塊")
 	for b in blocks:
-		var msg := validate_grid(b["grid"], palette)
+		# 有區塊調色盤的網格用「D01 + 區塊調色盤」(同名以區塊調色盤為準),只在該網格內生效
+		# shortcut: 精靈圖、道具 F2 等自動產生規則仍用 D01 渲染，母版若加區塊調色盤不會套用;要給磚塊母版用時再升級
+		if b.has("region"):
+			var merged := palette.duplicate()
+			merged.merge(b["region"], true)
+			b["pal"] = merged
+		var msg := validate_grid(b["grid"], b.get("pal", palette))
 		if msg != "":
 			errors.append("%s (設計稿第 %d 行): %s" % [b["name"], b["line"], msg])
 
@@ -272,6 +293,7 @@ func run(md_path: String, out_dir: String) -> int:
 	var layer_map := {}
 	var beam_layout := {}
 	var item_f2 := {}  # 輸出檔名(不含副檔名)-> 網格
+	var themes := {}   # D23 主題邊框：輸出檔名(不含副檔名)-> [網格, 調色盤]
 	if errors.is_empty():
 		var rules := parse_rules(section_lines(lines, RULE_ITEM), palette, errors)
 		if errors.is_empty():
@@ -292,6 +314,7 @@ func run(md_path: String, out_dir: String) -> int:
 				sheets[k] = psheets[k]
 		# 道具 F2 只依賴 D20、D21 的網格，錯誤與上面的規則一起列出
 		item_f2 = build_item_f2(blocks, errors)
+		themes = build_border_themes(lines, blocks, palette, errors)
 	errors.append_array(check_board_requirements())
 	if not errors.is_empty():
 		for e in errors:
@@ -305,7 +328,7 @@ func run(md_path: String, out_dir: String) -> int:
 
 	var images := {}  # name -> 原尺寸 Image
 	for b in blocks:
-		var img := render_grid(b["grid"], palette)
+		var img := render_grid(b["grid"], b.get("pal", palette))
 		images[b["name"]] = img
 		if save(img, out_dir.path_join(b["name"] + ".png")) != OK:
 			return 1
@@ -316,6 +339,15 @@ func run(md_path: String, out_dir: String) -> int:
 	# 道具 F2:與單張圖同處、同樣附 ×8,但不放進 overview.png(不加入 images)
 	for name in item_f2:
 		var img := render_grid(item_f2[name], palette)
+		if save(img, out_dir.path_join(name + ".png")) != OK:
+			return 1
+		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [name, SCALE_SINGLE])) != OK:
+			return 1
+		print("%-26s %dx%d" % [name, img.get_width(), img.get_height()])
+
+	# D23 主題邊框：同樣附 ×8、不放進 overview.png
+	for name in themes:
+		var img := render_grid(themes[name][0], themes[name][1])
 		if save(img, out_dir.path_join(name + ".png")) != OK:
 			return 1
 		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [name, SCALE_SINGLE])) != OK:
@@ -345,7 +377,7 @@ func run(md_path: String, out_dir: String) -> int:
 	if save(scaled(board, SCALE_BOARD), out_dir.path_join("board_sample_x%d.png" % SCALE_BOARD)) != OK:
 		return 1
 
-	print("完成：%d 個區塊、%d 張道具 F2、%d 張精靈圖，輸出到 %s" % [blocks.size(), item_f2.size(), sheets.size(), out_dir])
+	print("完成：%d 個區塊、%d 張道具 F2、%d 張主題邊框、%d 張精靈圖，輸出到 %s" % [blocks.size(), item_f2.size(), themes.size(), sheets.size(), out_dir])
 	return 0
 
 
@@ -400,6 +432,7 @@ func parse_blocks(lines: PackedStringArray, errors: PackedStringArray) -> Array:
 	var used := {}
 	var item := "D00"
 	var title := ""
+	var region := {}  # 待套用到下一個網格的區塊調色盤
 	var i := 0
 	while i < lines.size():
 		var s := lines[i].strip_edges()
@@ -430,11 +463,49 @@ func parse_blocks(lines: PackedStringArray, errors: PackedStringArray) -> Array:
 					errors.append("%s 區塊(設計稿第 %d 行)的標題「%s」與第 %d 行的區塊同名(%s)" % [item, start, title, used[name], name])
 				else:
 					used[name] = start
-					blocks.append({"item": item, "title": title, "name": name, "line": start, "grid": grid})
+					var block := {"item": item, "title": title, "name": name, "line": start, "grid": grid}
+					if not region.is_empty():
+						block["region"] = region
+					blocks.append(block)
+			region = {}
+		elif s.begins_with(REGION_PREFIX):
+			# 必須緊接在「圖寬」行正上方;放錯位置時若靜默忽略，網格會悄悄改用 D01 同名色
+			var next := lines[i + 1].strip_edges() if i + 1 < lines.size() else ""
+			if next.begins_with("圖寬"):
+				region = parse_region_palette(s, i + 1, errors)
+			else:
+				errors.append("設計稿第 %d 行的區塊調色盤不在「圖寬：…　圖高：…」行的正上方" % (i + 1))
 		elif s != "" and not s.begins_with("```"):
 			title = s
 		i += 1
 	return blocks
+
+
+## 解析區塊調色盤行「區塊調色盤：a #10141C；b #161B24」(全形冒號、全形分號;每項「單一字元 空格 #RRGGBB」)。
+## 字元限可見 ASCII(英數字與符號),不可為 `.`(透明)與 `K`(D01 描邊),同一行不可重複。
+## 回傳 {字元: Color};格式錯誤時把錯誤附加到 errors 並回傳空字典(line_no 為 1 起算的行號)。
+func parse_region_palette(s: String, line_no: int, errors: PackedStringArray) -> Dictionary:
+	var where := "設計稿第 %d 行的區塊調色盤" % line_no
+	if not s.begins_with(REGION_PREFIX + FW_COLON):
+		errors.append(where + "格式錯誤(預期「區塊調色盤：a #10141C；b #161B24」,全形冒號、全形分號)")
+		return {}
+	var item_re := RegEx.create_from_string("^([!-~]) #([0-9A-Fa-f]{6})$")
+	var out := {}
+	for part in s.substr((REGION_PREFIX + FW_COLON).length()).split(FW_SEMI):
+		var m := item_re.search(part.strip_edges())
+		if m == null:
+			errors.append(where + "的「%s」格式錯誤(每項應為「單一字元 空格 #RRGGBB」,以全形分號分隔)" % part)
+			return {}
+		var c := m.get_string(1)
+		if c == "." or c == "K":
+			errors.append(where + "不可定義 `%s`(`.` 固定透明、`K` 固定用 D01)" % c)
+			return {}
+		if out.has(c):
+			errors.append(where + "重複定義 `%s`" % c)
+			return {}
+		var hex := m.get_string(2)
+		out[c] = Color8(hex.substr(0, 2).hex_to_int(), hex.substr(2, 2).hex_to_int(), hex.substr(4, 2).hex_to_int(), 255)
+	return out
 
 
 ## 標題含「(id: 代號)」(全形或半形括號、冒號皆可)時直接用代號當檔名片段。
@@ -1140,6 +1211,99 @@ func build_item_f2(blocks: Array, errors: PackedStringArray) -> Dictionary:
 					s += p2[y][x] if f1[y][x] == p1[y][x] else f1[y][x]
 				f2.append(s)
 			out[name] = f2
+	if errors.size() > before:
+		return {}
+	return out
+
+
+## 依 D23「邊框依主題對照表」產生苔石邊框的主題換色版。
+## 只處理「邊框材質」含「A 苔石」且「做法」為「換色」的列;其他列(原色、新材質)只印略過訊息。
+## 每列用 T3 HEX 依 BORDER_RATIO 推算 5 階，替換 BORDER_GRIDS 三張網格的槽位;`K`、`.` 不變。
+## 回傳 {"D23_<網格 id>_t<序號兩位>": [網格, 該主題調色盤]};
+## 找不到表或解析不到任何列、HEX 格式錯誤、T3 灰階 Y 或飽和度超出範圍、缺網格、檔名重複時，錯誤附加到 errors 並回傳空字典。
+func build_border_themes(lines: PackedStringArray, blocks: Array, palette: Dictionary, errors: PackedStringArray) -> Dictionary:
+	var before := errors.size()
+	var sec := item_lines(lines, BORDER_ITEM)
+	var header_at := -1
+	for k in sec.size():
+		var cells := table_cells(sec[k])
+		if cells.size() > 0 and cells[0] == "序":
+			header_at = k
+			break
+	# 欄位依表頭名稱找，設計師調整欄序時不會讀錯欄
+	var col := {}
+	if header_at >= 0:
+		var header := table_cells(sec[header_at])
+		for key in ["邊框材質", "做法", "T3"]:
+			for c in header.size():
+				if header[c].contains(key):
+					col[key] = c
+					break
+	if col.size() != 3:
+		errors.append("%s 找不到邊框依主題對照表(表頭第一欄應為「序」,且含「邊框材質」「做法」「T3」欄)" % BORDER_ITEM)
+		return {}
+	var need_cols: int = col.values().max() + 1
+
+	var g := item_grids(blocks, BORDER_ITEM)
+	for id in BORDER_GRIDS:
+		if not g.has(id):
+			errors.append("%s 缺少苔石邊框網格 %s_%s(標題須含「(id: %s)」)" % [BORDER_ITEM, BORDER_ITEM, id, id])
+	var names := {}
+	for b in blocks:
+		names[b["name"]] = true
+	var hex_re := RegEx.create_from_string("^#([0-9A-Fa-f]{6})(?![0-9A-Za-z])")
+
+	var out := {}
+	var rows := 0
+	var k2 := header_at + 1
+	while k2 < sec.size():
+		var cells := table_cells(sec[k2])
+		if cells.is_empty():
+			break
+		k2 += 1
+		if cells[0].begins_with("---"):
+			continue
+		rows += 1
+		if cells.size() < need_cols or not cells[0].is_valid_int():
+			errors.append("%s 邊框依主題對照表的列格式錯誤(欄數不足或序號不是整數): %s" % [BORDER_ITEM, " | ".join(cells)])
+			continue
+		var seq := cells[0].to_int()
+		var mat: String = cells[col["邊框材質"]]
+		var way: String = cells[col["做法"]]
+		if not (mat.contains("A 苔石") and way == "換色"):
+			print("略過 %s 主題 %d(%s / %s):不是苔石換色，不產生主題邊框" % [BORDER_ITEM, seq, mat, way])
+			continue
+		var h := hex_re.search(cells[col["T3"]])
+		if h == null:
+			errors.append("%s 主題 %d 的 T3 HEX 格式錯誤(預期 #RRGGBB): %s" % [BORDER_ITEM, seq, cells[col["T3"]]])
+			continue
+		var hex := h.get_string(1)
+		var t3 := [hex.substr(0, 2).hex_to_int(), hex.substr(2, 2).hex_to_int(), hex.substr(4, 2).hex_to_int()]
+		# 灰階 Y 公式沿用設計稿 D01(0.299R + 0.587G + 0.114B)
+		# 以 ×1000 的整數比較：浮點會把正好 80 的值(如 #454F72)算成 79.999… 而誤擋
+		var y1000: int = 299 * t3[0] + 587 * t3[1] + 114 * t3[2]
+		if y1000 < BORDER_Y_MIN * 1000 or y1000 > BORDER_Y_MAX * 1000:
+			errors.append("%s 主題 %d 的 T3 #%s 灰階 Y %.3f 不在 %d~%d" % [BORDER_ITEM, seq, hex, y1000 / 1000.0, BORDER_Y_MIN, BORDER_Y_MAX])
+		var spread: int = t3.max() - t3.min()
+		if spread > BORDER_SPREAD_MAX:
+			errors.append("%s 主題 %d 的 T3 #%s 三通道最大減最小 %d,超過 %d" % [BORDER_ITEM, seq, hex, spread, BORDER_SPREAD_MAX])
+		var pal := palette.duplicate()
+		for s in BORDER_SLOTS.size():
+			var ch := []
+			for v in t3:
+				# 整數運算做四捨五入(.5 進位),避免浮點誤差
+				ch.append(mini(255, (v * BORDER_RATIO[s] + 45) / 90))
+			pal[BORDER_SLOTS[s]] = Color8(ch[0], ch[1], ch[2], 255)
+		for id in BORDER_GRIDS:
+			if not g.has(id):
+				continue
+			var name := "%s_%s_t%02d" % [BORDER_ITEM, id, seq]
+			if names.has(name) or out.has(name):
+				errors.append("%s 主題邊框輸出檔名 %s 重複(與設計稿區塊同名，或序號重複)" % [BORDER_ITEM, name])
+				continue
+			out[name] = [g[id], pal]
+	if rows == 0:
+		errors.append("%s 邊框依主題對照表解析不到任何列" % BORDER_ITEM)
 	if errors.size() > before:
 		return {}
 	return out

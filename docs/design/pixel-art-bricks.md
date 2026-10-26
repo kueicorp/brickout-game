@@ -118,6 +118,11 @@
    | `<` | #8C3F86 | 暗紫（中邊） | 94 | D21 用：減益底板 F1 的下緣、右緣內圈與轉角 |
    | `>` | #6A2166 | 暗紫（底板面） | 63 | D21 用：減益底板面（內容的透明處） |
    | `,` | #45143F | 暗紫（暗邊） | 40 | D21 用：減益底板 F2 的下緣、右緣內圈 |
+   | `(` | #8F9A78 | 苔石 T1 | 147 | D23 用（方案 A 苔石牆；若使用者不選方案 A 則刪除這 5 色）：石板最亮邊 |
+   | `)` | #6F7B5C | 苔石 T2 | 116 | D23 用：石板亮面 |
+   | `[` | #55604A | 苔石 T3（主色） | 90 | D23 用：石板主色 |
+   | `]` | #3E4837 | 苔石 T4 | 67 | D23 用：石板暗面、凹坑上緣 |
+   | `{` | #2A3226 | 苔石 T5 | 46 | D23 用：石板最暗邊、裂痕 |
 
    - 灰階亮度 Y = 0.299R + 0.587G + 0.114B，手算近似值，請工程師用工具複核
    - 七色主色（T3）灰階由亮到暗：黃 209、綠 183、橙 143、藍 124、紫 104、紅 88、靛 66；相鄰最小差 16 / 255（紫與紅）
@@ -125,6 +130,7 @@
    - 色數統計：`K`、`W`、`G` 共 3 + 七色 7×5 = 35 + 鋼灰 5 + 魔王 5 = 48 色；加 D13 擋板用的青色 2 色（`w`、`x`）、D14 不可破壞磚塊用的槍金屬 2 色（`s`、`y`）共 52 色；再加 D15 球用的珍珠白 4 色（`1`~`4`，T1 沿用 `W`）、品紅 2 色（`5`、`6`；現為 D17 雷射磚用，D16 強化已改 ATK 字樣，不再使用）共 58 色；D15 方案 C 沒有新增顏色；再加 D16 HUD 強化線段用的淺灰 `7`、中灰 `8` 共 60 色；再加 D17 功能型磚塊用的洋紅 3 色（`@`、`#`、`%`；T2、T4 沿用 `5`、`6`）、電青 5 色（`+ = ~ * &`）、骨白 5 色（`0 9 $ ^ !`）共 13 色，合計 73 色；再加 D18 功能型磚塊第 2 批用的炸藥褐 5 色（`? - / ; :`）共 78 色（彩虹磚、傳送磚沿用既有顏色，不新增）；再加 D21 減益道具底板用的暗紫 4 色（`_ < > ,`）共 82 色（D20 沒有新增顏色）
    - 靛色階（`T X I k l`）在 D12 的網格中沒有出現，但多層磚的七色換色對照表需要它，所以保留
    - 本表為全檔唯一調色盤
+   - D23 方案 A（苔石牆）新增苔石 5 色（`( ) [ ] {`），若採用則合計 87 色；方案 B（橡木桁架）不新增顏色
    - 色彩來源為本稿自訂，無外部取色來源
    - 色盲：七色紅橙黃綠藍靛紫在紅綠色盲下會有混淆（紅、橙、綠）；本稿以亮度差加形狀記號補強，未用色盲模擬器驗證，請 QA 或使用者複核
 
@@ -155,6 +161,7 @@
     - 使用者已確認：採路線 B；內部解析度寬 360、關卡區高 640；一排 10 塊磚；磚 32×16；磚區寬 320，左右邊框各 20（邊框不在本稿）；魔王 128×48（4×3 格，置中於關卡格的第 3~6 欄，欄編號從 0 起算，即 1 起算的第 4~7 欄）；圓形磚 16×16 置中於 32×16 格內，碰撞範圍為圓形；不加橫向磚縫；多層磚（一般磚已併入多層磚，最多 69 層；顏色代表層數、數字 1~9 代表第幾輪，詳見下方「多層磚層數（新規則）」）；寶箱橙、金幣黃、圓形紫維持原外觀，但不屬於七色（不會被彩虹磚挑中）；魔王不在七色內；破壞動畫每幀小磚 60 ms、魔王 100 ms
     - 本項只畫「母版」；七色換色版本、多層磚各層、各色破壞幀由轉檔工具依下列規則自動產生
     - 母版色階一律使用 D01 的代號；母版的色階對照紅色階 `h r R t o`（T1~T5）
+    - 魔王嘴巴與舌頭：2026-10-26 使用者提議把魔王舌頭當血條，新版以 D27 的 `boss_mouth_v2_patch` 疊在 `boss_normal` 上得 `boss_normal_v2`；本項原圖不改（待 D27 確認）
     - 網格尺寸為 32×16（磚、圓形所在的格）、128×48（魔王）、5×7（數字）
     - **欄、列編號一律從 0 起算**：左上角像素為第 0 欄、第 0 列，與網格的字元索引一致；本項所有「第 N 欄、第 N 列」皆依此（例：數字左上角在第 13 欄、第 4 列；裂痕在第 25~27 欄、第 3~7 列）
 
@@ -1719,6 +1726,7 @@
 
 16. [D16] HUD 球狀態圖示（使用者已確認）：
     - 使用者決定：球身上只有一種共用光暈（D15 方案 C），所以「是哪種狀態」「剩多久」「強化幾級」改由 HUD 圖示告知
+    - 位置已由 D28 取代（使用者 2026-10-26 已確認）：HUD 改為半透明 50% 懸浮在關卡區左下、垂直排列、整數 2 倍放大（每格 44×44）、有狀態往上補位（改寫下方「固定格位、不補位」，只限新位置）；格內結構、排列順序、圖示與線段條外觀不變
     - 範圍：只做 5 種狀態圖示、圖示下方的線段條與排列；時間、分數、魔王血量等其他 HUD 元素不在本次範圍
     - 風格沿用 D01、D02：1 px `K` 描邊、左上光源；新增顏色 2 色（淺灰 `7`、中灰 `8`，標「D16 用」，已加入 D01），色數統計為 60 色
     - 欄、列編號一律從 0 起算
@@ -4658,7 +4666,3085 @@
     KKKKKKKKKKKKKKKK
     ```
 
----
+22. [D22] 遊戲中整體版面（使用者已確認，2026-10-26；僅「瀏海」仍待確認）：
+    - 範圍：時間、分數、魔王血量條、暫停鈕、HUD 球狀態列（D16）的位置與尺寸，加上整體由上而下的分區；不含暫停選單、商城；數字與圖示的細圖在第 2 批畫
+    - 座標：螢幕內部像素，寬 360、**設計基準高 800**；位置與尺寸一律「x, y, 寬, 高」，從 0 起算
+    - 新版（本段到「給工程師的需求」之前的「新版」各段）為準；標「舊版」的段落（方案比較、高 640／800 座標表、延伸規則、layout_640、layout_800）保留供對照，不再採用
+
+    **已決定（使用者 2026-10-26）**
+
+    | 事項 | 決定 | 新版如何落實 |
+    |---|---|---|
+    | UI 排法 | 時間左上、分數右上、暫停鈕最右、球狀態列在第 2 排左、魔王血條在其右：可以 | 沿用，座標見下表 |
+    | 磚塊區 | 可以更高，超過畫面一半也可以 | 最多 22 排，下緣 y 435（見「磚塊區」） |
+    | 邊框 | 只要左、右、上三邊，下方不要 | 新增上邊框（D23），底端開放 |
+    | UI 位置 | 放在上邊框的上方，不疊在關卡區 | UI 區 y 0~47 |
+    | 手機高度 | 現在不考慮高 640 | 基準高 800；低於 800 只寫原則 |
+    | 時間 | 倒數；快結束時閃爍並播音效 | 見「時間倒數與閃爍」 |
+    | UI 疊在球路上 | 可以 | 新版 UI 在上邊框之上，**球不會進入 UI 區，沒有重疊** |
+    | 魔王血條 | 114 寬、不顯示數字：可以 | 已由 D27 取代（2026-10-26 使用者提議：移除 UI 區血條與魔王臉，改用魔王舌頭；待確認）；UI 區座標見 D27 的 v3 表 |
+    | 22 排 | 先這樣（22 排） | 沿用，最多 22 排，下緣 y 435 |
+    | 閃爍時機 | 剩餘 30 秒開始閃爍（不是 10 秒） | 見「時間倒數與閃爍」 |
+    | 閃爍節奏 | 兩段式（2026-10-26 使用者同意）：30~11 秒每 2 秒閃一次、無聲；10~1 秒每秒閃一次、有提示音 | 見「時間倒數與閃爍」 |
+    | UI 區底 | 實心深色底 | **2026-10-26 改為實心 `K`（#1B1A2E）**（原 `j` 與 D16 線段條外框同色，外框看不見），不露出背景（D24 景觀區因此取消） |
+    | 分數星形位置 | 星形緊貼分數最左一位 | 2026-10-26 依使用者看圖後要求（待再確認）：星形 x = 292 − 6 × 位數，與數字間距 3 px，位數變動時跟著移動；見座標表 |
+    | 低於 800 高 | 原則可以 | 沿用「低於 800 高的手機怎麼處理」 |
+    | 暫停觸控區 | 48×24 可以 | 沿用 x 308~355、y 0~23 |
+    | 瀏海 | 之後再確認 | 記為待確認，本稿不處理 |
+
+    **新版分區（高 800，由上而下）**
+
+    | 區 | y 範圍 | 高 | 內容 |
+    |---|---|---|---|
+    | UI 區 | 0~47 | 48 | 時間、分數、暫停鈕、HUD 球狀態列、魔王血條；全寬 360 |
+    | 上邊框 | 48~67 | 20 | 全寬 360；左右各 20×20 為轉角（D23） |
+    | 關卡區 | 68~799 | 732 | 左右邊框 x 0~19 與 340~359 一路到螢幕底端；底端沒有邊框，球掉出底端即漏球 |
+
+    **座標表（高 800，新版）**
+
+    | 元素 | x | y | 寬 | 高 | 說明 |
+    |---|---|---|---|---|---|
+    | UI 區底 | 0 | 0 | 360 | 48 | 實心 `K`（#1B1A2E，已修改，待再確認）；下緣緊貼上邊框頂端的 `K` 線；球不會進來 |
+    | 時間 | 8 | 4 | 56 | 16 | 左：時鐘圖示 9×9（x 8~16、y 7~15），右接數字 MM:SS，靠左 |
+    | 分數 | 208 | 4 | 97 | 16 | x 208~304；數字靠右對齊到 x 304，最多 14 位；星形圖示 9×9（y 7~15）緊貼最左一位，x = 292 − 6 × 位數（1 位 x 286~294；14 位 x 208~216），與數字間隔 3 px（已修改，待再確認） |
+    | 暫停鈕圖 | 332 | 4 | 16 | 16 | 兩條直線，離右緣 12 px |
+    | 暫停觸控區 | 308 | 0 | 48 | 24 | x 308~355、y 0~23；圖示外擴；3 倍放大約 144×72 實體像素 |
+    | HUD 球狀態列（D16） | 8 | 24 | 178 | 22 | x 8~185、y 24~45；7 格固定格位照 D16（位置已由 D28 取代，待確認） |
+    | 魔王臉圖示 | 222 | 30 | 10 | 10 | 只在第 10 的倍數關（**已由 D27 取代**：2026-10-26 使用者提議移除，改用魔王嘴裡的舌頭當血條；待確認） |
+    | 魔王血量條 | 238 | 30 | 114 | 10 | x 238~351；外框 1 px `K`（實為 `j`；該圖 D26 `hud_boss_bar_*` 已刪除），內 112×8；只在第 10 的倍數關（**已由 D27 取代**，同上；座標也已由 D28 v5 取代） |
+    | UI 區下緣留白 | 0 | 46 | 360 | 2 | HUD 下緣 y 45 與上邊框 y 48 之間 |
+    | 上邊框 | 0 | 48 | 360 | 20 | D23；含左上轉角 x 0~19、右上轉角 x 340~359 |
+    | 左邊框（轉角以下） | 0 | 68 | 20 | 732 | y 68~799；樣本拼接起點 y 67，與轉角下緣重疊 1 px（D23） |
+    | 右邊框（轉角以下） | 340 | 68 | 20 | 732 | 同上 |
+    | 關卡區 | 20 | 68 | 320 | 732 | 球的活動範圍：左界 x 20、右界 x 339、上界 y 68；背景（D24）在最底層 |
+    | 磚塊區（上限） | 20 | 84 | 320 | 352 | y 84~435；22 排 × 16 px |
+    | 魔王位置 | 116 | 84 | 128 | 48 | 第 3~6 欄、磚塊區最上 3 排；只在第 10 的倍數關 |
+    | 球的飛行空間 | 20 | 436 | 320 | 284 | y 436~719；無磚、無 UI、無手指（22 排排滿時） |
+    | 手指區 | 20 | 720 | 320 | 80 | y 720~799；**零 UI** |
+    | 擋板 | - | 763 | 64 | 8 | y 763~770；擋板下方空白 y 771~799（29 px） |
+
+    **磚塊區（加高）**
+
+    | 項目 | 數值 | 理由 |
+    |---|---|---|
+    | 磚塊起點 | y 84 | 上邊框下緣 y 67 之下留 16 px 空帶，球可從磚塊上方通過；舊版的 49 px 是為了 UI，新版 UI 已移走 |
+    | 磚塊尺寸 | 32×16，10 欄（假設沿用 D12，未重新量測） | 10 欄 × 32 = 320 剛好填滿關卡區寬 |
+    | **最多排數** | **22 排（352 px），y 84~435** | 下緣超過畫面一半（y 400）35 px；球的飛行空間 327 px（磚塊下緣到擋板上緣 y 436~762） |
+    | 規則 | 磚塊下緣到擋板上緣至少 320 px | 排數上限 = 向下取整（（擋板 y 763 − 磚塊起點 84 − 320）÷ 16）= 22 |
+    | 與舊版比較 | 舊版 10 排、下緣 208、飛行空間 394 | 排數 ×2.2；飛行空間少 67 px（約 17%），球從磚塊回到擋板的時間變短 |
+    | 風險 | 球速未知 | 22 排的反應時間要靠實機測；每少 1 排多 16 px 飛行空間，上限可再調 |
+
+    **手指區（依新版重算）**
+
+    | 項目 | 舊版（高 640 關卡區內） | 新版（高 800 螢幕） |
+    |---|---|---|
+    | 手指區 | 關卡區 y 560~639（底端 80 px） | 螢幕 y 720~799（底端 80 px，同樣高度） |
+    | 擋板 | 約 y 603（距手指區頂 43 px） | y 763（距手指區頂 43 px，相對位置不變） |
+    | 手指區頂到磚塊下緣 | 約 351 px | 284 px（22 排滿時）；排數少時更多 |
+    | UI | 零 | 零；UI 全部在 y 0~47，離手指區 672 px 以上 |
+
+    **低於 800 高的手機怎麼處理（只寫原則）**
+
+    - 寬度固定 360；UI 區 48、上邊框 20、左右邊框、磚塊區位置（y 84 起）、擋板距底端 37 px、手指區 80 px 都**不縮放、不裁切**（像素圖不縮放）
+    - 少的高度全部由「球的飛行空間」吸收：飛行空間 = H − 473（22 排滿時）；H = 800 → 327；H = 760 → 287
+    - 飛行空間建議不低於 250 px，對應最低支援高度約 H = 724；低於這個高度的手機本稿不處理（640 已決定暫不考慮）
+    - 關卡的磚塊排數不隨手機高度改變，避免同一關在不同手機難度不同；所以不依手機高度縮減排數
+    - 若之後要支援低於 724 的手機，可選：下調全部關卡的排數上限、或整體等比縮放；屬待決定，本稿不設計
+    - 高於 800 不在本次範圍
+
+    **時間倒數與閃爍**
+
+    | 剩餘秒數 | 時間數字與時鐘圖示 | 音效（音效另有負責人；這裡只記需求） |
+    |---|---|---|
+    | > 30 | `W` 白字加 `K` 描邊 | 無 |
+    | 30 ~ 11 | 剩餘秒數為偶數的那一秒，前 500 ms 為紅 `r`（#E8696B）加 `K` 描邊，後 500 ms 為白 `W`；其餘秒全白；**每 2 秒閃 1 次** | 無（我的提案，待確認） |
+    | 10 ~ 1 | 每秒前 500 ms 為紅 `r`，後 500 ms 為白 `W`；**每秒閃 1 次** | 每秒 1 聲提示音，與紅色同時開始 |
+    | 0 | 停在紅 `r` | 時間到音效 |
+
+    - 使用者決定：**剩餘 30 秒開始閃爍**
+    - 兩段節奏使用者已同意（2026-10-26）：30 秒內每秒都閃會有 30 次，太吵；前段每 2 秒一次提醒、最後 10 秒加快到每秒一次，越接近越急
+    - 時鐘圖示與數字同色同步變紅（換色規則見 D27 第十段；D26 原規則已搬走）
+    - 最快每秒 1 次，遠低於每秒 3 次的光敏安全上限；不靠顏色單獨傳達（同時有閃動，最後 10 秒另有聲音）
+    - 紅 `r` 對 `K` 描邊約 5.5:1（手算近似），描邊內的字在 `j` 底上看得清
+
+    **舊版（高 640／800；使用者 2026-10-26 已改為上方新版，保留供對照）**
+
+    - 範圍：時間、分數、魔王血量條、暫停鈕、HUD 球狀態列（D16）的位置與尺寸；不含暫停選單、商城；數字與圖示的細圖在第 2 批畫
+    - 座標：螢幕內部像素，寬 360、高 H（640~800）；位置與尺寸一律「x, y, 寬, 高」，從 0 起算；H = 640 + e，e 為多出的高度（0~160）
+    - 基準（來自 D01、D02 與盤面預覽圖，後者為我由 3 倍圖估計，未量測）：邊框 x 0~19 與 x 340~359；關卡區 x 20~339、高 640；磚塊從關卡區頂端往下約 49 px 才開始；擋板約在關卡區第 603 列；擋板下約 33 px 空白
+    - 關卡區頂端 0~48 px 沒有磚塊，球可以飛進去；本版面就是把 UI 放在這條空帶（640 高）或其上方的面板（高螢幕）
+    - 手指區：關卡區 y 560~639（整個寬度）；UI 全部放在關卡區頂端，**手指區內零 UI**；暫停鈕在右上，離手指區最遠，降低誤觸
+    - 數字：沿用 D12 數字風格（白字 `W` 加 1 px `K` 描邊，5×7 加描邊後 7×9），字距 6 px（含描邊）；實際字形第 2 批畫
+    - 使用者已決定的相關事項：遊戲中 UI 只用自繪像素數字與圖示，不用字型、不放中文
+
+    **方案比較**
+
+    | 方案 | 做法 | 優點 | 缺點 |
+    |---|---|---|---|
+    | 1（建議） | 640 高：UI 疊在關卡區頂端空帶；高螢幕（e ≥ 80）：UI 放在關卡區上方的獨立面板 | 手指區零 UI；高螢幕 UI 完全不在球路上；640 也放得下 | 兩套座標；640 時 UI 在球路上（球與子彈畫在 UI 之上，球經過時會短暫蓋住數字） |
+    | 2 | 所有高度都用面板，640 高時把球的天花板降到 y = 48 | 一套版面、UI 永不被球蓋住 | 640 高的可玩高度變 592，磚塊緊貼天花板，與高螢幕玩法不一致；違反「關卡區固定 640」 |
+    | 3 | HUD 球狀態列放擋板下方空白 | 離球與擋板最近 | 手指拖擋板會整個蓋住；否決 |
+    | 4 | HUD 放進左右邊框 | 不占空間 | 邊框只有 20 px 寬，放不下 22×22 圖示；否決 |
+
+    **座標表：高 640（e = 0）**
+
+    | 元素 | x | y | 寬 | 高 | 說明 |
+    |---|---|---|---|---|---|
+    | 左邊框 | 0 | 0 | 20 | 640 | D23 |
+    | 右邊框 | 340 | 0 | 20 | 640 | D23 |
+    | 關卡區 | 20 | 0 | 320 | 640 | 背景（D24）疊在整個螢幕底層 |
+    | 時間 | 24 | 2 | 56 | 16 | 左：時鐘圖示 9×9（x 24~32），右接數字，格式 MM:SS，靠左 |
+    | 分數 | 196 | 2 | 97 | 16 | 左：星形圖示 9×9（x 196~204），數字靠右對齊到 x 292，最多 14 位 |
+    | 暫停鈕圖 | 316 | 2 | 16 | 16 | 圖示（兩條直線） |
+    | 暫停觸控區 | 300 | 0 | 40 | 24 | 圖示外擴；右側貼到關卡區右緣 |
+    | HUD 球狀態列（D16） | 24 | 24 | 178 | 22 | x 24~201、y 24~45；7 格固定格位照 D16 |
+    | 魔王臉圖示 | 208 | 30 | 10 | 10 | 只在第 10 的倍數關 |
+    | 魔王血量條 | 222 | 30 | 114 | 10 | x 222~335；外框 1 px `K`，內 112×8；只在第 10 的倍數關 |
+    | 磚塊起點 | 20 | 49 | 320 | - | HUD 下緣 y 45 與磚塊間留 3 px |
+    | 擋板 | - | 約 603 | - | - | 不屬 UI；UI 與擋板相距 550 px 以上 |
+
+    **座標表：高 800（e = 160）**
+
+    | 元素 | x | y | 寬 | 高 | 說明 |
+    |---|---|---|---|---|---|
+    | 左邊框 | 0 | 0 | 20 | 800 | 與背景景觀區、面板、關卡區並排，全高連續 |
+    | 右邊框 | 340 | 0 | 20 | 800 | 同上 |
+    | 背景景觀區 | 20 | 0 | 320 | 104 | 只有 D24 背景；上方 24 px 兼作狀態列／瀏海安全區（假設，未實測） |
+    | UI 面板 | 20 | 104 | 320 | 56 | 實心深色板（`j` 面，1 px `K` 外框）；球不會進來 |
+    | 時間 | 24 | 108 | 56 | 16 | 內容同 640 版 |
+    | 分數 | 196 | 108 | 97 | 16 | 同上 |
+    | 暫停鈕圖 | 316 | 108 | 16 | 16 | 同上 |
+    | 暫停觸控區 | 300 | 104 | 40 | 32 | y 104~135；魔王血量條在其下方，不重疊 |
+    | HUD 球狀態列（D16） | 24 | 130 | 178 | 22 | x 24~201、y 130~151 |
+    | 魔王臉圖示 | 208 | 136 | 10 | 10 | 只在第 10 的倍數關 |
+    | 魔王血量條 | 222 | 136 | 114 | 10 | x 222~335 |
+    | 面板下緣留白 | 20 | 152 | 320 | 8 | 面板緊貼關卡區頂端（y 160） |
+    | 關卡區 | 20 | 160 | 320 | 640 | 磚塊起點 y 209；擋板約 y 763；手指區 y 720~799 |
+
+    **640~800 之間怎麼延伸（e = H − 640）**
+
+    | e 的範圍 | 版面 | 多出的 e 給誰 |
+    |---|---|---|
+    | 0 ≤ e < 80（H 640~719） | 緊湊版：640 版的元素 y 全部加 e；UI 疊在關卡區頂端空帶，沒有面板 | 最上方 e px 給背景；e < 24 時瀏海可能遮住 UI，見問題 |
+    | 80 ≤ e ≤ 160（H 720~800） | 面板版：面板 (20, e − 56, 320, 56) 緊貼關卡區上方；內容 y = 800 版的 y − (160 − e) | 面板上方 e − 56 px（24~104）給背景景觀區 |
+
+    - 為什麼 80：面板版最少要留 24 px 給背景景觀區，兼作狀態列／瀏海安全區（24 + 56 = 80）；多出的空間再給背景景觀
+    - 水平方向永遠固定：寬 360，其他整數倍放大規則照既有規格；邊框一律全高
+    - 手機不是整數倍時的黑邊處理不在本稿
+
+    **元素狀態**
+
+    | 元素 | 狀態 | 樣子 |
+    |---|---|---|
+    | 時間 | 一般 | `W` 白字加 `K` 描邊 |
+    | 時間 | 剩餘 30 秒以內 | 紅白閃爍，見上方「時間倒數與閃爍」 |
+    | 分數 | 數字變動 | 直接換數字，不加動態 |
+    | 暫停鈕 | 預設 | 16×16 兩條直線，`W` 加 `K` 描邊 |
+    | 暫停鈕 | 按下 | 圖示向右下偏 1 px，直到放開 |
+    | 暫停鈕 | 停用（倒數開始前、已暫停） | 圖示改 `8` 灰，不回應 |
+    | 魔王血量條 | 非魔王關 | 臉圖示與血條都不顯示，位置留空，不挪動 HUD |
+    | 魔王血量條 | 一般 | 底色 `v`；填色：上 1 列 `r`、中 5 列 `R`、下 2 列 `t`；填色長度 = 向上取整（112 × 目前血量 ÷ 本關血量上限） |
+    | 魔王血量條 | 受傷 | 剛失去的那一段先顯示 `W` 100 ms 再消失 |
+    | 魔王血量條 | 血量 0 | 填色清空；之後交給魔王破壞動畫（D12） |
+    | HUD 球狀態列 | 全部 | 規則照 D16，不變 |
+
+    - 血量上限 = 關卡數 × 5，最高 1000（PM 提供）；填色最小單位 1 px 約 9 血，所以不顯示數字
+    - 對比：`W` 字對 UI 區底 `K`（#1B1A2E）約 17:1（手算近似）；其他元件在 `K` 底上的對比見 D27 第十段的對比表（D26 原表已刪除）
+
+    **舊版線框圖例（給 layout_640、layout_800 用；新版圖例在 layout_800_v2 之前）**（1 字元 = 4 px；90 字元 = 360 px；只用 D01 顏色；線框以 4 px 為單位取近似，精確位置以座標表為準）
+
+    | 字元 | 代表 |
+    |---|---|
+    | `g` | 左右邊框（各 5 字元 = 20 px） |
+    | `K` | 關卡區（背景，球可飛行；本區無 UI 的部分） |
+    | `l` | 背景景觀區（只有高 800 版） |
+    | `j` | UI 面板（只有高 800 版） |
+    | `x` | 時間 |
+    | `Y` | 分數 |
+    | `t` | 暫停觸控區 |
+    | `R` | 暫停鈕圖示 |
+    | `U` | HUD 球狀態列 |
+    | `Z` | 魔王臉圖示 |
+    | `V` | 魔王血量條（只在第 10 的倍數關） |
+    | `b` | 磚塊區示意（約 y 49 起 10 排） |
+    | `Q` | 魔王位置示意（只在第 10 的倍數關，第 3~6 欄） |
+    | `s` | 手指區（y 560 起，不放 UI） |
+    | `e` | 擋板（約 y 603，寬 64） |
+
+    layout_640 說明：舊版，使用者 2026-10-26 改為 layout_800_v2；640 暫不考慮。
+
+    圖寬：90　圖高：160
+    高 640 版線框（id: layout_640）：
+    ```text
+    gggggKxxxxxxxxxxxxxxKKKKKKKKKKKKKKKKKKKKKKKKKKKKKYYYYYYYYYYYYYYYYYYYYYYYYYKttttRRRRttggggg
+    gggggKxxxxxxxxxxxxxxKKKKKKKKKKKKKKKKKKKKKKKKKKKKKYYYYYYYYYYYYYYYYYYYYYYYYYKttttRRRRttggggg
+    gggggKxxxxxxxxxxxxxxKKKKKKKKKKKKKKKKKKKKKKKKKKKKKYYYYYYYYYYYYYYYYYYYYYYYYYKttttRRRRttggggg
+    gggggKxxxxxxxxxxxxxxKKKKKKKKKKKKKKKKKKKKKKKKKKKKKYYYYYYYYYYYYYYYYYYYYYYYYYKttttRRRRttggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKttttttttttggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKttttttttttggggg
+    gggggKUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUKZZZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVKggggg
+    gggggKUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUKZZZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVKggggg
+    gggggKUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUKZZZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVKggggg
+    gggggKUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    ```
+
+    layout_800 說明：舊版，使用者 2026-10-26 改為 layout_800_v2；640 暫不考慮。
+
+    圖寬：90　圖高：200
+    高 800 版線框（id: layout_800）：
+    ```text
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllllggggg
+    gggggjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjttttttttttggggg
+    gggggjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYYjttttRRRRttggggg
+    gggggjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYYjttttRRRRttggggg
+    gggggjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYYjttttRRRRttggggg
+    gggggjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYYjttttRRRRttggggg
+    gggggjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjttttttttttggggg
+    gggggjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjjjjjjjjjjjjjjjjjttttttttttggggg
+    gggggjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjjjjjjjjjjjjjjjjjttttttttttggggg
+    gggggjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjZZZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVjggggg
+    gggggjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjZZZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVjggggg
+    gggggjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjZZZVVVVVVVVVVVVVVVVVVVVVVVVVVVVVjggggg
+    gggggjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjggggg
+    gggggjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjggggg
+    gggggjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    ```
+
+    **新版線框圖例（layout_800_v2）**（1 字元 = 4 px；90 字元 = 360 px，200 列 = 800 px；只用 D01 顏色；以 4 px 為單位取近似，精確位置以座標表為準）
+
+    | 字元 | 代表 | 對應 y 範圍 |
+    |---|---|---|
+    | `j` | UI 區底（實心深色；實際色已改為 `K`，且本圖例已由 D28 v5 取代） | 列 0~11（y 0~47） |
+    | `x` | 時間 | 列 1~4 |
+    | `Y` | 分數 | 列 1~4 |
+    | `t` | 暫停觸控區 | 列 0~5（y 0~23） |
+    | `R` | 暫停鈕圖示 | 列 1~4 |
+    | `U` | HUD 球狀態列 | 列 6~11（y 24~47；實際到 y 45） |
+    | `Z` | 魔王臉圖示（只在第 10 的倍數關） | 列 7~9 |
+    | `V` | 魔王血量條（只在第 10 的倍數關） | 列 7~9 |
+    | `c` | 上邊框左右轉角（各 20×20） | 列 12~16（y 48~67） |
+    | `h` | 上邊框 | 列 12~16 |
+    | `g` | 左右邊框（轉角以下，到螢幕底端） | 列 17~199 |
+    | `K` | 關卡區：磚塊上方空帶（y 68~83）與球的飛行空間（y 436~719） | 列 17~20 與 109~179 |
+    | `b` | 磚塊區（最多 22 排：y 84~435） | 列 21~108 |
+    | `Q` | 魔王位置（第 3~6 欄、最上 3 排；只在第 10 的倍數關） | 列 21~32 |
+    | `s` | 手指區（y 720~799，零 UI） | 列 180~199 |
+    | `e` | 擋板（y 763、寬 64） | 列 190~191 |
+
+    圖寬：90　圖高：200
+    高 800 新版線框（id: layout_800_v2）：
+    ```text
+    jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjttttttttttttj
+    jjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYjttttttRRRRttj
+    jjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYjttttttRRRRttj
+    jjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYjttttttRRRRttj
+    jjxxxxxxxxxxxxxxjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjYYYYYYYYYYYYYYYYYYYYYYYYjttttttRRRRttj
+    jjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjttttttttttttj
+    jjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+    jjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjZZZjjVVVVVVVVVVVVVVVVVVVVVVVVVVVVjj
+    jjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjZZZjjVVVVVVVVVVVVVVVVVVVVVVVVVVVVjj
+    jjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjZZZjjVVVVVVVVVVVVVVVVVVVVVVVVVVVVjj
+    jjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+    jjUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjjj
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    ```
+
+    給工程師的需求（由 PM 轉達）：
+    - 依上方「新版」座標表排版，基準高 800；低於 800 依「低於 800 高的手機怎麼處理」，不再有緊湊版與面板版之分
+    - 繪製層級由下到上：背景 → UI 區底 → 邊框 → 磚塊 → UI 數字與 HUD → 球、子彈與特效；球不會進入 UI 區
+    - 球的碰撞邊界：左 x = 20、右 x = 339、上 y = 68；下方沒有邊界，球越過 y = 799 即漏球
+    - 磚塊從 y 84 起、每排 16 px、最多 22 排；擋板 y 763；手指區 y 720~799 不放任何 UI
+    - 時間倒數：剩餘 30 秒起紅白閃（30~11 秒每 2 秒一次、10~1 秒每秒一次）；剩餘 10~1 秒在每個紅色開始時送出「提示音」事件；0 秒送出「時間到」事件（音效由他人負責，工程師只需發出事件）
+    - 瀏海安全區：待使用者確認，暫不實作（UI 區 y 0~47 貼著螢幕上緣）
+    - 魔王臉圖示與血量條只在第 10 的倍數關顯示；其他關這個位置留空，HUD 不挪動
+    - 暫停觸控區比圖示大（座標表），觸控區內任何點都算按下
+
+    已決定（D22）：
+    - 時間倒數、剩餘不多時閃爍並播音效（原問題 1）
+    - UI 疊在球路上可以；新版 UI 已在上邊框之上，沒有重疊（原問題 2）
+    - 魔王血量條 114 px 寬、不顯示數字（原問題 4）
+    - 瀏海：使用者要之後再確認，記為待確認，本稿不處理（原問題 3）
+    - 22 排先這樣（原問題 1）
+    - 閃爍改為剩餘 30 秒開始（原問題 2）；兩段節奏（30~11 秒每 2 秒一次無聲、10~1 秒每秒一次有提示音）使用者已同意，見「時間倒數與閃爍」
+    - UI 區底用實心深色底（原問題 3；原為 `j`，2026-10-26 因 D16 線段條外框同為 `j` 看不見，改為 `K`）；D24 景觀區因此取消，D24 已同步更新
+    - 低於 800 高的手機：只寫原則，可以（原問題 4）
+    - 暫停觸控區 48×24 可以（原問題 5）；高度略小於常見的 48 dp 建議，已接受
+
+    待使用者確認（D22）：
+    - 瀏海（之後再談）：UI 區貼著螢幕上緣，有瀏海的手機可能遮到
+    - D27（魔王舌頭血條與 UI 區 v3）若獲確認，本項座標表中的魔王臉、魔王血條、暫停觸控區、時間、分數列以 D27 的 v3 表為準
+    - **已由 D28 v5 取代**（使用者 2026-10-26）：本項新版座標表中的 UI 區（高 48）、上邊框、關卡區、磚塊區、魔王位置、球的飛行空間、HUD 位置，全部改以 D28 第七段「v5 座標總表」為準（UI 區縮成 32、其餘上移 16 px、HUD 移入關卡區）；本項原表保留供對照
+
+23. [D23] 關卡區邊框材質方案（使用者已確認，2026-10-26；含上邊框、轉角、依主題換色與主題對應表、工具自動換色）：
+    - 使用者決定（2026-10-26）：邊框只要左、右、上三邊；邊框依主題製作（每個主題有自己的邊框）；A、B 尚未選
+    - 範圍：左右邊框各 20 px 寬，從上邊框下緣一路到螢幕底端；上邊框高 20 px、全寬 360；本項只給材質與可重複拼接的樣本；使用者已決定「由我提 2~3 個材質方案」，我提 2 案（見「為什麼只有 2 案」）
+    - 依據：D02 畫風（左上光源、1 px `K` 描邊、5 階色階、材質紋理、不用抖色漸層）
+    - 欄、列編號從 0 起算；左右邊框樣本為 20×32，**可重複的單位高度 = 32 px**，拼接起點 y = 67（樣本第 0 列與轉角最後一列重疊，兩者都是 `K` 線），一塊接一塊往下拼；到螢幕底端 y = 799 裁掉多出的部分
+    - **位置已由 D28 v5 取代**：上邊框 y 32~51、轉角 y 32~51、左右邊框 y 52~799、樣本拼接起點 y 51（樣式與網格不變）；以下為原位置（高 800，見 D22）：上邊框 x 0~359、y 48~67；左上轉角 x 0~19、y 48~67；右上轉角 x 340~359、y 48~67；上邊框樣本拼接起點 x = 19（樣本第 0 欄與左轉角最後一欄重疊），到 x = 340 為止被右轉角蓋住；底端沒有邊框
+    - 左右兩邊用同一張圖、不鏡像（光源一致：左上）；每邊最外與最內都有 1 px `K`，所以與關卡區、螢幕邊緣交界清楚
+    - 為什麼只有 2 案：D01 當時剩下的未用符號只有 7 個，一案苔石就用掉 5 個（現在只剩 `'`、`"` 2 個）；另一案木材沿用既有色階、零新色；第 3 種（例如純鋼灰）會與擋板、不可破壞磚塊混淆，故不提
+
+    | 項目 | 方案 A：苔石牆 | 方案 B：橡木桁架 |
+    |---|---|---|
+    | 材質 | 3 塊厚石板疊成（高 10、12、10，縫在 y 0、10、22），石面有凹坑與裂痕 | 兩條直木板並排，各 9 px 寬；木板接頭錯開 16 px；銅釘 2 顆；木紋為直向短線 |
+    | 使用顏色 | 苔石 5 階（新增 `( ) [ ] {`，標「D23 用」，已加入 D01） | 炸藥褐 5 階（`? - / ; :`，沿用）加黃銅 `B Y C D`（沿用） |
+    | 新增顏色 | 5 色（D01 合計 87 色） | 0 色 |
+    | 明度範圍（灰階 Y） | 46~147；主色 90 | 43~209；主色 108 |
+    | 與不可破壞磚（D14，深藍灰鋼板 Y 71）分得開？ | 明度接近（67~90），靠色相（橄欖綠 vs 藍灰）與板縫紋路；中等 | 色相不同（暖褐 vs 冷灰）；分得開 |
+    | 與擋板（D13，亮鋼灰加青燈） | 較暗、偏綠；分得開 | 暖色；分得開 |
+    | 與七色磚 | 暗、低飽和，與亮綠磚（Y 135~207）差別在飽和度與明度；分得開 | 主色 `/` 與炸藥磚（D18）完全相同，且接近橙磚；**最外一欄磚貼著邊框時容易黏在一起** |
+    | 與魔王（紫灰） | 分得開（綠 vs 紫） | 分得開 |
+    | 與球（珍珠白 Y 210） | 最亮只有 147，不搶球 | 最亮 `?` Y 209，與球接近；只有各板左緣 1 px，影響不大但球貼牆時要留意 |
+    | 與背景（D24，Y ≤ 40） | 最暗 46 比背景亮，邊界清楚 | 最暗 43，邊界清楚 |
+    | 風險 | 與 D14 明度接近 | 與炸藥磚、橙磚色相接近；T1 偏亮 |
+    | 我的建議 | **建議 A** | 備案 |
+
+    苔石 5 階（方案 A 用）：
+
+    | 階 | 代號 | HEX | Y |
+    |---|---|---|---|
+    | T1 | `(` | #8F9A78 | 147 |
+    | T2 | `)` | #6F7B5C | 116 |
+    | T3（主色） | `[` | #55604A | 90 |
+    | T4 | `]` | #3E4837 | 67 |
+    | T5 | `{` | #2A3226 | 46 |
+
+    收邊（兩案相同）：
+    - 底端：左右邊框隨螢幕底緣直接裁掉，不加端帽，下方沒有邊框
+    - 與 UI 區相接：上邊框頂端的 `K` 線（y 48）就是 UI 區的下緣，UI 區底（D22）不畫在邊框上
+    - 與關卡區相接：邊框內緣 1 px `K` 就是關卡區的邊界；球碰撞邊界在 x = 20、x = 339、y = 68
+    - 轉角：左右轉角各是一塊 20×20 的獨立石板（或木塊），自帶 `K` 外框；**右上轉角直接用左上轉角同一張圖，不鏡像**——鏡像會讓光源跑到右上，與左右邊框（光源左上）不一致；這與「左右兩邊用同一張圖」的規則相同
+    - 轉角與邊框相接處：兩個樣本的 `K` 線重疊，成 1 px 線；轉角內部是完整的石板／木塊，所以接縫看起來像一塊獨立的角石
+    - 背景（D24）不畫在邊框上
+
+    圖寬：20　圖高：32
+    方案 A 苔石牆樣本（id: border_moss_tile）：
+    ```text
+    KKKKKKKKKKKKKKKKKKKK
+    K(((((((((((((((()[K
+    K()))))))))))))))[]K
+    K()[[[[[[[[[[[{[[]{K
+    K()[[[]]][[[[{[[[]{K
+    K()[[[[))[[[{[[[[]{K
+    K()[[[[[[[[{[[[[[]{K
+    K()[[[[[[[{[[[[[[]{K
+    K)[]]]]]]]]]]]]]]]{K
+    K[]{{{{{{{{{{{{{{{{K
+    KKKKKKKKKKKKKKKKKKKK
+    K(((((((((((((((()[K
+    K()))))))))))))))[]K
+    K()[[[[[[[[[[[[[[]{K
+    K()[]]][[[[[[[[[[]{K
+    K()[[))[[[[[[[[[[]{K
+    K()[[[[[{[[[[[[[[]{K
+    K()[[[[{[[[[]]][[]{K
+    K()[[[{[[[[[[))[[]{K
+    K()[[{[[[[[[[[[[[]{K
+    K)[]]]]]]]]]]]]]]]{K
+    K[]{{{{{{{{{{{{{{{{K
+    KKKKKKKKKKKKKKKKKKKK
+    K(((((((((((((((()[K
+    K()))))))))))))))[]K
+    K()[[[[[[[[[]]][[]{K
+    K()[[[[[[[[[[))[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[]]][[[[[[[[[[]{K
+    K()[[))[[[[[[[[[[]{K
+    K)[]]]]]]]]]]]]]]]{K
+    K[]{{{{{{{{{{{{{{{{K
+    ```
+
+    圖寬：20　圖高：32
+    方案 B 橡木桁架樣本（id: border_oak_tile）：
+    ```text
+    KKKKKKKKKK?-/////;:K
+    K???????-;?-/////;:K
+    K?------/;?-///-/;:K
+    K?-/////;:?-///-/;:K
+    K?-/;///;:?-/////;:K
+    K?-/;///;:?-/////;:K
+    K?-/;///;:?-/////;:K
+    K?-/////;:?-/-///;:K
+    K?-/BY//;:?-/-///;:K
+    K?-/CD//;:?-/-///;:K
+    K?-/////;:?-/////;:K
+    K?-/////;:?-///;/;:K
+    K?-/-///;:?-/////;:K
+    K?-/-///;:?-/////;:K
+    K?-/////;:-/;;;;;;:K
+    K?-/////;:/::::::::K
+    K?-/////;:KKKKKKKKKK
+    K?-/////;:???????-;K
+    K?-///;/;:?------/;K
+    K?-///;/;:?-/////;:K
+    K?-///;/;:?-///;/;:K
+    K?-/////;:?-///;/;:K
+    K?-/////;:?-/////;:K
+    K?-/////;:?-/////;:K
+    K?-/////;:?-/BY//;:K
+    K?-///-/;:?-/CD//;:K
+    K?-///-/;:?-/////;:K
+    K?-/////;:?-/////;:K
+    K?-/////;:?-/;///;:K
+    K?-/////;:?-/;///;:K
+    K-/;;;;;;:?-/////;:K
+    K/::::::::?-/////;:K
+    ```
+
+    **新增樣本：上邊框與左上轉角**（座標與拼接規則見上方「位置」與「收邊」）
+
+    | 項目 | 方案 A：苔石牆 | 方案 B：橡木桁架 |
+    |---|---|---|
+    | 上邊框樣本 | 40×20，可水平重複的單位寬度 = 40 px | 32×20，可水平重複的單位寬度 = 32 px |
+    | 結構 | 兩層石板：上層 y 1~9（9 列）、下層 y 11~18（8 列），橫縫在 y 0、10、19；上層直縫在 x 0、20，下層直縫在 x 10、30（錯開 10 px） | 兩條橫向木板：y 1~9 與 y 10~18；板端接頭錯開 16 px；銅釘 2 顆（2×2：x 8~9、y 4~5 與 x 24~25、y 13~14）；由左右邊框樣本 border_oak_tile **轉置**（列與欄互換）而來 |
+    | 光源 | 每塊石板上緣、左緣亮，下緣、右緣暗，與左右邊框的石板相同（左上） | 轉置不改變左上光源；木板上緣 `?` 亮、下緣 `:` 暗 |
+    | 左上轉角 | 20×20 一整塊石板，自帶 `K` 外框，上緣左緣亮、下緣右緣暗，1 個凹坑、1 條裂痕 | 20×20 一整塊木塊，自帶 `K` 外框，上緣左緣亮、下緣右緣暗，銅釘 1 顆 |
+    | 右上轉角 | 直接用左上轉角同一張圖，**不鏡像** | 同左 |
+    | 為什麼右上轉角不鏡像 | 鏡像後亮面在右上，與左右邊框、上邊框（光源左上）矛盾；轉角是自帶外框的獨立方塊，同一張圖放右邊不會有接縫問題 | 同左 |
+    | 使用顏色 | 苔石 5 階 + `K`，零新色 | 炸藥褐 5 階 + 黃銅 `B Y C D` + `K`，零新色 |
+
+    圖寬：40　圖高：20
+    方案 A 苔石牆上邊框樣本（id: border_moss_top_tile）：
+    ```text
+    KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+    K((((((((((((((((()[K((((((((((((((((()[
+    K())))))))))))))))[]K())))))))))))))))[]
+    K()[[[[[[[[[[[[[[[]{K()[[[[[[[[[[[[[[[]{
+    K()[[[[))[[[[[[[[[]{K()[[[[[[[[[[[[[[[]{
+    K()[[[[[[[[[[[[[[[]{K()[[[[[[[[[[[[[[[]{
+    K()[[[[[[[[[[[[[[[]{K()[[[[[[[[{[[[[[[]{
+    K()[[[[[[[[[[[[[[[]{K()[[[[[[[[[[[[[[[]{
+    K)[]]]]]]]]]]]]]]]]{K)[]]]]]]]]]]]]]]]]{
+    K[]{{{{{{{{{{{{{{{{{K[]{{{{{{{{{{{{{{{{{
+    KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+    (((((((()[K((((((((((((((((()[K(((((((((
+    ))))))))[]K())))))))))))))))[]K())))))))
+    [[[[[[[[]{K()[[[[[[[[[[[[[[[]{K()[[[[[[[
+    [[[[[[[[]{K()[[[[[[]]][[[[[[]{K()[[[[[[[
+    [[[[[[[[]{K()[[[[[[[[[[[[[[[]{K()[[[[[[[
+    [[[[[[[[]{K()[[[[[[[[[[[[[[[]{K()[[[[[[[
+    ]]]]]]]]]{K)[]]]]]]]]]]]]]]]]{K)[]]]]]]]
+    {{{{{{{{{{K[]{{{{{{{{{{{{{{{{{K[]{{{{{{{
+    KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：20　圖高：20
+    方案 A 苔石牆左上轉角（id: border_moss_corner_tl）：
+    ```text
+    KKKKKKKKKKKKKKKKKKKK
+    K(((((((((((((((()[K
+    K()))))))))))))))[]K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[))[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[{[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K()[[[[[[[[[[[[[[]{K
+    K)[]]]]]]]]]]]]]]]{K
+    K[]{{{{{{{{{{{{{{{{K
+    KKKKKKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：32　圖高：20
+    方案 B 橡木桁架上邊框樣本（id: border_oak_top_tile）：
+    ```text
+    KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+    K?????????????????????????????-/
+    K?----------------------------/:
+    K?-///////////////////////////;:
+    K?-/;;;/BC//--////////////////;:
+    K?-/////YD////////////////////;:
+    K?-///////////////;;;////--///;:
+    K?-///////////////////////////;:
+    K-/;;;;;;;;;;;;;;;;;;;;;;;;;;;;:
+    K;;:::::::::::::::::::::::::::::
+    ??????????????-/K???????????????
+    --------------/:K?--------------
+    //////////////;:K?-/////////////
+    ///////---////;:K?-/////BC//;;//
+    //////////////;:K?-/////YD//////
+    //--///////;//;:K?-/;;//////////
+    //////////////;:K?-/////////////
+    ;;;;;;;;;;;;;;;:K-/;;;;;;;;;;;;;
+    ::::::::::::::::K;;:::::::::::::
+    KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：20　圖高：20
+    方案 B 橡木桁架左上轉角（id: border_oak_corner_tl）：
+    ```text
+    KKKKKKKKKKKKKKKKKKKK
+    K????????????????-;K
+    K?---------------/;K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////BY//////;:K
+    K?-//////CD//////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K?-//////////////;:K
+    K-/;;;;;;;;;;;;;;;:K
+    K/:::::::::::::::::K
+    KKKKKKKKKKKKKKKKKKKK
+    ```
+
+    **B 橡木與炸藥磚同色的問題在新版面是否仍存在**
+
+    | 位置 | 是否仍存在 | 原因與處理 |
+    |---|---|---|
+    | 上邊框與磚塊 | **不存在** | 磚塊從 y 84 起，與上邊框下緣 y 67 之間有 16 px 空帶，兩者不相鄰 |
+    | 左右邊框與最外一欄磚（x 20~51、x 308~339） | **仍存在** | 炸藥磚主色 `/` 與橡木主色 `/` 相同，且橙磚（`d`）也接近；隔著邊框內緣 `K` 加磚自己的 `K` 描邊共 2 px 黑線，能分開，但顏色相近的面積仍大 |
+    | 處理 1（建議） | 橡木只給一個主題 | 本稿主題表只有「地下礦坑」用橡木（木支架符合主題）；影響第 11~20 關 |
+    | 處理 2（備案） | 礦坑也改用苔石換色 | 若實機仍分不清，礦坑改用苔石樣本換成岩壁褐灰（見主題表）；橡木整個不用，不需新增任何東西 |
+    | 處理 3（不建議） | 關卡設計避開 | 禁止炸藥磚出現在最外一欄；限制關卡設計，不建議 |
+    | 與球 | 無新問題 | 橡木最亮 `?`（Y 209）只有各板左緣 1 px 與上邊框上緣；球貼牆時仍要留意（沿用原備註） |
+
+    **邊框依主題：顏色限制與做法**
+
+    - 限制：D01 新增色可用的符號只剩 `'` 和 `"` 兩個；20 個主題各要一組 5 階色，用新符號做不到
+    - 借用既有色階也不行：D01 既有 5 階色組只有魔王紫灰、鋼灰、靛、骨白、電青等，不是與磚塊、擋板、魔王相混（鋼灰＝擋板、靛＝靛磚、魔王紫灰＝魔王），就是太亮（骨白、電青）
+    - **替代做法（建議）：同一張網格，由轉檔工具依主題換色**
+      - 網格只用 5 個「槽位」符號 `( ) [ ] {`（槽位 1~5＝T1~T5）加 `K`；符號不變，不新增符號
+      - 每個主題提供 1 個 HEX（T3 主色）；其他 4 階由工具推算：T1、T2、T4、T5 = T3 逐通道乘以 147÷90、116÷90、67÷90、46÷90（四捨五入；T3 最大通道不超過 156 就不會超過 255，下表都符合）。這樣每階的明度與原苔石相同（Y 147、116、90、67、46）
+      - 每個主題輸出一張自己的 PNG（檔名含主題代號）；沒有換色的主題（暮色草原用原苔石、礦坑用橡木）照原網格轉檔
+      - 需要工具支援：轉檔工具新增「主題換色表」輸入（主題代號、網格 id、T3 HEX），並對這幾張邊框網格略過「只能用 D01 顏色」的檢查，改檢查「5 個槽位以外不得出現其他字元」
+      - 衍生色只用在邊框，不進 D01 調色盤；新增 0 個符號，約 90 個衍生 HEX（18 個主題 × 5 階）
+    - 換色規則（工具可驗收）：T3 灰階 Y 在 80~95；T3 三通道最大減最小 ≤ 45（低飽和，與七色磚的高飽和分開）；不得與七色磚主色（T3）、魔王主色 `Z` #5A4A6E 太接近（HEX 距離由工程師複核）
+    - 新材質只有 2 種要另畫（第 2 批之後再畫，不在本次）：金屬鉚接板（太空站、機械工廠、霓虹夜街）、晶體（冰洞、水晶洞、星雲）；它們同樣只用 5 個槽位符號加 `K`；若需要鉚釘高光等小亮點，可用 `'`、`"` 兩個新符號，屆時再提
+
+    **邊框依主題對照表**（D24 主題內容不變；T3 為手算近似，Y 約 85~95，請工程師用工具複核）
+
+    | 序 | 主題 | 邊框材質 | 做法 | T3 主色（名稱） | 理由 |
+    |---|---|---|---|---|---|
+    | 1 | 暮色草原 | A 苔石 | 原色 | #55604A（苔綠） | 草原與苔石相合；也是第 2 批先畫的主題 |
+    | 2 | 地下礦坑 | B 橡木 | 原色 | 原橡木褐 | 木支架符合礦坑；全表唯一用橡木，限制炸藥磚同色的影響範圍 |
+    | 3 | 雨夜城市 | A 苔石 | 換色 | #4D586A（藍灰石） | 城市石牆，冷色與雨夜一致 |
+    | 4 | 深海 | A 苔石 | 換色 | #3F6068（青藍珊瑚岩） | 石面凹坑像珊瑚孔洞 |
+    | 5 | 沙漠夜 | A 苔石 | 換色 | #5E5A4E（砂岩灰） | 低飽和砂色，避免與橙磚、炸藥磚相混 |
+    | 6 | 冰洞 | 新材質：晶體 | 換色 | #4E6074（冰藍灰） | 冰是塊狀晶體，不是石板 |
+    | 7 | 深林 | A 苔石 | 換色 | #4A5A42（深苔） | 比第 1 個更暗更綠；與第 1 個相近，是相似度最高的一組 |
+    | 8 | 火山洞穴 | A 苔石 | 換色 | #62504A（玄武岩暗紅灰） | 裂痕像岩縫；低飽和，避免與紅磚相混 |
+    | 9 | 古代遺跡 | A 苔石 | 換色 | #5C5868（風化灰紫） | 石板厚重，最像遺跡石牆 |
+    | 10 | 機械工廠 | 新材質：金屬鉚接板 | 換色 | #5A5C60（鐵灰） | 鉚接牆板；注意與不可破壞磚（D14）明度相近 |
+    | 11 | 雲海夜空 | A 苔石 | 換色 | #50587A（夜藍灰） | 冷藍與夜空一致 |
+    | 12 | 墓園 | A 苔石 | 換色 | #5A5E58（墓碑灰） | 墓碑石材 |
+    | 13 | 水晶洞 | 新材質：晶體 | 換色 | #5E4E7A（紫水晶） | 晶簇洞壁 |
+    | 14 | 太空站 | 新材質：金屬鉚接板 | 換色 | #4A5C66（冷青灰） | 艙壁格板；注意與擋板（D13）、不可破壞磚（D14）分開 |
+    | 15 | 沼澤 | A 苔石 | 換色 | #58593F（泥綠） | 濕泥石 |
+    | 16 | 城堡地牢 | A 苔石 | 換色 | #54545C（地牢灰） | 石磚牆，最像原本的石板 |
+    | 17 | 霓虹夜街 | 新材質：金屬鉚接板 | 換色 | #5A4C70（暗紫） | 街邊鐵皮；沒有霓虹光（沒有可用的亮色） |
+    | 18 | 星雲 | 新材質：晶體 | 換色 | #6A4E70（星雲紫） | 晶體面像星雲結晶 |
+    | 19 | 黑暗神殿 | A 苔石 | 換色 | #544C62（黑曜紫灰） | 神殿石柱 |
+    | 20 | 魔王城 | A 苔石 | 換色 | #6A4A56（暗莓紅石） | 暗紅帶紫；刻意避開魔王主色 `Z`；與紅磚的區別靠低飽和 |
+
+    - 統計：A 原色 1、B 原色 1、A 換色 12、新材質 6（金屬鉚接板 3、晶體 3）；共 20
+    - 相似風險：第 1、7、15、12 的綠灰色相近；第 3、11、14 的藍灰色相近；差別小，使用者若在意，可改其中幾個主題的 T3
+    - 若使用者不接受換色：退回「全部用 A 或 B 原色」或「只做少數幾個主題的專屬邊框」，由使用者決定
+
+    - 已知限制：
+      - 樣本只在 20×32 內重複，垂直方向每 32 px 會看出週期（兩案都刻意把裂痕、木紋放在不同位置以減輕）；若使用者覺得重複感強，可加第 2 塊變體
+      - 方案 A 與 D14 明度接近；方案 B 與炸藥磚同色（新版面仍存在於左右邊框，見上方表）；兩者都沒有用色盲模擬器驗證
+      - 上邊框、轉角樣本是我手排的 ASCII，尚未轉成 PNG 看過；接縫（轉角與邊框重疊的 1 px 線、上邊框與右轉角的裁切處）需看 PNG 才能確認
+      - 上邊框 B 樣本由左右邊框樣本轉置而來，木板接頭與銅釘位置跟著轉置，沒有重新設計；若看起來不自然可重畫
+      - 主題換色的 T3 色碼為我手算，沒有實際看過色；T1~T5 由工具推算，亮邊在低飽和色上可能偏灰白，需看 PNG 調整
+      - 20 個主題的邊框對應是我的提案；12 個主題共用苔石形狀，只靠顏色區別，單調感待使用者判斷
+      - D24 的景觀區（y 0~103）被 UI 區與上邊框蓋住，D24 本次未改，見 D22 問題 3
+
+24. [D24] 背景主題清單（暫定：使用者 2026-10-27 決定「先暫定，實機測試再確認」；2026-10-26 範圍改為只在關卡區；主題 1、8 的圖見 D25）：
+    - 範圍：每 10 關換一個主題，200 關共 20 個主題；第 N 關的主題 = 第 ⌈N ÷ 10⌉ 個；主題切換在關卡開始時直接換，不加轉場
+    - 背景是關卡區的最底層圖，靜態、不動；畫在磚塊、球之下
+    - **可見範圍（D22 新版，使用者已確認 UI 區用實心深色底，現為 `K`）：只有關卡區 x 20~339、y 68~799，共 320×732**；UI 區（y 0~47）與上邊框（y 48~67）蓋住的區域不再有背景，**景觀區取消**
+    - 低於 800 高的手機：背景左上對齊 (20, 68)，底端多出的部分裁掉
+    - **已由 D28 v5 取代**：可見範圍改為 x 20~339、y 52~799（320×748），原點對齊關卡區左上 (20, 52)；其餘規則不變；以下為原文
+    - 實作方式：以底圖單元（例 64×64）上下左右重複鋪滿 320×732，原點對齊關卡區左上 (20, 68)，再疊裝飾圖；範例見 D25
+
+    **亮度與對比規則**（工具與使用者可驗收）：
+
+    | 規則 | 數值 | 原因 |
+    |---|---|---|
+    | 關卡區背景每個像素的灰階 Y | 8 ≤ Y ≤ 40（比 D01 的 `K` Y 29 略深到略淺） | 球主色 `2`（Y 210）對背景約 9:1 以上 |
+    | 關卡區背景內任兩個相鄰像素的 Y 差 | ≤ 12 | 沒有硬邊，不會被誤認為磚塊或道具輪廓 |
+    | 關卡區背景內 32×32 範圍內最亮與最暗像素的 Y 差 | ≤ 24 | 景物只是氛圍 |
+    | 色彩飽和度 | 同一像素的 R、G、B 最大值減最小值 ≤ 40 | 不與七色磚及道具搶色 |
+    | 禁用顏色 | 不得使用 D01 的任何一色（磚塊、擋板、球、道具色皆不用） | 辨識不被背景色干擾 |
+    | 景物密度 | 關卡區背景中，非底色像素 ≤ 25% | 留白給球與磚塊 |
+    | 景觀區 | 已取消（被 UI 區與上邊框蓋住，使用者確認 UI 區實心）；原「3% 像素到 Y ≤ 90」的例外**不再保留**，全部像素一律 Y ≤ 40 | 可見範圍只有關卡區，亮點會干擾球 |
+    | 動態 | 無 | 球與特效是唯一會動的東西 |
+    | 文字 | 不放任何文字、招牌字 | 使用者決定：不放中文 |
+    - 驗收方式：轉出背景圖後，工具逐像素檢查 Y、相鄰像素差、飽和度；超出的列出座標
+    - 磚塊最暗主色（靛 `I`，Y 66）對背景對比低，靠磚塊 1 px `K` 描邊與斜面分辨；這是已知限制
+    - HEX 與 Y 為我手算近似，請工程師用工具複核；「底色」為整體基底，「景物色」為景物與紋路用，兩者 Y 都在規則內
+
+    | 序 | 關卡 | 主題 | 底色（Y） | 景物色（Y） | 主要元素 |
+    |---|---|---|---|---|---|
+    | 1 | 1~10 | 暮色草原 | #0E1A16（22） | #1A2E26（39） | 遠丘剪影、零星草叢；景觀區有一彎淡月 |
+    | 2 | 11~20 | 地下礦坑 | #17130F（20） | #2B241C（37） | 木支架、礦車軌、岩壁紋 |
+    | 3 | 21~30 | 雨夜城市 | #0D1220（18） | #1C273A（38） | 樓房剪影、小窗點（每點 ≤ 2×2 px）、極淡的斜雨線 |
+    | 4 | 31~40 | 深海 | #09171F（20） | #112D38（38） | 海草、氣泡圈、遠處魚影 |
+    | 5 | 41~50 | 沙漠夜 | #1A1410（21） | #2E2518（38） | 沙丘、仙人掌剪影、景觀區星點 |
+    | 6 | 51~60 | 冰洞 | #0F1822（22） | #1B2937（38） | 冰柱、霜紋、冰晶 |
+    | 7 | 61~70 | 深林 | #0B140D（17） | #1A2B1C（36） | 樹幹、蕨葉、微光孢子（單點） |
+    | 8 | 71~80 | 火山洞穴 | #1A0F0D（18） | #3A1D14（37） | 岩縫與暗紅裂紋、遠處熔岩河、石筍 |
+    | 9 | 81~90 | 古代遺跡 | #14131C（20） | #272534（39） | 石柱、符文刻痕（無字）、碎磚 |
+    | 10 | 91~100 | 機械工廠 | #10161C（21） | #202830（39） | 齒輪、管線、鉚接牆板（第 100 關魔王之後換主題） |
+    | 11 | 101~110 | 雲海夜空 | #0C0F26（17） | #1E2244（37） | 雲層帶、星點、遠方浮島 |
+    | 12 | 111~120 | 墓園 | #111613（20） | #222925（39） | 墓碑、枯樹、低霧帶 |
+    | 13 | 121~130 | 水晶洞 | #150E22（18） | #2A1E44（38） | 晶簇、洞壁、微光折面 |
+    | 14 | 131~140 | 太空站 | #080A14（11） | #1D2336（35） | 艙壁格板、舷窗星點、管道 |
+    | 15 | 141~150 | 沼澤 | #12150B（19） | #272B16（39） | 蘆葦、枯枝、水面反光帶 |
+    | 16 | 151~160 | 城堡地牢 | #15151A（22） | #27262C（39） | 石磚牆、鐵窗、無火焰的火把座 |
+    | 17 | 161~170 | 霓虹夜街 | #0A0B12（12） | #2A1840（34）、#0F312F（39） | 無字招牌輪廓、電線、暗色霓虹線條 |
+    | 18 | 171~180 | 星雲 | #0D0817（11） | #2B1646（34） | 雲狀色塊、星點、環狀行星 |
+    | 19 | 181~190 | 黑暗神殿 | #0F0B12（13） | #2A1F33（37） | 立柱、符文圈（無字）、門拱 |
+    | 20 | 191~200 | 魔王城 | #0C0A10（11） | #2D2038（39） | 尖塔、王座剪影、裂開的夜空 |
+
+    - 表中「景觀區」「月亮」「星點」「招牌光」等字眼：景觀區已取消，這些元素若要保留，改畫進關卡區背景，並遵守上方亮度規則（Y ≤ 40，不可更亮）；主題 1 的月亮已不畫（D25 未使用）
+    - 主題順序的想法：由亮處（草原）一路走到暗處（魔王城），關卡越後面底色越冷、越深；冷暖交錯避免連續三個主題同色
+    - 暖色主題（礦坑、沙漠、火山）的景物色都壓在 Y ≤ 39 且低飽和，以免與紅、橙、黃磚相混；這是風險最高的三個
+    - **建議第 2 批先畫 2 個**：
+      - 第 1 個 暮色草原：玩家最先看到；偏綠，用來測「背景綠」會不會干擾綠磚
+      - 第 2 個 火山洞穴：暖紅褐，是最容易與紅橙磚相混的；兩個畫完就能驗證亮度規則的兩個極端
+    - 已知限制：
+      - 20 個主題的名稱與元素是我的提案，沒有使用者研究；使用者可換、可刪
+      - 景觀區取消後，主題辨識度只靠關卡區背景的低對比景物（Y ≤ 40）；與磚塊重疊的上半部看不太到，可見度靠球的飛行空間（y 436~719）
+
+25. [D25] 背景圖：主題 1 暮色草原、主題 8 火山洞穴（使用者已確認，2026-10-27；主題 1、8 的背景圖定案）：
+    - 範圍：D24 的主題 1（關卡 1~10）與主題 8（關卡 71~80）；每個主題 1 張可無縫重複的**底圖單元** 64×64 + 3 張**裝飾圖**；不畫邊框（主題 1 用苔石原色、主題 8 由工具換色，D23）
+    - 為什麼不畫整張：關卡區 320×732 太大；64×64 單元重複 5 欄 × 12 列（最後一列裁掉），再疊少量裝飾，檔案小、容易改
+    - 為什麼是 64×64：320 剛好 5 欄；紋理單元夠大，看不出明顯的格子重複，又不會大到手排出錯
+    - **已由 D28 v5 更新**：關卡區原點改為螢幕 (20, 52)，關卡區 x 0~319、y 0~747；本項的擺放座標（關卡區座標）與底圖、裝飾圖都不變，螢幕上整體上移 16 px；底圖鋪設 748 = 11 × 64 + 44（最後一列只用前 44 列）
+    - 座標一律用「關卡區座標」：(0, 0) = 螢幕 (20, 68)；螢幕座標 = 關卡區座標 + (20, 68)；關卡區 x 0~319、y 0~731（v5 前的原文）
+    - 顏色：依 D24「禁用 D01 顏色」，不使用 D01 任何一色，每個主題用自己的**區塊調色盤**；調色盤寫在每張網格的「圖寬」行正上方，同主題各張共用同一組；`.` 為透明、`K` 不可定義、本項沒有使用 `K`
+    - 工具提醒：工具尚未支援區塊調色盤，轉檔須等工程師完成；在那之前我沒有看過這些圖，下方格子與色值皆為手排、手算
+
+    **無縫規則與畫法**
+
+    | 項目 | 規則 |
+    |---|---|
+    | 底圖單元無縫 | 所有紋理圖案都完整落在單元內，第 0 列、第 63 列、第 0 欄、第 63 欄**全部是底色 `a`**；上下左右相接時只會接到底色，沒有接縫 |
+    | 紋理不排成格子 | 圖案位置錯開，不以 8 或 16 的倍數排成整齊陣列 |
+    | 底色 | 兩個主題的 `a` 都等於 D24 表的「底色」 |
+    | 裝飾圖 | 背景透明 `.`，疊在底圖上；邊緣色與底色的灰階差都在 12 以內，不會出現硬邊 |
+    | 疊放順序 | 底圖 → 遠景（丘、河）→ 中景（灌木、岩池）→ 近景（花、石筍） |
+
+    **D24 亮度規則自查（Y = 0.299R + 0.587G + 0.114B，手算近似，請工程師用工具複核）**
+
+    主題 1 暮色草原，`區塊調色盤：e #0A1410；a #0E1A16；b #11201A；c #152620；f #282236`
+
+    | 符號 | HEX | Y | 飽和度（最大−最小） | 用途 |
+    |---|---|---|---|---|
+    | e | #0A1410 | 16.6 | 10 | 最暗：土丘本體、岩坑、灌木底影 |
+    | a | #0E1A16 | 22.0 | 12 | 底色（等於 D24） |
+    | b | #11201A | 26.8 | 15 | 草葉暗部、土丘邊、灌木本體 |
+    | c | #152620 | 32.2 | 17 | 草葉亮部、灌木頂 |
+    | f | #282236 | 38.1 | 20 | 花心（暮紫，全圖最亮點，只有 1 px） |
+
+    - 全部 Y 在 16.6~38.1，落在 8~40 內；飽和度最大 20，≤ 40
+    - 相鄰像素差（含斜角）用到的組合：e–a 5.4、a–b 4.9、b–c 5.4、a–c 10.3、b–e 10.3、c–f 5.8，全部 ≤ 12；刻意**不相鄰**的組合：c–e 15.7、a–f 16.1（花心四周一圈是 `c`，把 `f` 與 `a` 隔開）
+    - 任意 32×32 內最亮與最暗的差最大 f–e = 21.5，≤ 24
+    - 非底色像素：底圖約 6%，加裝飾約 8%（手算估計），≤ 25%
+
+    主題 8 火山洞穴，`區塊調色盤：e #140B09；a #1A0F0D；b #20120F；c #28160F；d #2F1911；f #361C13`
+
+    | 符號 | HEX | Y | 飽和度 | 用途 |
+    |---|---|---|---|---|
+    | e | #140B09 | 13.5 | 11 | 最暗：暗裂縫、石筍陰面 |
+    | a | #1A0F0D | 18.1 | 13 | 底色（等於 D24） |
+    | b | #20120F | 21.8 | 17 | 岩塊、石筍本體 |
+    | c | #28160F | 26.6 | 25 | 裂紋外緣、岩塊亮點、熔岩岸 |
+    | d | #2F1911 | 30.7 | 30 | 裂紋中心、熔岩次層 |
+    | f | #361C13 | 34.8 | 35 | 熔岩核心（全圖最亮，仍低於 D24 景物色 Y 37） |
+
+    - 全部 Y 在 13.5~34.8，落在 8~40 內；飽和度最大 35，≤ 40
+    - 相鄰差用到的組合：e–a 4.6、a–b 3.8、a–c 8.5、b–c 4.7、b–d 8.8、c–d 4.1、c–f 8.2、d–f 4.1、b–e 8.4，全部 ≤ 12；刻意不相鄰：a–d 12.6、c–e 13.1（裂紋中心 `d` 外圈包 `c`；暗縫 `e` 只接 `a` 或 `b`）
+    - 任意 32×32 最大差 f–e = 21.3，≤ 24
+    - 非底色像素：底圖約 6%，加裝飾約 7%（手算估計），≤ 25%
+    - 暖色風險：D24 已列為高風險；f 的 R 只有 54，與紅磚主色 `R`（Y 88）差很多，但仍請在實機看是否把紅磚「染暖」
+
+    **擺放規則（關卡區座標；裝飾位置可依實機微調，但保持 Y 範圍與間距）**
+
+    | 主題 | 圖 | 尺寸 | 數量 | 位置（x, y 為圖左上角） | y 範圍 | 規則 |
+    |---|---|---|---|---|---|---|
+    | 1 | meadow_tile | 64×64 | 鋪滿 | 原點 (0, 0)，每 64 px 重複 | 0~731 | 底層，最後一列只用前 28 列 |
+    | 1 | meadow_mound | 48×12 | 5 | (16,392) (144,452) (248,524) (40,596) (176,668) | 392~679 | 只放在 y ≥ 372（球的飛行空間，磚塊區之下）；兩兩相距 ≥ 48 px |
+    | 1 | meadow_bush | 20×9 | 6 | (272,380) (100,500) (8,540) (228,610) (120,700) (290,690) | 380~708 | 不與土丘重疊 |
+    | 1 | meadow_flowers | 12×7 | 6 | (96,388) (210,470) (150,560) (20,640) (260,650) (90,712) | 388~718 | 最上層；不與土丘、灌木重疊 |
+    | 8 | volcano_tile | 64×64 | 鋪滿 | 原點 (0, 0)，每 64 px 重複 | 0~731 | 底層，最後一列只用前 28 列 |
+    | 8 | volcano_river | 40×9 | 3 | (24,400) (200,520) (60,640) | 400~648 | 遠景；只放在 y ≥ 372；兩條之間 ≥ 100 px |
+    | 8 | volcano_pool | 16×7 | 4 | (140,410) (260,560) (100,590) (250,690) | 410~696 | 中景 |
+    | 8 | volcano_stalagmite | 12×12 | 6 | (8,384) (280,430) (120,470) (230,600) (30,690) (180,700) | 384~711 | 近景；不與河、池重疊 |
+
+    - 磚塊區（關卡區 y 16~367）只有底圖單元，不放裝飾，避免被磚塊切碎
+    - 手機高度低於 800 時，下方裝飾被一起裁掉（D24）；不重新排列
+    - 全圖不放任何文字、招牌（D24）
+
+    區塊調色盤：e #0A1410；a #0E1A16；b #11201A；c #152620；f #282236
+    圖寬：64　圖高：64
+    暮色草原底圖單元（id: meadow_tile）：
+    ```text
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacacaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbcaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbcbbaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaacfcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaeeeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaacaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbcbcaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaacacaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaacbcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaabbcbbaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaaaaacfcaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaacaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaacbcbcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaabbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeeeeaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaacacaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaacbcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaabbcbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaacfcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbcbcaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbbbaaaaaaaaaaa
+    aaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaeeeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacacaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacbcaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbcbbaaaaaaaaaaaaaaaaacccaaaaa
+    aaaaaaaaaaaaaaaaaaaaacaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaacfcaaaaa
+    aaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaa
+    aaaaaaaaaaaaaaaaaaacbcbcaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaabbbbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    ```
+
+    區塊調色盤：e #0A1410；a #0E1A16；b #11201A；c #152620；f #282236
+    圖寬：48　圖高：12
+    暮色草原土丘（id: meadow_mound）：
+    ```text
+    ...................bbbbbbbbbb...................
+    ...............bbbbeeeeeeeeeebbbb...............
+    ............bbbeeeeeeeeeeeeeeeeeebbb............
+    .........bbbeeeeeeeeeeeeeeeeeeeeeeeebbb.........
+    .......bbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeebb.......
+    .....bbeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeebb.....
+    ....beeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeb....
+    ...beeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeb...
+    ..beeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeb..
+    .beeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeb.
+    beeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeb
+    eeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeee
+    ```
+
+    區塊調色盤：e #0A1410；a #0E1A16；b #11201A；c #152620；f #282236
+    圖寬：20　圖高：9
+    暮色草原灌木（id: meadow_bush）：
+    ```text
+    ......cccccccc......
+    ....ccbbbbbbbbbb....
+    ..ccbbbbbbbbbbbbbb..
+    .cbbbbbbbbbbbbbbbbb.
+    cbbbbbbbbbbbbbbbbbbb
+    bbbbbbbbbbbbbbbbbbbb
+    bbbbbbbbbbbbbbbbbbbb
+    .eeeeeeeeeeeeeeeeee.
+    ..eeeeeeeeeeeeeeee..
+    ```
+
+    區塊調色盤：e #0A1410；a #0E1A16；b #11201A；c #152620；f #282236
+    圖寬：12　圖高：7
+    暮色草原花叢（id: meadow_flowers）：
+    ```text
+    ..ccc..ccc..
+    ..cfc..cfc..
+    ..ccc..ccc..
+    .bbcbbbbcbb.
+    bbbbbcbbbbbb
+    bbbbbbbbbbbb
+    .eeeeeeeeee.
+    ```
+
+    區塊調色盤：e #140B09；a #1A0F0D；b #20120F；c #28160F；d #2F1911；f #361C13
+    圖寬：64　圖高：64
+    火山洞穴底圖單元（id: volcano_tile）：
+    ```text
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaa
+    aaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbcbbaaaaaaaa
+    aaaaaacdccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbaaaaaaaa
+    aaaaaaccdcccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaa
+    aaaaaaaccddccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaacccdccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaccdcaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaabbcbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaabbcbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaabbbbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaa
+    aaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaccdcaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccdccaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaccddccaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaccdcccaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacdccaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaccdcaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccdccaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaccddccaaaaaaa
+    aaaacccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaccdcccaaaaaaaa
+    aaaacdccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacdccaaaaaaaaaa
+    aaaaccdcccaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaacccaaaaaaaaaaa
+    aaaaaccddccaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaacccdccaaaaaaaaaaaaaaaaaaaaaaaaabbcbbaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaccdcaaaaaaaaaaaaaaaaaaaaaaaaabbbbbaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaacccaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaa
+    aaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbcbbaaaaaaaa
+    aaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbbbaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaeeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaabbbaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaeeaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+    ```
+
+    區塊調色盤：e #140B09；a #1A0F0D；b #20120F；c #28160F；d #2F1911；f #361C13
+    圖寬：40　圖高：9
+    火山洞穴熔岩河（id: volcano_river）：
+    ```text
+    ...cccccccccccccccccccccccccccccccccc...
+    ..cddddddddddddddddddddddddddddddddddc..
+    .cdffffffffffffffffffffffffffffffffffdc.
+    cdffffffffffffffffffffffffffffffffffffdc
+    cdffffffffffffffffffffffffffffffffffffdc
+    cdffffffffffffffffffffffffffffffffffffdc
+    .cdffffffffffffffffffffffffffffffffffdc.
+    ..cddddddddddddddddddddddddddddddddddc..
+    ...cccccccccccccccccccccccccccccccccc...
+    ```
+
+    區塊調色盤：e #140B09；a #1A0F0D；b #20120F；c #28160F；d #2F1911；f #361C13
+    圖寬：12　圖高：12
+    火山洞穴石筍（id: volcano_stalagmite）：
+    ```text
+    .....cb.....
+    .....cb.....
+    ....cbbe....
+    ....cbbe....
+    ...cbbbbe...
+    ...cbbbbe...
+    ..cbbbbbbe..
+    ..cbbbbbbe..
+    .cbbbbbbbbe.
+    .cbbbbbbbbe.
+    cbbbbbbbbbbe
+    cbbbbbbbbbbe
+    ```
+
+    區塊調色盤：e #140B09；a #1A0F0D；b #20120F；c #28160F；d #2F1911；f #361C13
+    圖寬：16　圖高：7
+    火山洞穴岩池（id: volcano_pool）：
+    ```text
+    ...cccccccccc...
+    ..cddddddddddc..
+    .cdffffffffffdc.
+    cdffffffffffffdc
+    .cdffffffffffdc.
+    ..cddddddddddc..
+    ...cccccccccc...
+    ```
+
+26. [D26] 遊戲中 UI 元件圖（部分已刪除，2026-10-27，見 D27）：
+    - 已刪除（使用者 2026-10-27 決定；已被 D27 取代）：網格 `hud_digit_0`~`hud_digit_9`、`hud_colon`、`hud_pause_normal`、`hud_pause_pressed`、`hud_boss_face`、`hud_boss_bar_empty`、`hud_boss_bar_full`，以及只描述它們的文字
+    - 仍適用的規則（閃爍紅色版 `W`→`r`、暫停鈕按下與停用、數字重疊與對齊、分數位數）已搬到 D27 第十段
+    - 原版 9×9 `hud_icon_clock`、`hud_icon_star` 也已刪除（使用者 2026-10-27 確認放大版後）
+    - **D26 已全部刪除（2026-10-27），見 D27**（圖在 D27，座標在 D28 v5 總表）
+
+
+27. [D27] 魔王舌頭血條與 UI 區 v3（使用者已確認，2026-10-27：舌頭血條、下巴少 1 列、低血量不閃爍、暫停觸控區 56×32；放大版時鐘與星形 `hud_icon_clock_l`、`hud_icon_star_l` 亦已確認（2026-10-27），原 9×9 版已刪除；2026-10-26 提議：移除 UI 區魔王血條與魔王臉，改用魔王牙齒下方的紅舌頭當血條，省出空間放大分數與暫停鈕）：
+    - 取代關係：D22 的魔王臉、魔王血量條，D26 的 `hud_boss_face`、`hud_boss_bar_empty`、`hud_boss_bar_full`，改由本項取代；D26 的這些網格已於 2026-10-27 刪除
+    - **座標已由 D28 v5 取代**：本項的 UI 區 v3 座標表與魔王位置 (116, 84)、舌頭血條 (130, 124)，改為 v5：UI 區高 32、魔王 (116, 68)、舌頭血條 (130, 108)；HUD 見 D28；圖與網格不變
+    - 座標：魔王圖內部座標（128×48）與螢幕座標都從 0 起算；魔王螢幕位置 (116, 84)（D22）
+    - 只用 D01 現有顏色，沒有新增顏色
+
+    **一、現有舌頭評估（`boss_normal`，D12）**
+
+    | 項目 | 現況 | 評估 |
+    |---|---|---|
+    | 嘴巴範圍 | 外框第 13~114 欄、第 36~43 列；內寬 100（第 14~113 欄） | 嘴本身夠寬 |
+    | 牙齒 | 第 37~39 列：`W`、`W`、`G` | 在舌頭正上方，保留 |
+    | 舌頭 | 第 23~104 欄（82 px 寬）、第 40~42 列（`r`、`R`、`t` 各 1 列，共 3 px 高）；兩端第 13~22、105~114 欄是 `K` | 82 px 可當血條，但只有 3 px 高，3 倍放大後約 9 px，偏細；兩端 20 px 的 `K` 浪費了嘴寬 |
+    | 結論 | 勉強可用，建議加大 | 畫新版 `boss_normal_v2`：舌頭撐滿嘴內寬 100 px、高 4 px，1 px ＝ 1% 血量 |
+
+    **二、新版魔王 `boss_normal_v2`（只改嘴巴與舌頭區）**
+
+    | 項目 | 規則 |
+    |---|---|
+    | 做法 | 不整張重畫：新增補丁疊加圖 `boss_mouth_v2_patch`（128×48，只有第 40~44 列有像素，其餘 `.`），**疊在 `boss_normal` 上**（非 `.` 蓋過原像素，規則同 D12 裂痕疊加）得到 `boss_normal_v2`；其他像素必然與原圖相同 |
+    | 舌頭（滿血） | 第 14~113 欄（100 px 寬）、第 40~43 列（4 px 高）：第 40 列 `r`、第 41~42 列 `R`、第 43 列 `t`；左右緊貼嘴外框 `K`（第 13、114 欄） |
+    | 嘴外框下緣 | 由第 43 列下移到第 44 列（`K`，第 13~114 欄）；第 44 列左右兩側（第 3~12、115~124 欄）改 `Z`（原為下巴暗色 `z`） |
+    | 下巴 | 原第 44 列的下巴暗色被嘴外框取代，下巴只剩原第 45~46 列（2 px）；第 45~47 列不動 |
+    | 嘴內其他部分 | 牙齒（第 37~39 列）不動 |
+    | 空的部分 | 另一張 `boss_tongue_empty_v2`（100×4，全 `v` #241C30），畫在舌頭上蓋掉失去的部分 |
+    | 為什麼用「滿舌頭 + 空條蓋上」 | 魔王被擊中的全白幀（D12 自動規則）與其他自動產生圖都以 `boss_normal_v2` 為底，不必為每個血量各畫一張 |
+
+    **三、血條規則**
+
+    | 項目 | 規則 |
+    |---|---|
+    | 血條範圍 | 螢幕 x 130~229、y 124~127（魔王內第 14~113 欄、第 40~43 列），100×4 |
+    | 滿血 | 舌頭完整（`boss_normal_v2` 原樣） |
+    | 扣血 | 舌頭**由右端往左縮**，左端固定；失去的部分顯示 `v` 空條 |
+    | fill_px | 向上取整（100 × 目前血量 ÷ 本關血量上限），限制在 0~100；血量 > 0 時至少 1；血量 0 時為 0（只剩空條，隨即進入魔王破壞動畫） |
+    | 裁切畫法 | 先畫 `boss_normal_v2`；再把 `boss_tongue_empty_v2` 的來源矩形（x 從 fill_px 到 99、全部 4 列）畫到螢幕 (130 + fill_px, 124)；fill_px = 100 時不畫 |
+    | 解析度 | 血量上限最高 1000，1 px 約 10 血；仍不顯示數字 |
+    | 非魔王關 | 不畫，與一般磚無關 |
+
+    **四、與其他圖的關係**
+
+    | 項目 | 關係與解法 |
+    |---|---|
+    | 被擊中（全白 1 幀） | D12 規則把非 `K`、`.` 的像素全變 `W`，舌頭也變白，沒有衝突；需要 `boss_hit_v2`（由工具對 `boss_normal_v2` 產生）；空條 `boss_tongue_empty_v2` 照常畫在白色魔王上（失去的部分保持暗色），該幀只有 100 ms；D22 原「失去的那段先 `W` 100 ms」由全白幀取代，不另做 |
+    | 裂痕疊加（F1） | 裂痕 `K` 直線在第 63~65 欄穿過舌頭（第 40~43 列），舌頭被切開 1 px 的暗縫；血條仍可讀，**不改裂痕圖**；繪製順序：`boss_normal_v2` → 空條 → 裂痕 → 炸彈標記 |
+    | 炸彈標記 `bomb_mark_boss_overlay` | 在第 109~123 欄、第 3~14 列（右眉附近），與舌頭（第 40~43 列）相隔很遠，**沒有衝突**，圖不改 |
+    | 無敵外框 | 魔王不受「無敵」影響（D14），不套外框，**沒有衝突** |
+    | 破壞幀 F2~F4 | 它們是另畫的圖，沒有舌頭（Grep 確認無長串紅色像素）；血量 0 時舌頭已空，接 F2 不會出現紅舌頭，**不需要 v2 版**；唯一差別是 F2 的下巴比 v2 多 1 列，1 幀 100 ms 內看不出 |
+    | 舌頭與紅磚混淆 | 舌頭在魔王嘴內、四周有 `K` 外框與白色牙齒，位置固定；紅磚是 32×16 的磚，離魔王嘴有 20 px 以上；玩家混淆風險低。血條空的部分是暗紫 `v`，與磚的紅差異大 |
+    | 血量低時提示 | **不閃爍**（使用者 2026-10-27 決定）：舌頭只靠長度表示血量，不加任何低血量提示 |
+
+    **五、UI 區 v3（高 800，UI 區 y 0~47，底色 `K`）**
+
+    | 決定 | 內容 | 理由 |
+    |---|---|---|
+    | 移除 | 魔王臉、魔王血條（UI 區第 2 排右側整塊空出） | 改用舌頭血條 |
+    | 數字放大 | 時間與分數**共用同一組大數字** `hud_digit_l_0`~`_9`、`hud_colon_l`：D12 的 5×7 字形 2 倍放大（10×14 白字）加 1 px `K` 描邊，每格 **12×16**；冒號格 6×16 | 與多層磚數字風格一致；整數倍放大不失真；時間也放大，因為要與分數同一套（使用者要求） |
+    | 字距 | 相鄰格起點相差：數字 +11、冒號 +5（描邊重疊 1 px，字間仍有 1 px 空隙，規則見第十段） | 同第十段 |
+    | 時鐘、星形 | （2026-10-27 已改）**保留並畫放大版** `hud_icon_clock_l`、`hud_icon_star_l`（14×14，見第九段）；原 9×9 版已刪除 | 使用者 2026-10-27 決定保留並已確認放大版 |
+    | 暫停鈕 | 放大為 24×24：`hud_pause_l_normal`、`hud_pause_l_pressed`（兩條各 6×16 填色加 `K` 描邊；按下偏右下 1 px、填色變灰，見第十段） | 約 1.5 倍；右側空間夠 |
+    | 暫停觸控區 | 56×48（x 304~359、y 0~47，貼右緣到 UI 區下緣），3 倍放大約 168×144 實體像素 | 原 48×24 偏小；整個右欄都能按，圖示在正中 |
+    | HUD 球狀態列（D16） | 位置不變 (8, 24, 178, 22) | 沒有理由移動 |
+    | 第 2 排右側 | x 190~303、y 24~47 留空 | 可留給之後的功能；不放元件（**已由 D28 v5 取代**：HUD 已移出，分數已用到此區，UI 區縮成 32） |
+
+    **UI 區 v3 座標表（新增，不覆寫 D22 舊表；螢幕座標，x, y, 寬, 高）**
+
+    | 元素 | x | y | 寬 | 高 | 說明 |
+    |---|---|---|---|---|---|
+    | UI 區底 | 0 | 0 | 360 | 48 | `K` |
+    | 時鐘圖示 | 8 | 7 | 9 | 9 | 舊版 9×9（已刪除，改為放大版 `hud_icon_clock_l`，座標見 D28 v5） |
+    | 時間數字（`MM:SS`） | 20 | 4 | 12 | 16 | 格起點 x：20、31、42（冒號 6 寬）、47、58；最右到 x 69 |
+    | 時間數字（`M:SS`） | 20 | 4 | 12 | 16 | 格起點 x：20、31（冒號）、36、47；最右到 x 58 |
+    | 分數數字（已修改，待再確認） | 見說明 | 16 | 12 | 16 | 在暫停鈕正左邊，與暫停鈕垂直置中（鈕 y 12~35，中心 23.5；數字 y 16~31，中心 23.5）；靠右：最右格起點 x = 286（x 286~297），往左每位 −11；**最多 8 位**，最左格起點 x = 209 |
+    | 星形圖示（已修改，待再確認） | 285 − 11 × 位數 | 19 | 9 | 9 | 緊貼最左一位，間隔 3 px，y 19 使星形與數字同一水平線；1 位 x 274；8 位 x 197；舊版 9×9（已刪除，改為放大版 `hud_icon_star_l`，座標見 D28 v5） |
+    | 暫停鈕圖 | 332 | 12 | 24 | 24 | x 332~355、y 12~35，在觸控區正中 |
+    | 暫停觸控區 | 304 | 0 | 56 | 48 | x 304~359、y 0~47 |
+    | HUD 球狀態列（D16） | 8 | 24 | 178 | 22 | 位置已由 D28 取代（待確認）；D28 把 HUD 移到關卡區內，本表分數與時間位置亦以 D28 的 v4 表為準 |
+    | 魔王舌頭血條（螢幕） | 130 | 124 | 100 | 4 | 在魔王嘴內，不在 UI 區；只在第 10 的倍數關 |
+
+    - 分數靠右的右端 x 297，離觸控區 x 304 留 6 px
+    - 時間維持在 y 4（x 8~69）、不跟著下移：分數下移到 y 16~31 後，時間若也下移會與 HUD 球狀態列（x 8~185、y 24~45）重疊；時間在上排、分數與暫停鈕在右側同高，兩者不在同一水平線，是為避開 HUD 的取捨（待使用者確認）
+    - 分數位數上限改為 8 位（99,999,999）：分數下移後，星形左端 x 197 才與 HUD 右端 x 185 留 12 px；超過 8 位的星形會與 HUD（y 24~27 重疊段）相撞；不加千分位逗號、0 分顯示單一 `0`（規則見第十段）；v4 起已恢復 14 位
+    - 閃爍紅色版：見第十段，大數字與冒號、時鐘的 `W` 換成 `r`
+    - 對比：大數字仍是 `W` 對 `K` 底，約 17:1，不變
+
+    **六、給工程師的需求（由 PM 轉達）**
+
+    - 工具：新增 `boss_normal_v2` ＝ `boss_normal` 疊 `boss_mouth_v2_patch`（規則同裂痕疊加）；由 `boss_normal_v2` 產生 `boss_hit_v2`（D12 全白規則）；轉出 `boss_tongue_empty_v2`
+    - 程式：魔王關改用舌頭血條，依「血條規則」裁切；繪製順序 `boss_normal_v2` → `boss_tongue_empty_v2` → 裂痕 → 炸彈標記；被擊中幀用 `boss_hit_v2`；UI 區依 v3 座標表排版（移除魔王臉與血條）
+    - 舊圖：`hud_boss_face`、`hud_boss_bar_*` 已於 2026-10-27 刪除（不再轉檔）
+
+    圖寬：12　圖高：16
+    大數字 0（id: hud_digit_l_0）：
+    ```text
+    ..KKKKKKKK..
+    ..KWWWWWWK..
+    KKKWWWWWWKKK
+    KWWKKKKKKWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWKKKKKKWWK
+    KKKWWWWWWKKK
+    ..KWWWWWWK..
+    ..KKKKKKKK..
+    ```
+
+    圖寬：12　圖高：16
+    大數字 1（id: hud_digit_l_1）：
+    ```text
+    ....KKKK....
+    ....KWWK....
+    ..KKKWWK....
+    ..KWWWWK....
+    ..KWWWWK....
+    ..KKKWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ..KKKWWKKK..
+    ..KWWWWWWK..
+    ..KWWWWWWK..
+    ..KKKKKKKK..
+    ```
+
+    圖寬：12　圖高：16
+    大數字 2（id: hud_digit_l_2）：
+    ```text
+    ..KKKKKKKK..
+    ..KWWWWWWK..
+    KKKWWWWWWKKK
+    KWWKKKKKKWWK
+    KWWK....KWWK
+    KKKK....KWWK
+    ......KKKWWK
+    ......KWWKKK
+    ....KKKWWK..
+    ....KWWKKK..
+    ..KKKWWK....
+    ..KWWKKK....
+    KKKWWKKKKKKK
+    KWWWWWWWWWWK
+    KWWWWWWWWWWK
+    KKKKKKKKKKKK
+    ```
+
+    圖寬：12　圖高：16
+    大數字 3（id: hud_digit_l_3）：
+    ```text
+    KKKKKKKKKK..
+    KWWWWWWWWK..
+    KWWWWWWWWKKK
+    KKKKKKKKKWWK
+    ........KWWK
+    ........KWWK
+    ..KKKKKKKWWK
+    ..KWWWWWWKKK
+    ..KWWWWWWKKK
+    ..KKKKKKKWWK
+    ........KWWK
+    ........KWWK
+    KKKKKKKKKWWK
+    KWWWWWWWWKKK
+    KWWWWWWWWK..
+    KKKKKKKKKK..
+    ```
+
+    圖寬：12　圖高：16
+    大數字 4（id: hud_digit_l_4）：
+    ```text
+    ......KKKK..
+    ......KWWK..
+    ....KKKWWK..
+    ....KWWWWK..
+    ..KKKWWWWK..
+    ..KWWKKWWK..
+    KKKWWKKWWK..
+    KWWKKKKWWK..
+    KWWKKKKWWKKK
+    KWWWWWWWWWWK
+    KWWWWWWWWWWK
+    KKKKKKKWWKKK
+    ......KWWK..
+    ......KWWK..
+    ......KWWK..
+    ......KKKK..
+    ```
+
+    圖寬：12　圖高：16
+    大數字 5（id: hud_digit_l_5）：
+    ```text
+    KKKKKKKKKKKK
+    KWWWWWWWWWWK
+    KWWWWWWWWWWK
+    KWWKKKKKKKKK
+    KWWKKKKKKK..
+    KWWWWWWWWK..
+    KWWWWWWWWKKK
+    KKKKKKKKKWWK
+    ........KWWK
+    ........KWWK
+    KKKK....KWWK
+    KWWK....KWWK
+    KWWKKKKKKWWK
+    KKKWWWWWWKKK
+    ..KWWWWWWK..
+    ..KKKKKKKK..
+    ```
+
+    圖寬：12　圖高：16
+    大數字 6（id: hud_digit_l_6）：
+    ```text
+    ..KKKKKKKK..
+    ..KWWWWWWK..
+    KKKWWWWWWK..
+    KWWKKKKKKK..
+    KWWK........
+    KWWK........
+    KWWKKKKKKK..
+    KWWWWWWWWK..
+    KWWWWWWWWKKK
+    KWWKKKKKKWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWKKKKKKWWK
+    KKKWWWWWWKKK
+    ..KWWWWWWK..
+    ..KKKKKKKK..
+    ```
+
+    圖寬：12　圖高：16
+    大數字 7（id: hud_digit_l_7）：
+    ```text
+    KKKKKKKKKKKK
+    KWWWWWWWWWWK
+    KWWWWWWWWWWK
+    KKKKKKKKKWWK
+    ......KKKWWK
+    ......KWWKKK
+    ....KKKWWK..
+    ....KWWKKK..
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KWWK....
+    ....KKKK....
+    ```
+
+    圖寬：12　圖高：16
+    大數字 8（id: hud_digit_l_8）：
+    ```text
+    ..KKKKKKKK..
+    ..KWWWWWWK..
+    KKKWWWWWWKKK
+    KWWKKKKKKWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWKKKKKKWWK
+    KKKWWWWWWKKK
+    KKKWWWWWWKKK
+    KWWKKKKKKWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWKKKKKKWWK
+    KKKWWWWWWKKK
+    ..KWWWWWWK..
+    ..KKKKKKKK..
+    ```
+
+    圖寬：12　圖高：16
+    大數字 9（id: hud_digit_l_9）：
+    ```text
+    ..KKKKKKKK..
+    ..KWWWWWWK..
+    KKKWWWWWWKKK
+    KWWKKKKKKWWK
+    KWWK....KWWK
+    KWWK....KWWK
+    KWWKKKKKKWWK
+    KKKWWWWWWWWK
+    ..KWWWWWWWWK
+    ..KKKKKKKWWK
+    ........KWWK
+    ........KWWK
+    ..KKKKKKKWWK
+    ..KWWWWWWKKK
+    ..KWWWWWWK..
+    ..KKKKKKKK..
+    ```
+
+    圖寬：6　圖高：16
+    大冒號（id: hud_colon_l）：
+    ```text
+    ......
+    ......
+    ......
+    KKKKKK
+    KWWWWK
+    KWWWWK
+    KWWWWK
+    KKKKKK
+    KKKKKK
+    KWWWWK
+    KWWWWK
+    KWWWWK
+    KKKKKK
+    ......
+    ......
+    ......
+    ```
+
+    圖寬：24　圖高：24
+    大暫停鈕：正常（id: hud_pause_l_normal）：
+    ```text
+    ........................
+    ........................
+    ........................
+    ..KKKKKKKK....KKKKKKKK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KWWWWWGK....KWWWWWGK..
+    ..KKKKKKKK....KKKKKKKK..
+    ........................
+    ........................
+    ........................
+    ```
+
+    圖寬：24　圖高：24
+    大暫停鈕：按下（id: hud_pause_l_pressed）：
+    ```text
+    ........................
+    ........................
+    ........................
+    ........................
+    ...KKKKKKKK....KKKKKKKK.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KGGGGG8K....KGGGGG8K.
+    ...KKKKKKKK....KKKKKKKK.
+    ........................
+    ........................
+    ```
+
+    圖寬：100　圖高：4
+    魔王空舌頭條（id: boss_tongue_empty_v2）：
+    ```text
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvv
+    ```
+
+    圖寬：128　圖高：48
+    魔王嘴巴補丁疊加圖（疊在 boss_normal 上得 boss_normal_v2）（id: boss_mouth_v2_patch）：
+    ```text
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    .............KrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrrK.............
+    .............KRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRK.............
+    .............KRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRRK.............
+    .............KttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttttK.............
+    KuQZZZZZZZZZZKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKZZZZZZZZZZzvK
+    ................................................................................................................................
+    ................................................................................................................................
+    ................................................................................................................................
+    ```
+
+    **新線框圖例（layout_800_v3）**（1 字元 = 4 px；90 字元 = 360 px，200 列 = 800 px；只用 D01 顏色；以 4 px 為單位取近似，精確位置以 v3 座標表為準）
+
+    | 字元 | 代表 | 對應 y 範圍 |
+    |---|---|---|
+    | `v` | UI 區底（實際色為 `K`；線框改用 `v` 以和關卡區的 `K` 區分） | 列 0~11（y 0~47） |
+    | `x` | 時間（時鐘加大數字，最寬到 x 71） | 列 1~4，欄 2~17 |
+    | `Y` | 分數（星形加大數字，8 位時 x 197~299；與暫停鈕垂直置中；座標表算出右端為 x 297，線框以 4 px 取整；**本圖例已由 D28 v5 取代**） | 列 4~7（y 16~31），欄 49~74 |
+    | `t` | 暫停觸控區 56×48（x 304~359） | 列 0~11，欄 76~89 |
+    | `R` | 暫停鈕圖示 24×24（x 332~355、y 12~35） | 列 3~8，欄 83~88 |
+    | `U` | HUD 球狀態列（D16） | 列 6~11 |
+    | `c` | 上邊框左右轉角（各 20×20） | 列 12~16（y 48~67） |
+    | `h` | 上邊框 | 列 12~16 |
+    | `g` | 左右邊框（轉角以下，到螢幕底端） | 列 17~199 |
+    | `K` | 關卡區：磚塊上方空帶（y 68~83）與球的飛行空間（y 436~719） | 列 17~20 與 109~179 |
+    | `b` | 磚塊區（最多 22 排：y 84~435） | 列 21~108 |
+    | `Q` | 魔王位置（第 3~6 欄、最上 3 排；只在第 10 的倍數關；舌頭血條在魔王嘴內，約列 31） | 列 21~32 |
+    | `s` | 手指區（y 720~799，零 UI） | 列 180~199 |
+    | `e` | 擋板（y 763、寬 64） | 列 190~191 |
+
+    圖寬：90　圖高：200
+    高 800 v3 線框（id: layout_800_v3）：
+    ```text
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUvvYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUvvYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    ```
+
+    **九、使用者 2026-10-27 的決定**
+
+    | 決定 | 內容 | 落實 |
+    |---|---|---|
+    | 舌頭血條 | 採用（`boss_normal_v2` 加 `boss_tongue_empty_v2`） | 使用者已確認 |
+    | 低血量提示 | **不閃爍** | 取消第四段的「剩 20% 以下切換 `W`」提案；舌頭只靠長度表示血量 |
+    | 魔王下巴少 1 列 | 可以 | `boss_normal_v2` 維持現狀 |
+    | 暫停觸控區 56×32 | 可以 | 見 D28 v5 總表 |
+    | 時鐘與星形 | **保留，並畫放大版** | `hud_icon_clock_l`、`hud_icon_star_l`（14×14，見下；使用者已確認，2026-10-27）；原版 9×9 已刪除 |
+    | D26 舊版 | 已被取代的舊元件**刪除** | D26 已刪 `hud_digit_0`~`9`、`hud_colon`、`hud_pause_normal`、`hud_pause_pressed`、`hud_boss_face`、`hud_boss_bar_empty`、`hud_boss_bar_full`；仍適用的規則搬到下面第十段 |
+
+    **放大版圖示（使用者已確認，2026-10-27）**
+
+    | 項目 | 內容 | 理由 |
+    |---|---|---|
+    | 尺寸 | 14×14 | 16 高大數字（y 8~23）內垂直置中，上下各留 1 px；比 9×9 與大數字比例相稱 |
+    | `hud_icon_clock_l` | 白面 `W`、`K` 描邊、粗針（2 px 寬）：分針向上、時針向右 | 畫風同原 9×9 時鐘（已刪除）放大 |
+    | `hud_icon_star_l` | 黃 `Y`、`K` 描邊 | 畫風同原 9×9 星形（已刪除）放大 |
+    | 顏色 | 只用 `K`、`W`、`Y` | D01 現有 |
+    | 閃爍紅色版 | 時鐘的 `W` 換 `r`（規則見第十段）；星形不換色 | 同原規則 |
+
+    | 元素 | v5 座標（螢幕座標，x, y, 寬, 高） | 說明 |
+    |---|---|---|
+    | 時鐘圖示（放大） | 8, 9, 14, 14 | y 9~22，中心 15.5，與數字（y 8~23）同中心線 |
+    | 時間數字（`MM:SS`） | 第 1 格 x 25；格起點 x：25、36、47（冒號）、52、63；y 8 | 時鐘右端 x 21 與第 1 格間隔 3 px；最右到 x 74 |
+    | 時間數字（`M:SS`） | 格起點 x：25、36（冒號）、41、52 | 同上 |
+    | 星形圖示（放大） | x = 280 − 11 × 位數，y 9，14×14 | 緊貼最左一位，間隔 3 px（星形右端 + 3 = 最左位數起點 297 − 11 × 位數）；14 位時 x 126，不與時間（右端 x 74）相撞 |
+
+    圖寬：14　圖高：14
+    放大時鐘圖示（id: hud_icon_clock_l）：
+    ```text
+    ....KKKKKK....
+    ..KKWWWWWWKK..
+    .KWWWWWWWWWWK.
+    .KWWWWKKWWWWK.
+    .KWWWWKKWWWWK.
+    .KWWWWKKWWWWK.
+    .KWWWWKKWWWWK.
+    .KWWWWKKKKKWK.
+    .KWWWWKKKKKWK.
+    .KWWWWWWWWWWK.
+    .KWWWWWWWWWWK.
+    .KWWWWWWWWWWK.
+    ..KKWWWWWWKK..
+    ....KKKKKK....
+    ```
+
+    圖寬：14　圖高：14
+    放大星形圖示（id: hud_icon_star_l）：
+    ```text
+    ......KK......
+    .....KYYK.....
+    .....KYYK.....
+    ....KYYYYK....
+    KKKKKYYYYKKKKK
+    KYYYYYYYYYYYYK
+    .KYYYYYYYYYYK.
+    ..KYYYYYYYYK..
+    ...KYYYYYYK...
+    ...KYYYYYYK...
+    ..KYYYKKYYYK..
+    .KYYYK..KYYYK.
+    .KYYK....KYYK.
+    .KKK......KKK.
+    ```
+
+    **十、由 D26 搬入的規則（D26 舊網格已刪除；本段取代 D26 原文，「同 D26」一律以本段為準）**
+
+    | 項目 | 規則 |
+    |---|---|
+    | 數字字形 | 大數字 `hud_digit_l_0`~`9`、`hud_colon_l`（本項）；白色填色 `W` 加 `K` 描邊；每格 12×16，冒號格 6×16 |
+    | 字格重疊 | 相鄰格起點相差：數字 +11、冒號 +5（描邊重疊 1 px）；重疊的欄只有 `K` 或透明，只畫非透明像素，不會蓋掉 `W` |
+    | 位置 | 時間靠左、接在時鐘圖示後（位數少就整串靠左，不置中）；分數靠右對齊，最右格起點 x 286，往左每位 −11 |
+    | 時間格式 | `M:SS`（9:59 以下）或 `MM:SS`（最長約 11:40） |
+    | 分數位數 | 上限 **14 位**（99,999,999,999,999）；不加千分位逗號；前導零不顯示；0 分顯示單一 `0` |
+    | 數字變動 | 直接換圖，不加動態（D22 已定） |
+    | 閃爍紅色版 | 把圖裡的 `W` 換成 `r`（#E8696B），`K` 描邊不變；套用時鐘圖示、時間數字、冒號；**不套用**分數、星形、暫停鈕；紅色那 500 ms 依 D22「時間倒數與閃爍」；0 秒停在紅色；程式以顏色映射實作，不需第二套圖檔 |
+    | 暫停鈕按下 | 整個圖形向右下偏 1 px（`hud_pause_l_pressed` 已畫好），填色改 `G` 加 `8`（變灰），放開恢復（使用者 2026-10-26 同意） |
+    | 暫停鈕停用 | 不另畫圖；D22 的停用狀態（灰 `8`）由程式把 `W`、`G` 換成 `8` |
+    | 顏色 | 全部取自 D01：`K` `W` `Y` `G` `8` `r` `j` `v` 等；不新增符號 |
+
+    對比（手算近似；UI 區底 `K`，亮度 L 0.0117）：
+
+    | 元件 | 顏色 | 對 `K` 底 |
+    |---|---|---|
+    | 數字、冒號、時鐘 | `W` | 約 17:1 |
+    | 數字紅色版 | `r` | 約 5.4:1（達 4.5:1） |
+    | 星形 | `Y` | 約 12:1 |
+    | 暫停鈕正常 | `W`、`G` | 約 17:1、9:1 |
+    | 暫停鈕按下 | `G`、`8` | 約 9:1、6.9:1 |
+
+    - 舊的魔王臉與血條外框規則隨 D26 網格一併刪除（已改用舌頭血條，見第三段）；D22 的「受傷白段」規則已由全白幀取代，不再適用
+
+28. [D28] HUD 球狀態列移到關卡區內（半透明懸浮）兩方案與 UI 區 v4（使用者已確認 2026-10-26：方案 B、不透明度 50%、有狀態往上補位、UI 區縮成 32、HUD 整數 2 倍；v5 座標、第 1 格 y 424、維持 22 排皆已確認；唯一待微調：50% 下線段條外框偏淡，見「七、使用者決定與 v5」）：
+    - 取代關係：D16 的「HUD 位置」（UI 區第 2 排 x 8、y 24）、D22 座標表的 HUD 列、D27 v3 座標表的 HUD 列與分數／時間位置，改由本項取代；原文保留，標「位置已由 D28 取代（待確認）」
+    - 座標：螢幕座標，從 0 起算；格 22×22、格距 4、7 格，與 D16 相同；圖示、線段條、數字、暫停鈕外觀都不改
+
+    **一、兩方案共用規則**
+
+    | 項目 | 決定 | 理由 |
+    |---|---|---|
+    | 排列順序 | 沿用 D16：強化、fever、減速、加速、穿透、火焰、炸彈；7 個**固定格位**，沒有的狀態該格留空、**不補位** | 玩家憑位置記憶；位置不因別的狀態消失而跳動 |
+    | 整組長度 | 7 × 22 + 6 × 4 = 178 px（橫向是寬、垂直是高） | D16 不變 |
+    | 不透明度 | **建議 70%**（整組 HUD 一個統一的 alpha，由程式調整，不畫新圖） | 見下方對比；60% 看起來更「透」但外框更淡；100% 就不是懸浮了 |
+    | 繪製層級（由下到上） | 背景 → 磚塊、擋板 → **HUD（半透明）** → 掉落道具 → 球光暈 → 球本體 | 球與道具永遠看得見，HUD 絕不蓋住它們 |
+    | 球經過時 | 球本體畫在 HUD 之上，不另做避讓、不自動淡出 | 避免 HUD 忽隱忽現；球在 HUD 後面短暫經過仍可辨識 |
+    | 道具經過時 | 掉落道具（D20、D21，不透明）畫在 HUD 之上；道具的 12×12 圖案與 HUD 同款，但道具不透明且在掉落，與 HUD 分得開 | 玩家不會把半透明的 HUD 當成可接的道具 |
+
+    對比（手算近似；背景 Y ≈ 22，亮度 L ≈ 0.008；混色＝不透明度 × 圖 + (1 − 不透明度) × 背景）：
+
+    | 元素 | 原色 Y | 70% 後 Y | 對背景 | 60% 後 Y | 對背景 |
+    |---|---|---|---|---|---|
+    | 白色線段 `W` | 255 | 約 185 | 約 9:1 | 約 162 | 約 7:1 |
+    | 圖示底板面 `g` | 95 | 約 73 | 約 2.0:1 | 約 66 | 約 1.8:1 |
+    | 線段條外框 `j` | 61 | 約 49 | 約 1.4:1 | 約 45 | 約 1.3:1 |
+    | 圖示描邊 `K` | 29 | 約 27 | 與背景幾乎同色（本來就是描邊深色） | 約 26 | 同左 |
+
+    - 白色線段與圖示內容仍清楚；底板靠亮邊 `f`、暗邊 `j` 與內容辨識；**線段條外框 `j` 對背景只有約 1.4:1，比 UI 區底時更淡**（D27 前的問題會回來），是半透明的已知代價
+    - 若使用者覺得外框太淡：可把不透明度提高到 80%（外框約 1.5:1），或日後另畫去底板的版本（見第五段）
+
+    **二、方案 A：橫向一排，懸浮在擋板下方**
+
+    | 項目 | 內容 |
+    |---|---|
+    | 位置 | y 774~795（擋板 y 763~770，下方空白 y 771~799 共 29 px；上留 3 px、下留 4 px）；水平置中於關卡區 x 20~339：x 91~268 |
+    | 格 1 強化 | x 91、y 774 |
+    | 格 2 fever | x 117、y 774 |
+    | 格 3 減速 | x 143、y 774 |
+    | 格 4 加速 | x 169、y 774 |
+    | 格 5 穿透 | x 195、y 774 |
+    | 格 6 火焰 | x 221、y 774 |
+    | 格 7 炸彈 | x 247、y 774 |
+    | 順序 | 由左到右，同 D16 |
+
+    **三、方案 B：垂直排列在關卡區左下角**
+
+    | 項目 | 內容 |
+    |---|---|
+    | 位置 | x 24~45（左邊框內緣 x 19 與 HUD 之間留 4 px）、y 574~751；底端離擋板上緣 y 763 有 12 px，**不與擋板重疊**（使用者圈的範圍到 y 780，本方案刻意縮短到 y 751 讓出擋板高度） |
+    | 格 1 強化 | x 24、y 574 |
+    | 格 2 fever | x 24、y 600 |
+    | 格 3 減速 | x 24、y 626 |
+    | 格 4 加速 | x 24、y 652 |
+    | 格 5 穿透 | x 24、y 678 |
+    | 格 6 火焰 | x 24、y 704 |
+    | 格 7 炸彈 | x 24、y 730 |
+    | 順序 | **由上往下**，同 D16 的由左到右順序；強化、fever 等常駐的在上，限時的在下（離球與擋板較近、較容易被看見） |
+    | 格內結構 | 不變：圖示在上、線段條在下（格 22×22），垂直排列時每格仍是「圖示＋下方線段」 |
+
+    **四、問題評估與處理**
+
+    | 問題 | 方案 A（擋板下方橫排） | 方案 B（左下垂直） |
+    |---|---|---|
+    | 手指拖擋板遮擋 | **嚴重**：擋板正下方就是拇指停的位置（y 771~799），HUD 幾乎一直被手指蓋住；處理：無，位置本身的問題 | 輕微：在左側、擋板上方；左手玩家的拇指在擋板高度以下，不會蓋到 y 574~751；右手拖到最左邊時手背可能蓋到一部分 |
+    | 與 D22「手指區 y 720~799 零 UI」 | **違反**（HUD 整排在手指區內）；若採 A，需使用者同意改寫該規則 | 部分違反：y 720~751 在手指區上緣 32 px 內；其餘在手指區之上 |
+    | 球與道具看得清楚嗎 | 球掉出擋板下方才經過 HUD，已是漏球，影響小；道具漏接掉過 HUD，道具畫在 HUD 之上，看得清楚 | 球在左邊框附近彈跳時會經過 HUD 後方；球畫在 HUD 之上、半透明 HUD 不蓋球，看得清楚；道具同理 |
+    | HUD 是否蓋住球或道具 | 不會（HUD 在球與道具之下） | 不會 |
+    | 擋板最長 320（滿寬）時 | 擋板 y 763~770 與 HUD y 774~795 垂直錯開 3 px，**不重疊**；但擋板貼著 HUD 上緣，視覺很擠 | 擋板在 y 763 以下，HUD 到 y 751，不重疊；擋板在最左端時離 HUD 底端 12 px |
+    | 與背景對比 | 底部背景最暗、最單純（Y ≤ 40），70% 的 HUD 對比同上表 | 同上；左下角若有 D25 裝飾（灌木、石筍等）會疊在 HUD 後方，只影響外框（本來就淡） |
+    | 與左邊框距離 | 不適用 | 左邊框內緣 x 19，HUD 左緣 x 24，留 4 px；球碰左牆彈回時（x 20 起）會從 HUD 上方通過 |
+    | 系統手勢區（底部橫條、導覽列） | **衝突**：y 774~799 是常見的系統手勢區，手勢操作可能誤觸；處理：只能整體上移，等於放棄方案 A | 無衝突 |
+    | 佔用球的飛行空間 | 不佔（飛行空間 y 436~719 不變） | 佔左側 22 px 寬 × 178 px 高（約 y 574~751，與飛行空間下半重疊）；球可穿過但看起來有東西 |
+    | 其他 | 橫排像 D16 原本的樣子，不需要重新習慣 | 垂直排列需要玩家把視線放到左下角；與「球從下往上」的視線動線一致 |
+
+    - **我的建議：方案 B**。理由：A 的位置正好是拇指與系統手勢區，HUD 幾乎看不到；B 避開手指與擋板，代價是左側 22 px 窄條與飛行空間有些重疊，球經過時 HUD 在球後方、不蓋球
+    - 若使用者堅持 A：建議把 HUD 整排上移到擋板之上（y 720~741）並放棄「零 UI 手指區」，我另寫座標；本項不處理
+
+    **五、半透明需要的新圖（只列需求，本次不畫）**
+
+    | 圖 | 需要嗎 | 說明 |
+    |---|---|---|
+    | 去底板的圖示版本 | 不需要 | 半透明由程式整組調整不透明度；現有底板（`g` 面）在 70% 下仍可辨識 |
+    | 加深的線段條外框（例如 `K`） | 視實機決定 | 若 70% 下外框 `j`（約 1.4:1）太淡，可畫一版外框改 `K` 的線段條；`hud_timebar_*`、`hud_reinforce_levels`、`hud_slow_fast_levels` 會需要新 id，屬 D16 範圍的新圖 |
+    | 垂直專用圖 | 不需要 | 每格結構不變，只是位置不同 |
+
+    **六、UI 區 v4（HUD 移出後；不覆寫 v3 表）**
+
+    | 決定 | 內容 | 理由 |
+    |---|---|---|
+    | 同一水平線 | 時間、分數、暫停鈕都以中心線 y 23.5 垂直置中（UI 區高度仍 48） | 使用者要求同一水平線；HUD 已移出，不再有重疊問題 |
+    | 分數位數上限 | **恢復 14 位**（最左格起點 x 143、星形 x 131）；時間右端 x 69 與星形最左 x 131 之間仍有 62 px，理論上限約 18 位，仍取 14 位（見 D27 第十段） | 不再需要避開 HUD |
+    | 暫停觸控區 | 56×48，同 v3 | 不變 |
+
+    | 元素 | x | y | 寬 | 高 | 說明 |
+    |---|---|---|---|---|---|
+    | UI 區底 | 0 | 0 | 360 | 48 | `K` |
+    | 時鐘圖示 | 8 | 19 | 9 | 9 | 舊版 9×9（已刪除）；v5 起為放大版 14×14，見 D28 v5 總表 |
+    | 時間數字（`MM:SS`） | 20 | 16 | 12 | 16 | 格起點 x：20、31、42（冒號）、47、58；`M:SS` 同 v3 |
+    | 分數數字 | 最右格起點 286 | 16 | 12 | 16 | 靠右，往左每位 −11；最多 14 位，最左格起點 x 143 |
+    | 星形圖示 | 285 − 11 × 位數 | 19 | 9 | 9 | 緊貼最左一位；14 位 x 131；舊版 9×9（已刪除）；v5 起為放大版 14×14，見 D28 v5 總表 |
+    | 暫停鈕圖 | 332 | 12 | 24 | 24 | y 12~35，中心 23.5 |
+    | 暫停觸控區 | 304 | 0 | 56 | 48 | x 304~359 |
+    | HUD（方案 A 或 B） | 見第二、三段 | | | | 在關卡區內 |
+
+    **UI 區高度可以縮小（只是建議，不改關卡區座標）**
+
+    | 項目 | 目前 | 建議（UI 區高 32） |
+    |---|---|---|
+    | UI 區 | y 0~47（48） | y 0~31（32）：暫停鈕 24 加上下各 4 px 剛好 |
+    | 數字（y） | 16 | 8（y 8~23） |
+    | 時鐘、星形（y） | 19 | 11 |
+    | 暫停鈕圖 | (332, 12) | (332, 4) |
+    | 暫停觸控區 | (304, 0, 56, 48) | (304, 0, 56, 32)，3 倍約 168×96 實體像素，仍夠大 |
+    | 上邊框 | y 48~67 | y 32~51 |
+    | 關卡區 | y 68~799（732） | y 52~799（748），多 16 px |
+    | 磚塊起點 | y 84 | y 68（或維持 y 84，把多的 16 px 都給球的飛行空間） |
+    | 擋板、手指區 | y 763、720~799 | 不變 |
+
+    - 影響：D22 磚塊區、D23 上邊框與轉角位置、D24 背景可見範圍、D25 擺放座標都要整體上移 16 px；本項**不做**，等使用者決定是否縮小 UI 區
+
+    **七、給工程師的需求（由 PM 轉達）**
+
+    - HUD 位置依使用者選定的方案（A 或 B）改用第二、三段座標；整組套統一不透明度 70%（可設定值）；繪製層級見第一段
+    - UI 區依 v4 座標表排版（時間、分數、暫停鈕垂直置中；分數上限 14 位）
+    - 不新增圖；若使用者要求更深的外框才另開需求
+
+    線框圖例沿用 v3 的字元，加 `U`（HUD 球狀態列，位置因方案而異；方案 A：列 193~198、欄 22~67；方案 B：列 143~187、欄 6~11）。
+
+    圖寬：90　圖高：200
+    高 800 v4 方案 A 線框：HUD 橫排在擋板下方（id: layout_800_v4a）：
+    ```text
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUsssssssssssssssssggggg
+    gggggsssssssssssssssssUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUsssssssssssssssssggggg
+    gggggsssssssssssssssssUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUsssssssssssssssssggggg
+    gggggsssssssssssssssssUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUsssssssssssssssssggggg
+    gggggsssssssssssssssssUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUsssssssssssssssssggggg
+    gggggsssssssssssssssssUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUUsssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    ```
+
+    圖寬：90　圖高：200
+    高 800 v4 方案 B 線框：HUD 垂直排列在關卡區左下角（id: layout_800_v4b）：
+    ```text
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUsssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    ```
+
+    **七、使用者決定與 v5（2026-10-26；v5 取代前面的 v3、v4 座標；舊表保留不覆寫）**
+
+    | 決定 | 內容 | 落實 |
+    |---|---|---|
+    | 方案 | 採**方案 B**（左下直排） | 方案 A 與 `layout_800_v4a` 作廢（保留供對照） |
+    | 不透明度 | **50%**（不是 70%） | 對比重算見下 |
+    | 排列 | **有狀態就往上補位**：依 D16 固定順序、沒有的狀態不佔格，下面的往上補，從最上一格開始排 | 這一點**改寫 D16 的「固定格位、不補位」**（只限這個新位置的 HUD）；順序仍是強化、fever、減速或加速、穿透、火焰、炸彈 |
+    | UI 區 | 由 48 縮成 **32**（D28 第六段建議） | 見 v5 總表 |
+    | 多出的 16 px | 給**球的飛行空間**：磚塊與上邊框的空帶維持 16 px（磚塊起點 y 68）；擋板、手指區位置不變 | 飛行空間（22 排時）y 420~719＝300 px，原 284 |
+    | HUD 大小 | **整數 2 倍**：程式以最近鄰放大 2 倍，不重畫；每格 44×44、格距 8、線段條 44×8 | 圖示底板 32×32、內容 24×24；描邊 2 px |
+    | HUD 第 1 格 y 424 | 可以（使用者 2026-10-26 v5 回覆） | 整列 y 424~727，6 格全滿時第 6 格有 8 px 進入手指區，一併接受 |
+    | 線段條外框偏淡 | **先這樣，之後再微調**（記為待微調，不畫新圖） | 50% 下外框約 1.2:1；之後可由程式畫亮，或另畫外框改 `K` 的線段條 |
+    | 磚塊排數 | **維持 22 排**（原同意增加，但增加會與 HUD y 424 重疊） | 多出的 16 px 全給飛行空間（22 排時 y 420~719） |
+    | v5 | **使用者已確認（2026-10-26）** | v5 座標總表生效 |
+    | 時鐘與星形（2026-10-27） | 保留並畫放大版（14×14） | 見 D27 第九段；v5 總表中時鐘、星形、時間數字的 x、y 已改（使用者已確認，2026-10-27） |
+    | 暫停觸控區 56×32（2026-10-27） | 可以 | v5 總表不變 |
+
+    **HUD 2 倍版座標（方案 B；整列範圍使用者已確認 2026-10-26）**
+
+    | 項目 | 內容 |
+    |---|---|
+    | 格 | 44×44（圖示 32×32 加下方線段條 44×8，結構同 D16 ×2）；格距 8；步進 52 |
+    | x | 24~67（左邊框內緣 x 19 與 HUD 之間留 4 px） |
+    | 第 1 格 y | **424**（第 1 格上緣；補位後永遠從這裡開始） |
+    | 第 k 格 y（k 從 0 起） | 424 + 52 × k：424、476、528、580、632、684 |
+    | 最多格數 | **6**：減速與加速互斥（D16），所以同時最多 6 種狀態 |
+    | 6 格整列範圍 | y 424~727（304 高）；少於 6 格時只佔前 k 格 |
+
+    衝突檢查：
+
+    | 對象 | 距離 | 結論 |
+    |---|---|---|
+    | 磚塊區最下排（22 排，下緣 y 419） | 第 1 格上緣 y 424，隔 4 px | 不重疊；排數少於 22 時空隙更大，HUD 位置不隨排數變 |
+    | 擋板上緣 y 763 | 整列下緣 y 727，隔 36 px | 不重疊 |
+    | 手指區 y 720~799 | 第 6 格（y 684~727）有 8 px（y 720~727）進入手指區 | 只有 6 格全滿時才發生；使用者 2026-10-26 已確認接受 |
+    | 第 7 格（若有） | y 736~779，與擋板 y 763~770 重疊 | 不會發生（減速、加速互斥）；若日後新增第 7 種同時狀態，提案：整列改為由下往上排（第 1 格貼近 y 727）並把上限延伸到磚塊區下緣，另議 |
+
+    - 為什麼是 y 424：上限由「不碰 22 排磚（y ≥ 420）」決定、下限由「離擋板至少 12 px（整列底 ≤ 751）」決定，可選第 1 格 y 在 420~448；取 424 讓整列最靠上，離擋板與手指區最遠
+    - 若使用者想離磚塊遠一點：改 y 432（整列 y 432~735，進入手指區 16 px）
+    - 2 倍放大規則：圖示 12×12 內容變 24×24、`K` 描邊 1 px 變 2 px；半透明 50% 套整組（含線段條）
+
+    50% 不透明度下的對比（手算近似；背景 Y ≈ 22，L ≈ 0.008）：
+
+    | 元素 | 原色 Y | 50% 後 Y | 對背景 | 說明 |
+    |---|---|---|---|---|
+    | 白色線段 `W` | 255 | 約 139 | 約 5.2:1 | 仍達 4.5:1 |
+    | 圖示底板面 `g` | 95 | 約 59 | 約 1.6:1 | 靠亮邊 `f`、暗邊 `j` 與內容辨識 |
+    | 線段條外框 `j` | 61 | 約 42 | 約 1.2:1 | **很淡**；放大 2 倍後外框 2 px 稍醒目，但仍是已知弱點 |
+    | 圖示描邊 `K` | 29 | 約 26 | 與背景幾乎同色 | 圖示輪廓靠亮邊與底板 |
+
+    - 若 50% 下外框看不清：可由程式把外框畫更亮，或另畫外框改 `K` 的線段條（屬 D16 範圍新圖，本次不畫）
+
+    **v5 座標總表（螢幕座標，x, y, 寬, 高；高 800；整個 UI 區縮成 32、其餘下方內容上移 16 px）**
+
+    | 元素 | 舊（D22 新版／D23／D24／D27／D28 v4） | v5 |
+    |---|---|---|
+    | UI 區底 | 0, 0, 360, 48 | 0, 0, 360, **32**（`K`） |
+    | 時鐘圖示 | 8, 19（v4） | **使用者已確認（2026-10-27）**：放大版 `hud_icon_clock_l` 8, **9**, **14, 14**（原 9×9 版已刪除） |
+    | 時間數字 | y 16 | **25**, **8**, 12, 16；格起點 x（`MM:SS`）：25、36、47（冒號）、52、63，最右到 x 74；`M:SS`：25、36（冒號）、41、52（因放大時鐘，起點由 20 右移到 25，間隔仍 3 px） |
+    | 分數數字 | y 16 | x 規則不變（最右格起點 286，往左每位 −11，最多 14 位），y **8**，12×16 |
+    | 星形圖示 | y 19 | **使用者已確認（2026-10-27）**：放大版 `hud_icon_star_l`，x = **280 − 11 × 位數**，y **9**，**14×14**（與最左一位數字間隔仍 3 px；14 位時 x 126；保留，使用者 2026-10-27 決定） |
+    | 暫停鈕圖 | 332, 12, 24, 24 | 332, **4**, 24, 24 |
+    | 暫停觸控區 | 304, 0, 56, 48 | 304, 0, 56, **32**（3 倍約 168×96 實體像素） |
+    | 上邊框 | y 48~67 | y **32~51**（全寬 360，高 20） |
+    | 左上轉角、右上轉角 | 0, 48 與 340, 48 | 0, **32**, 20, 20 與 340, **32**, 20, 20 |
+    | 左、右邊框（轉角以下） | y 68~799（732）；樣本拼接起點 y 67 | y **52~799**（748）；樣本拼接起點 y **51**；x 0~19 與 340~359 |
+    | 關卡區 | 20, 68, 320, 732 | 20, **52**, 320, **748** |
+    | 球的碰撞邊界 | 左 20、右 339、上 68 | 左 20、右 339、上 **52**；越過 y 799 即漏球 |
+    | 磚塊區起點 | y 84 | y **68**（與上邊框之間空帶 16 px 不變：y 52~67） |
+    | 磚塊區（22 排） | y 84~435 | y **68~419** |
+    | 魔王位置 | 116, 84, 128, 48 | 116, **68**, 128, 48（y 68~115） |
+    | 魔王舌頭血條（螢幕） | 130, 124, 100, 4 | 130, **108**, 100, 4（y 108~111） |
+    | 球的飛行空間（22 排） | y 436~719（284） | y **420~719**（300） |
+    | 手指區 | y 720~799 | 不變（y 720~799，零 UI；HUD 第 6 格有 8 px 進入，見上） |
+    | 擋板 | y 763~770 | 不變 |
+    | HUD 球狀態列 | D16：8, 24, 178, 22（UI 區內） | 方案 B 2 倍：x 24~67；第 k 格 y = 424 + 52 × k；每格 44×44 |
+    | 背景（D24） | 可見 x 20~339、y 68~799（320×732） | 可見 x 20~339、y **52~799**（320×**748**）；底圖單元原點 (20, 52)，748 = 11 × 64 + 44，最後一列只用前 44 列 |
+    | 背景裝飾（D25） | 關卡區座標 | **關卡區座標不變**（原點上移 16，所以螢幕上整體上移 16）；磚塊區在關卡區座標仍是 y 16~367，「磚塊區只放底圖」規則不變；飛行空間的裝飾仍放在 y ≥ 372 |
+    | 低於 800 高手機 | 飛行空間 = H − 473 | 飛行空間 = H − **457**（22 排滿時）；建議不低於 250 → 最低支援約 H = 707 |
+
+    - 磚塊排數上限仍 22；多出的飛行空間讓球從磚塊回到擋板的時間變長（約 +5%），使用者已決定**維持 22 排**（增加排數會與 HUD y 424 重疊），多出的 16 px 全給飛行空間
+    - 本表為 v5：D22 新版座標表、D23 位置段、D24 可見範圍、D25 擺放規則、D27 魔王位置與舌頭血條座標，**在標註處都以本表為準**
+
+    **八、給工程師的需求（v5，由 PM 轉達）**
+
+    - HUD：依方案 B 2 倍版座標；補位邏輯＝依固定順序過濾出目前有的狀態，從第 1 格往下排；半透明 50% 整組套用；繪製層級見第一段
+    - UI 區、邊框、關卡區、磚塊、魔王、背景全部依 v5 總表（只是整體位置變，圖不變）
+    - 球的邊界上緣改 y 52；磚塊起點 y 68
+
+    圖例沿用 v3；v5 線框中 `v` 為 UI 區底（實際色 `K`）、`U` 為 HUD（方案 B 2 倍）。
+
+    圖寬：90　圖高：200
+    高 800 v5 線框：UI 區 32、方案 B 的 HUD 2 倍（id: layout_800_v5）：
+    ```text
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvxxxxxxxxxxxxxxxxvvvvvvvvvvvvvvYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYYvtttttttRRRRRRt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttRRRRRRt
+    vvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvvtttttttttttttt
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    ccccchhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhhccccc
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQQbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbggggg
+    gggggKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggKUUUUUUUUUUUKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKggggg
+    gggggsUUUUUUUUUUUssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsUUUUUUUUUUUssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggsssssssssssssssssssssssssssssssseeeeeeeeeeeeeeeessssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    gggggssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssssggggg
+    ```
+
+    ---
 
 ## 七色對應方案比較（舊稿；D12 原採用方案 C）
 

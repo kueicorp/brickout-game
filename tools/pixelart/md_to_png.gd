@@ -7,6 +7,7 @@ extends SceneTree
 ##      多層磚依 D12「多層磚層數(新規則)」產生 70 種外觀(7 色 ×(無數字 + 數字 1~9))與層數對照表 layer_map.json;
 ##   3. 依 D17、D18「需轉檔工具新增的自動產生規則」產生功能型磚(數字合成、被擊中、破壞幀)、
 ##      垂直雷射光束(由水平圖旋轉、鏡射)與彩虹挑色環七色版;
+##   3b. 依 D20、D21「F2 規則」由道具 F1 與底板產生各道具的 F2(單張圖 <項目>_<道具 id>_f2,不放進總覽圖);
 ##   4. 依 D13 拼接規則，由擋板分段拼出各長度、各狀態的擋板圖(sprites/paddle_*.png);
 ##   5. 產生總覽圖 overview.png 與示意盤面 board_sample.png。
 ## 調色盤、換色表、被擊中規則、擋板長度與拼接參數從設計稿解析;設計稿標明「寫死在轉檔工具」的規則
@@ -85,6 +86,14 @@ const FUNC2_BRICKS := [
 const PICK_FRAMES := ["rainbow_pick_f1", "rainbow_pick_f2", "rainbow_pick_f3"]
 const PICK_W := 48
 const PICK_H := 32
+
+# ---- D20、D21 道具 F2(設計稿標明寫死在轉檔工具):F1 中與底板 F1 同位置、同代號的像素改成底板 F2 同位置的像素
+## [設計稿項目, 底板 F1 id, 底板 F2 id];道具 = 該項目中 id 以 item_ 開頭、但不是 item_plate_* 與 item_pickup_* 的區塊
+const ITEM_F2_SPECS := [
+	["D20", "item_plate_buff_f1", "item_plate_buff_f2"],
+	["D21", "item_plate_debuff_f1", "item_plate_debuff_f2"],
+]
+const ITEM_SIZE := 16
 
 const PADDLE_ITEM := "D13"  # 擋板分段與拼接規則所在的設計稿項目
 ## 各擋板圖使用的分段 id(左端、中段、右端)。設計稿的「槍」「吸附」「同時有槍與吸附」規則
@@ -262,6 +271,7 @@ func run(md_path: String, out_dir: String) -> int:
 	var sheets := {}
 	var layer_map := {}
 	var beam_layout := {}
+	var item_f2 := {}  # 輸出檔名(不含副檔名)-> 網格
 	if errors.is_empty():
 		var rules := parse_rules(section_lines(lines, RULE_ITEM), palette, errors)
 		if errors.is_empty():
@@ -280,6 +290,8 @@ func run(md_path: String, out_dir: String) -> int:
 			var psheets := build_paddle_sheets(blocks, prules, palette, errors)
 			for k in psheets:
 				sheets[k] = psheets[k]
+		# 道具 F2 只依賴 D20、D21 的網格，錯誤與上面的規則一起列出
+		item_f2 = build_item_f2(blocks, errors)
 	errors.append_array(check_board_requirements())
 	if not errors.is_empty():
 		for e in errors:
@@ -300,6 +312,15 @@ func run(md_path: String, out_dir: String) -> int:
 		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [b["name"], SCALE_SINGLE])) != OK:
 			return 1
 		print("%-26s %dx%d" % [b["name"], img.get_width(), img.get_height()])
+
+	# 道具 F2:與單張圖同處、同樣附 ×8,但不放進 overview.png(不加入 images)
+	for name in item_f2:
+		var img := render_grid(item_f2[name], palette)
+		if save(img, out_dir.path_join(name + ".png")) != OK:
+			return 1
+		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [name, SCALE_SINGLE])) != OK:
+			return 1
+		print("%-26s %dx%d" % [name, img.get_width(), img.get_height()])
 
 	for sheet_name in sheets:
 		var img := render_grid(sheets[sheet_name]["grid"], palette)
@@ -324,7 +345,7 @@ func run(md_path: String, out_dir: String) -> int:
 	if save(scaled(board, SCALE_BOARD), out_dir.path_join("board_sample_x%d.png" % SCALE_BOARD)) != OK:
 		return 1
 
-	print("完成：%d 個區塊、%d 張精靈圖，輸出到 %s" % [blocks.size(), sheets.size(), out_dir])
+	print("完成：%d 個區塊、%d 張道具 F2、%d 張精靈圖，輸出到 %s" % [blocks.size(), item_f2.size(), sheets.size(), out_dir])
 	return 0
 
 
@@ -1082,6 +1103,46 @@ func build_beam_layout(blocks: Array) -> Dictionary:
 		"mirror": {"left_block": "laser_beam_block_* 水平鏡射(左側被擋下)"},
 		"vertical_offset_x": BEAM_SIZE / 2,
 		"note": "水平中段可左右平鋪;垂直分段圖左緣 x = 磚左緣 x + 8;起點圖 32×16 覆蓋雷射磚整格"}
+
+
+## 依 D20、D21「F2 規則」產生道具 F2:道具 F1 與底板 F1 同位置、同代號的像素，改成底板 F2 同位置的像素，其餘不動。
+## 回傳 {"<項目>_<道具 id>_f2": 網格}(依設計稿順序);底板缺少、尺寸不是 16×16、道具不是 16×16、
+## 輸出檔名與既有區塊重名時，錯誤附加到 errors 並回傳空字典。
+func build_item_f2(blocks: Array, errors: PackedStringArray) -> Dictionary:
+	var before := errors.size()
+	var names := {}
+	for b in blocks:
+		names[b["name"]] = true
+	var out := {}
+	for spec in ITEM_F2_SPECS:
+		var item: String = spec[0]
+		var g := item_grids(blocks, item)
+		check_masters(g, {spec[1]: [ITEM_SIZE, ITEM_SIZE], spec[2]: [ITEM_SIZE, ITEM_SIZE]}, item, errors)
+		if errors.size() > before:
+			continue
+		var p1: PackedStringArray = g[spec[1]]
+		var p2: PackedStringArray = g[spec[2]]
+		for id in g:
+			if not id.begins_with("item_") or id.begins_with("item_plate_") or id.begins_with("item_pickup_"):
+				continue
+			var f1: PackedStringArray = g[id]
+			if f1[0].length() != ITEM_SIZE or f1.size() != ITEM_SIZE:
+				errors.append("%s_%s 尺寸 %dx%d,道具應為 %dx%d" % [item, id, f1[0].length(), f1.size(), ITEM_SIZE, ITEM_SIZE])
+				continue
+			var name := "%s_%s_f2" % [item, id]
+			if names.has(name):
+				errors.append("道具 F2 輸出檔名 %s 與設計稿既有區塊同名" % name)
+				continue
+			var f2 := PackedStringArray()
+			for y in ITEM_SIZE:
+				var s := ""
+				for x in ITEM_SIZE:
+					s += p2[y][x] if f1[y][x] == p1[y][x] else f1[y][x]
+				f2.append(s)
+			out[name] = f2
+	if errors.size() > before:
+		return {}
+	return out
 
 
 # ---------------------------------------------------------------- 擋板(D13)

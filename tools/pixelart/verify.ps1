@@ -1,6 +1,7 @@
 ﻿# 驗證 docs/design/preview/ 的輸出是否與設計稿一致(獨立於 md_to_png.gd 的第二套實作)。
 # 檢查項目：
 #   1. 單張 PNG:區塊數 = PNG 數、尺寸、每像素顏色與 D01 HEX 完全相同、`.` 的 alpha 為 0、×8 為最近鄰
+#   1b. 道具 F2(D20 13 張、D21 14 張):依底板 F1/F2 獨立重算後逐像素比對、×8 為最近鄰
 #   2. 精靈圖：尺寸、所有像素都在 D01 內、正常幀與破壞幀依換色表換色後與設計稿一致、
 #      被擊中幀符合規則、魔王 F1 = 正常圖疊上裂痕層、×6 為最近鄰;
 #      多層磚(D12 新規則)70 列、與 4 張範例逐像素一致;D17 功能型磚 5 種 × 數字 1~9、與 3 張 _n5 範例一致;
@@ -195,8 +196,36 @@ foreach ($l in $lines) {
 }
 $red = $tiers['紅']
 
+# 依 id 找區塊(標題含「(id: 代號)」)
+function Get-ById($item, $id) {
+    $m = @($blocks | Where-Object { $_.Item -eq $item -and $_.Title -match ('id\s*[:：]\s*' + [regex]::Escape($id) + '\s*[)）]') })
+    if ($m.Count -ne 1) { Fail "$item 標題含 id「$id」的區塊有 $($m.Count) 個"; return $null }
+    return , $m[0].Grid
+}
+
+# ---- PM 交付的 D20、D21 道具 F2 規格：道具 = id 以 item_ 開頭、不是 item_plate_* 與 item_pickup_*;
+#      F2 逐像素：道具 F1 與底板 F1 同代號 → 底板 F2 的代號，否則保留 F1;道具數 D20 13 個、D21 14 個
+$itemSpec = [ordered]@{ 'D20' = @('item_plate_buff_f1', 'item_plate_buff_f2', 13); 'D21' = @('item_plate_debuff_f1', 'item_plate_debuff_f2', 14) }
+$itemF2 = [ordered]@{}   # 輸出檔名(不含 .png)-> 期望網格
+foreach ($it in $itemSpec.Keys) {
+    $p1 = Get-ById $it $itemSpec[$it][0]; $p2 = Get-ById $it $itemSpec[$it][1]
+    $n = 0
+    foreach ($b in $blocks) {
+        if ($b.Item -ne $it -or $b.Title -notmatch 'id\s*[:：]\s*(item_[a-z0-9_]+)\s*[)）]') { continue }
+        $id = $Matches[1]
+        if ($id -match '^item_(plate|pickup)_') { continue }
+        $n++
+        $g = $b.Grid
+        if ($null -eq $p1 -or $null -eq $p2 -or $g.Count -ne 16 -or $g[0].Length -ne 16) { Fail "$it $id 或其底板不是 16x16,無法驗證 F2"; continue }
+        # 字元比較須區分大小寫(調色盤代號大小寫有別),所以用 -ceq
+        $itemF2["${it}_${id}_f2"] = [string[]]@(0..15 | ForEach-Object { $y = $_; -join @(0..15 | ForEach-Object { if ($g[$y][$_] -ceq $p1[$y][$_]) { $p2[$y][$_] } else { $g[$y][$_] } }) })
+    }
+    if ($n -ne $itemSpec[$it][2]) { Fail "$it 道具數 $n,應為 $($itemSpec[$it][2])" }
+}
+
 # ================================================================ 1. 單張 PNG
-$files = @(Get-ChildItem $out -Filter 'D*.png' | Where-Object { $_.Name -notmatch '_x\d+\.png$' })
+# 道具 F2 不是設計稿區塊，另在 1b 驗證
+$files = @(Get-ChildItem $out -Filter 'D*.png' | Where-Object { $_.Name -notmatch '_x\d+\.png$' -and -not $itemF2.Contains($_.BaseName) })
 if ($files.Count -ne $blocks.Count) { Fail "區塊數 $($blocks.Count) 與單張 PNG 數 $($files.Count) 不一致" }
 $used = @{}
 foreach ($f in $files) {
@@ -223,16 +252,23 @@ foreach ($f in Get-ChildItem $out -Filter 'D*.png') {
 }
 "單張 PNG:$($files.Count) 張"
 
+# ================================================================ 1b. 道具 F2(D20、D21)
+foreach ($name in $itemF2.Keys) {
+    $path = Join-Path $out "$name.png"
+    if (-not (Test-Path $path)) { Fail "缺少 $name.png"; continue }
+    $img = [Img]::Load($path)
+    if ($img.W -ne 16 -or $img.H -ne 16) { Fail "$name 尺寸 $($img.W)x$($img.H),應為 16x16"; continue }
+    $r = $img.Compare($itemF2[$name], 0, 0, $pal); if ($r -ne '') { Fail "${name}: $r" }
+    $big = Join-Path $out "${name}_x8.png"
+    $r = if (Test-Path $big) { $img.IsScaledBy([Img]::Load($big), 8) } else { '缺少 _x8 放大版' }
+    if ($r -ne '') { Fail "$name x8: $r" }
+}
+"道具 F2:$($itemF2.Count) 張"
+
 # ================================================================ 2. 精靈圖
 $master = Get-Grid '一般磚正常'
 $f = @((Get-Grid 'F1'), (Get-Grid 'F2'), (Get-Grid 'F3'), (Get-Grid 'F4'))
 $digits = @(0..9 | ForEach-Object { , (Get-Grid "數字 $_") })
-# 依 id 找區塊(標題含「(id: 代號)」)
-function Get-ById($item, $id) {
-    $m = @($blocks | Where-Object { $_.Item -eq $item -and $_.Title -match ('id\s*[:：]\s*' + [regex]::Escape($id) + '\s*[)）]') })
-    if ($m.Count -ne 1) { Fail "$item 標題含 id「$id」的區塊有 $($m.Count) 個"; return $null }
-    return , $m[0].Grid
-}
 function To-Grid($cs) { return , [string[]]@($cs | ForEach-Object { New-Object string (, $_) }) }
 
 # 每張精靈圖的期望：列 -> 6 格網格;$null 表示該格只做被擊中規則檢查

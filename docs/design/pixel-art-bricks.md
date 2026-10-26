@@ -1,6 +1,6 @@
 # 可破壞磚塊像素美術規格
 
-- 狀態：剩 D01、D02、D12、D13、D14、D17、D18 待使用者確認；D15、D16 使用者已確認；D03~D11 舊稿已依使用者決定刪除（代號不重新編號）
+- 狀態：全部項目（D01、D02、D12~D21）使用者已確認；D03~D11 舊稿已依使用者決定刪除（代號不重新編號）
 - 依據：README.md「磚塊種類」與「基本數值」；尺寸：內部解析度寬 360、關卡區高 640，一排 10 塊磚（磚 32×16，磚區寬 320，左右邊框各 20）
 - 圖用文字網格表示：一字元 = 一像素；`.` = 透明；其他字元見 D01 調色盤；之後由工程師轉成 PNG
 - 本文不含程式碼、不含圖檔
@@ -23,7 +23,7 @@
 
 ---
 
-1. [D01] 調色盤（已改寫，待再確認；七色各 5 階，共 78 色（含 D13 擋板用 2 色、D14 不可破壞磚塊用 2 色、D15 球用 6 色、D16 HUD 用 2 色、D17 功能型磚塊用 13 色、D18 功能型磚塊第 2 批用 5 色），不受 32 色限制）：
+1. [D01] 調色盤（使用者已確認，2026-10-26；七色各 5 階，共 82 色（含 D13 擋板用 2 色、D14 不可破壞磚塊用 2 色、D15 球用 6 色、D16 HUD 用 2 色、D17 功能型磚塊用 13 色、D18 功能型磚塊第 2 批用 5 色、D21 減益底板用 4 色），不受 32 色限制）：
    - 代號即網格字元，大小寫有別；本表為全檔唯一調色盤
    - 色階階次（每色 5 階，T1 最亮 → T5 最暗）：
      - T1：斜面最亮邊（上緣、左緣最外 1 px）、高光點、金屬高光
@@ -87,8 +87,8 @@
    | `2` | #D2CEE6 | 珍珠白 T3（主色） | 210 | D15 用：球本體主色 |
    | `3` | #9E98BC | 珍珠白 T4 | 158 | D15 用：球本體暗部 |
    | `4` | #6A6490 | 珍珠白 T5 | 107 | D15 用：球本體最暗（右下） |
-   | `5` | #FF6FB5 | 品紅（亮） | 162 | D16 用：強化圖示（`hud_icon_reinforce`）亮面（原 D15 外圍記號用，該方案已刪除） |
-   | `6` | #B02A78 | 品紅（暗） | 91 | D16 用：強化圖示（`hud_icon_reinforce`）暗面（原 D15 外圍記號用，該方案已刪除） |
+   | `5` | #FF6FB5 | 品紅（亮） | 162 | D17 雷射磚用（D16 強化已改 ATK 字樣，不再使用；原 D15 外圍記號用，該方案已刪除） |
+   | `6` | #B02A78 | 品紅（暗） | 91 | D17 雷射磚用（D16 強化已改 ATK 字樣，不再使用；原 D15 外圍記號用，該方案已刪除） |
    | `7` | #DDE0EA | 淺灰 | 224 | D16 用：強化線段第 2 階 |
    | `8` | #9EA4B6 | 中灰 | 164 | D16 用：強化線段第 4 階 |
    | `u` | #B4A6C8 | 魔王 T1 | 174 | 魔王最亮邊 |
@@ -114,17 +114,21 @@
    | `/` | #94603C | 炸藥褐 T3（主色） | 108 | D18 用：爆炸磚主色 |
    | `;` | #66402A | 炸藥褐 T4 | 73 | D18 用：爆炸磚暗面、凹坑上緣 |
    | `:` | #3E2517 | 炸藥褐 T5 | 43 | D18 用：爆炸磚最暗邊 |
+   | `_` | #B85CB0 | 暗紫（亮邊） | 129 | D21 用：減益底板 F1 的上緣、左緣內圈 |
+   | `<` | #8C3F86 | 暗紫（中邊） | 94 | D21 用：減益底板 F1 的下緣、右緣內圈與轉角 |
+   | `>` | #6A2166 | 暗紫（底板面） | 63 | D21 用：減益底板面（內容的透明處） |
+   | `,` | #45143F | 暗紫（暗邊） | 40 | D21 用：減益底板 F2 的下緣、右緣內圈 |
 
    - 灰階亮度 Y = 0.299R + 0.587G + 0.114B，手算近似值，請工程師用工具複核
    - 七色主色（T3）灰階由亮到暗：黃 209、綠 183、橙 143、藍 124、紫 104、紅 88、靛 66；相鄰最小差 16 / 255（紫與紅）
    - 多層磚數字與底色對比：改為白字加 `K` 描邊，七色底（T3）上至少一組達 4.69:1 以上（`K`／`W` 與七色的實算對比見 D12「多層磚層數（新規則）」）；原本「`K` 字在藍底約 4.8:1、在綠底約 11:1」的算法已作廢
-   - 色數統計：`K`、`W`、`G` 共 3 + 七色 7×5 = 35 + 鋼灰 5 + 魔王 5 = 48 色；加 D13 擋板用的青色 2 色（`w`、`x`）、D14 不可破壞磚塊用的槍金屬 2 色（`s`、`y`）共 52 色；再加 D15 球用的珍珠白 4 色（`1`~`4`，T1 沿用 `W`）、品紅 2 色（`5`、`6`）共 58 色；D15 方案 C 沒有新增顏色；再加 D16 HUD 強化線段用的淺灰 `7`、中灰 `8` 共 60 色；再加 D17 功能型磚塊用的洋紅 3 色（`@`、`#`、`%`；T2、T4 沿用 `5`、`6`）、電青 5 色（`+ = ~ * &`）、骨白 5 色（`0 9 $ ^ !`）共 13 色，合計 73 色；再加 D18 功能型磚塊第 2 批用的炸藥褐 5 色（`? - / ; :`）共 78 色（彩虹磚、傳送磚沿用既有顏色，不新增）
+   - 色數統計：`K`、`W`、`G` 共 3 + 七色 7×5 = 35 + 鋼灰 5 + 魔王 5 = 48 色；加 D13 擋板用的青色 2 色（`w`、`x`）、D14 不可破壞磚塊用的槍金屬 2 色（`s`、`y`）共 52 色；再加 D15 球用的珍珠白 4 色（`1`~`4`，T1 沿用 `W`）、品紅 2 色（`5`、`6`；現為 D17 雷射磚用，D16 強化已改 ATK 字樣，不再使用）共 58 色；D15 方案 C 沒有新增顏色；再加 D16 HUD 強化線段用的淺灰 `7`、中灰 `8` 共 60 色；再加 D17 功能型磚塊用的洋紅 3 色（`@`、`#`、`%`；T2、T4 沿用 `5`、`6`）、電青 5 色（`+ = ~ * &`）、骨白 5 色（`0 9 $ ^ !`）共 13 色，合計 73 色；再加 D18 功能型磚塊第 2 批用的炸藥褐 5 色（`? - / ; :`）共 78 色（彩虹磚、傳送磚沿用既有顏色，不新增）；再加 D21 減益道具底板用的暗紫 4 色（`_ < > ,`）共 82 色（D20 沒有新增顏色）
    - 靛色階（`T X I k l`）在 D12 的網格中沒有出現，但多層磚的七色換色對照表需要它，所以保留
    - 本表為全檔唯一調色盤
    - 色彩來源為本稿自訂，無外部取色來源
    - 色盲：七色紅橙黃綠藍靛紫在紅綠色盲下會有混淆（紅、橙、綠）；本稿以亮度差加形狀記號補強，未用色盲模擬器驗證，請 QA 或使用者複核
 
-2. [D02] 風格指南（已改寫為路線 B 正式規範，待再確認）：
+2. [D02] 風格指南（使用者已確認，2026-10-26）：
    - 內部解析度寬 360、關卡區高 640；一排 10 塊磚，磚 32×16，磚區寬 320，左右邊框各 20（邊框美術不在本稿）
    - 細緻度標準：泰拉瑞亞式的細緻像素風（5 階色階、斜面、凹坑、木紋、金屬）；只參考風格，沒有複製任何圖
    - 不加橫向磚縫（保持數字預留區完整）
@@ -147,7 +151,7 @@
    | 破壞動畫 | 幀數、幀時間以 D12 為準（小磚 60 ms、魔王 100 ms） |
    | 以 D12 為準 | 本表與 D12 若有任何不一致（位置、尺寸、被擊中、自動產生規則等），一律以 D12 為準；D12 的欄、列編號從 0 起算 |
 
-12. [D12] 路線 B 正式母版（已修改，待再確認；多層磚層數改為新規則）：
+12. [D12] 路線 B 正式母版（使用者已確認，2026-10-26）：
     - 使用者已確認：採路線 B；內部解析度寬 360、關卡區高 640；一排 10 塊磚；磚 32×16；磚區寬 320，左右邊框各 20（邊框不在本稿）；魔王 128×48（4×3 格，置中於關卡格的第 3~6 欄，欄編號從 0 起算，即 1 起算的第 4~7 欄）；圓形磚 16×16 置中於 32×16 格內，碰撞範圍為圓形；不加橫向磚縫；多層磚（一般磚已併入多層磚，最多 69 層；顏色代表層數、數字 1~9 代表第幾輪，詳見下方「多層磚層數（新規則）」）；寶箱橙、金幣黃、圓形紫維持原外觀，但不屬於七色（不會被彩虹磚挑中）；魔王不在七色內；破壞動畫每幀小磚 60 ms、魔王 100 ms
     - 本項只畫「母版」；七色換色版本、多層磚各層、各色破壞幀由轉檔工具依下列規則自動產生
     - 母版色階一律使用 D01 的代號；母版的色階對照紅色階 `h r R t o`（T1~T5）
@@ -940,7 +944,7 @@
     ```
 
 
-13. [D13] 擋板（新增，待確認）：
+13. [D13] 擋板（使用者已確認，2026-10-26）：
     - 使用者決定：高 8 px；基準長度 64 px；最大長度 320 px（關卡區全寬，左右碰到邊框）
     - 道具改變長度後的結果長度：小增 77、大增 102、小減 51、大減 26、最短暫定 16（最短待 README 更新時確認）
     - 因為長度會變，擋板拆成「左端、可重複的中段、右端」，由程式依長度拼接
@@ -975,13 +979,13 @@
     | 槍 | 把左端、右端換成「槍左端、槍右端」（各 8 寬 × 12 高：上 4 列只畫砲管，下 8 列是擋板本體）；中段沿用正常中段圖塊（高 8）；砲管在左端第 2~5 欄、右端第 2~5 欄（最左、最右邊），砲口閃光在第 3~4 欄；槍的端帽小燈改為黃色 |
     | 高度與對齊 | 拼接時各段底部對齊；整條高 = 各段最大高（正常、吸附為 8；槍為 12）；中段圖塊高 8，上方不足的列補透明，不另畫 |
     | 碰撞 | 只算本體 8 px（槍的下 8 列）；砲管（槍的上 4 列）不參與碰撞 |
-    | 吸附 | 把左端、中段、右端三個圖塊全部換成吸附版；拼接規則不變（上緣兩列改為綠色黏液，其餘與正常相同） |
-    | 同時有槍與吸附 | 左端、右端用槍版，中段用吸附版（槍的端帽與吸附的上緣黏液可並存；如使用者要不同組合，請通知 PM） |
+    | 吸附 | 把左端、中段、右端三個圖塊全部換成吸附版；拼接規則不變（2026-10-26 使用者要求移除綠色，吸附版外觀與正常版相同；吸附狀態靠球黏住與 HUD 辨識） |
+    | 同時有槍與吸附 | 左端、右端用槍版，中段用吸附版（吸附版已與正常版相同（2026-10-26 使用者要求移除綠色），所以實際外觀就是槍端加正常中段；如使用者要不同組合，請通知 PM） |
     | 被擊中（1 幀） | 對「組好的整條擋板」套用：除 `K` 與 `.` 以外的像素全部改成 `W`（與 D12 同規則） |
     | 隱形 | 由程式調整透明度，不畫圖 |
 
     取捨說明：
-    - 吸附只改上緣兩列（綠色黏液），不另畫整組新造型：球黏在上緣，顏色一眼可分，且中段、端帽的細節不用重畫
+    - 吸附：2026-10-26 使用者要求移除綠色，吸附版外觀與正常版相同（網格 id 與尺寸保留，供轉檔工具使用）；吸附狀態靠球黏住與 HUD 辨識
     - 槍只改兩端：砲管往上突出 4 px（頂端黃色閃光、管身左亮右暗、底部一圈金屬環），因為使用者要求「最左、最右邊可以發射雷射」，砲口位置即雷射發射點；本體端帽小燈改黃色（表示彈藥就緒）
     - 第 2 版調整（依 PM 看圖）：1. 拿掉每 8 欄一條的接縫，避免長擋板像履帶；中段圖塊改寬 16，只有一顆鉚釘、兩小段刮痕，細節稀疏而不連成帶狀 2. 左端上緣加 3 px 白色高光（與磚塊一致） 3. 炮管改為有結構的深色管
 
@@ -1056,8 +1060,8 @@
     吸附左端（id: paddle_sticky_left）：
     ```text
     .KKKKKKK
-    KFFFFFFF
-    KFLLLLLL
+    KiWWWiii
+    Kieeeeee
     Kifwwfff
     Kifxxfff
     Kggggggg
@@ -1068,8 +1072,8 @@
     吸附中段（id: paddle_sticky_mid）：
     ```text
     KKKKKKKKKKKKKKKK
-    FFFFFFFFFFFFFFFF
-    LLLLLLLLLLLLLLLL
+    iiiiiiiiiiiiiiii
+    eeeeeeeeeeeeeeee
     fffffffieffeefff
     ffggfffgjfffffff
     gggggggggggggggg
@@ -1080,8 +1084,8 @@
     吸附右端（id: paddle_sticky_right）：
     ```text
     KKKKKKK.
-    FFFFFFLK
-    LLLLLLHK
+    iiiiiieK
+    eeeeeefK
     fffwwfgK
     fffxxfgK
     ggggggjK
@@ -1120,8 +1124,8 @@
     吸附完整 64（id: paddle_sticky_64）：
     ```text
     .KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK.
-    KFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFLK
-    KFLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLLHK
+    KiWWWiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiiieK
+    KieeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeeefK
     KifwwffffffffffieffeeffffffffffieffeeffffffffffieffeeffffffwwfgK
     KifxxfffffggfffgjfffffffffggfffgjfffffffffggfffgjffffffffffxxfgK
     KgggggggggggggggggggggggggggggggggggggggggggggggggggggggggggggjK
@@ -1129,7 +1133,7 @@
     .KKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKKK.
     ```
 
-14. [D14] 不可破壞磚塊（新增，待確認）：
+14. [D14] 不可破壞磚塊（使用者已確認，2026-10-26）：
     - 規格（README）：被球碰觸後不會消失，用來阻擋玩家攻擊；雷射磚塊的雷射與擋板槍的雷射都會被它擋下；閃電不能打它；彩虹磚不會挑到它，它不在彩虹七色內；減益道具「無敵」會讓所有磚塊（魔王除外）變成不可破壞，持續 5 秒，結束後恢復原本層數
     - 尺寸：32×16（一般磚格）；風格、光源、描邊沿用 D01、D02
     - 欄、列編號一律從 0 起算
@@ -1252,7 +1256,7 @@
     - 狀態：正常、穿透（5 秒；附魔可整局）、火焰（5 秒；附魔可整局）、炸彈（5 秒）、強化（每次減層 +1，最多 +7，整局）、fever（球 50 顆以上，低於 50 解除）；狀態可同時存在
     - 風格沿用 D01、D02：1 px `K` 描邊、左上光源、不用抖色、漸層、隨機點
     - 欄、列編號一律從 0 起算
-    - 顏色：珍珠白 `1`~`4`（T1 沿用 `W`）標「D15 用」，已加入 D01；品紅 `5`、`6` 原為已刪除的外圍記號方案所用，D01 保留，目前改由 D16 強化圖示使用；色數統計為 58 色
+    - 顏色：珍珠白 `1`~`4`（T1 沿用 `W`）標「D15 用」，已加入 D01；品紅 `5`、`6` 原為已刪除的外圍記號方案所用，D01 保留，目前由 D17 雷射磚使用（D16 強化已改 ATK 字樣，不再使用）；色數統計為 58 色
 
     設計重點（取捨）：
     - **白色核心 = 這是球**：七色磚、鋼灰擋板、深灰藍不可破壞磚都沒有「近中性的珍珠白」；本體永遠是珍珠白，**不換色**（本體換成橙或紅會和七色玩法資訊混淆）
@@ -1718,12 +1722,13 @@
     - 範圍：只做 5 種狀態圖示、圖示下方的線段條與排列；時間、分數、魔王血量等其他 HUD 元素不在本次範圍
     - 風格沿用 D01、D02：1 px `K` 描邊、左上光源；新增顏色 2 色（淺灰 `7`、中灰 `8`，標「D16 用」，已加入 D01），色數統計為 60 色
     - 欄、列編號一律從 0 起算
+    - 2026-10-26 使用者已確認 SP/ATK 文字畫法：減速/加速/強化改為文字畫法（`hud_icon_slow`、`hud_icon_fast`、`hud_icon_reinforce` 與 `hud_row_example` 對應位置已重畫；文字用 `W`，下方球用珍珠白）
     - 使用者回饋（第 2 版）：1. 5 個圖示要一樣大、都是正方形 2. 下方提示全部改為線段，不再用 +N 數字和 ∞ 記號，5 格的線段尺寸、位置、高度完全一致
     - **正方形的做法：統一的 16×16 底板加固定內容框**
       - 5 個圖示共用同一塊 16×16 的正方形底板：最外圈 1 px `K` 描邊；內側上緣、左緣 1 px `f`（亮邊），下緣、右緣 1 px `j`（暗邊），右上與左下轉角用 `g`；底板面用 `g`（左上光源，與 D02 一致）
       - 圖示內容全部畫在 12×12 的內容框內（底板的第 2~13 欄、第 2~13 列），內容的外形都**頂到內容框的四邊**，所以 5 個看起來一樣大；內容框外不再有突出物（上一版炸彈與 fever 的火花會突出，已改掉：炸彈的引信與火花收進框內，fever 取消火花）
       - 內容框內沒畫到的透明處，會露出底板面（網格中以 `g` 表示，不用 `.`）
-    - 色盲照顧：5 種圖示的**外形各不相同**（箭穿過橫板、水滴火焰、有引信的圓炸彈、雙層向上箭頭、三顆球成堆），不靠顏色辨識；顏色只是輔助
+    - 色盲照顧：穿透（箭穿橫板）、火焰（水滴）、炸彈（有引信的圓炸彈）、fever（三顆球成堆）外形各不相同；強化（ATK 字樣）、減速與加速（球加 SP）改為文字記號，靠字辨識，不靠顏色；**加速與減速只差右上的 +／−（1 px 筆畫），其餘完全相同**，色盲與小螢幕下較易混淆；顏色只是輔助
     - 圖示內容縮到 12×12 的代價：筆畫細節比上一版（16×16 內容）少，見「已知限制」
 
     各狀態圖示（16×16，底板加 12×12 內容）：
@@ -1733,7 +1738,7 @@
     | 穿透 | 向上的箭穿過一塊橫板 | 箭頭加橫板，橫板頂到左右兩邊 | 青 `w` `x`、鋼灰 `e` `f` | `hud_icon_pierce` |
     | 火焰 | 火焰 | 水滴狀、頂端尖 | 橙 `a` `O` `d` `b`、黃 `A` `B`、紅 `R` `t` | `hud_icon_flame` |
     | 炸彈 | 圓炸彈加引信火花 | 圓形加右上引信（火花收進內容框） | 鋼灰 `f` `g` `j`、魔王最暗 `v`、引信 `G`、火花 `Y` `W` | `hud_icon_bomb` |
-    | 強化 | 雙層向上箭頭 | 兩個疊起的 V 形 | 品紅 `5` `6`、白 `W` | `hud_icon_reinforce` |
+    | 強化 | 文字 ATK 加右上 +（使用者已確認 SP/ATK，2026-10-26） | 3×5 像素字，ATK 在 + 下方，無球 | 白 `W`（文字） | `hud_icon_reinforce` |
     | fever | 三顆球成堆 | 上 1 顆、下 2 顆緊貼 | 珍珠白 `W` `1`~`4` | `hud_icon_fever` |
 
     格子的組成（每個狀態一格，格寬 22、格高 22；第 3 版：線段加寬為 22 以放下 7 小段，圖示不變，在格內水平置中）：
@@ -1811,10 +1816,10 @@
 
     | 狀態 | 圖示 | 外形記號 | 主要顏色（D01 代號） | 圖 id |
     |---|---|---|---|---|
-    | 減速 | 龜殼（側面，有頭、腿） | 圓頂加頭加兩條腿，左右不對稱 | 綠 `F` `L` `H` `J` | `hud_icon_slow` |
-    | 加速 | 向右的雙層實心箭頭 | 兩個並排的向右三角形 | 黃 `A` `B` `Y` | `hud_icon_fast` |
+    | 減速 | 珍珠白球加文字 SP 與右上 −（使用者已確認 SP/ATK，2026-10-26） | 左上 SP、右上 −、下方 6×6 球 | 白 `W`（文字）、珍珠白 `W` `1`~`4`、`K` | `hud_icon_slow` |
+    | 加速 | 珍珠白球加文字 SP 與右上 +（使用者已確認 SP/ATK，2026-10-26） | 左上 SP、右上 +、下方 6×6 球 | 白 `W`（文字）、珍珠白 `W` `1`~`4`、`K` | `hud_icon_fast` |
 
-    - 為什麼這兩個外形不會和既有的混淆：穿透是向上的箭穿橫板、強化是向上的雙 V 形（空心）、加速是向右的實心三角、減速是有頭有腿的圓頂；方向、實心或空心、整體輪廓都不同
+    - 為什麼這兩個圖示不會和既有的混淆（2026-10-26 改）：穿透是向上的箭穿橫板、強化是 ATK 字樣（無球）、加速與減速是球加 SP 字樣；有字或無字、有球或無球、整體輪廓都不同；加速與減速彼此只差右上 +／−
     - 線段（沿用 22×4 外框與分段通用規則）：減速 3 段（對應 −1~−3 階）、加速 4 段（對應 +1~+4 階）；整場有效，沒有時間條
     - 3 段與 4 段從 7 種灰挑色：用通用規則 round((i − 1) × 6 ÷ (N − 1))，7 種灰的順序為 `W`（0）`7`（1）`G`（2）`8`（3）`f`（4）`y`（5）`g`（6）
 
@@ -1831,8 +1836,8 @@
       - 減速與加速互為反方向，實際上不會同時出現；範例圖 `hud_row_example` 兩格都畫只是為了示意
     - 光暈（D15 方案 C，使用者決定）：只要 HUD 上有任何一格在顯示，球就有光暈；所以減速、加速都會讓球顯示青色光暈
     - 已知限制：
-      - 加速的黃色與火焰的橙色、減速的綠色與其他圖示的色相不同，但色盲玩家仍要靠形狀（龜殼、雙三角）分辨
-      - 加速圖示的實心三角在 12×12 內每個只有 6 欄寬，細節很少
+      - 加速與減速不靠顏色，靠 SP 字樣與右上 +／−（1 px 筆畫）分辨；兩者只差這一個符號，色盲與小螢幕下較易混淆
+      - SP 為 3×5 像素字，球縮成 6×6，細節很少
       - 顯示的是淨階數，玩家看不到「加速、減速各疊了幾次」
 
     排列規則（7 格排列與新版 `hud_row_example` 使用者已確認）：
@@ -1858,7 +1863,7 @@
 
     已知限制：
     - 圖示內容只有 12×12（上一版是 16×16），箭頭、火焰、炸彈的筆畫更少；在手機上約放大 3~4 倍，仍可辨，但細節（火焰內焰、炸彈高光）已簡化
-    - 強化圖示（品紅）與火焰（橙紅）色相接近，色盲玩家要靠形狀；底板（灰）讓各圖示的底色一致，但品紅在灰底上對比不高
+    - 強化圖示已改為白色 ATK 字樣（2026-10-26），不再與火焰色相接近；底板（灰）讓各圖示的底色一致，白字對灰底約 6.2:1
     - 強化分段的每段只有 2×2 px，見上方說明
     - 附魔與 fever 的線段都是全滿白色，彼此只靠圖示分辨；5 秒狀態剛開始時線段也是全滿白色，要看它是否開始縮短才知道是不是附魔
     - 範例網格（`hud_row_example`）寬 126 列高 22，在文件裡每列很長；實際圖由轉檔工具輸出
@@ -1936,18 +1941,18 @@
     ```text
     KKKKKKKKKKKKKKKK
     KfffffffffffffgK
-    KfgggggKKgggggjK
-    KfggggKW6KggggjK
-    KfgggK5566KgggjK
-    KfggK55KK66KggjK
-    KfgK55KggK66KgjK
-    KfKKKKggggKKKKjK
-    KfgggggKKgggggjK
-    KfggggKW6KggggjK
-    KfgggK5566KgggjK
-    KfggK55KK66KggjK
-    KfgK55KggK66KgjK
-    KfKKKKggggKKKKjK
+    KfggggggggggWgjK
+    KfgggggggggWWWjK
+    KfggggggggggWgjK
+    KfggggggggggggjK
+    KfggggggggggggjK
+    KfggWggWWWgWgWjK
+    KfgWgWggWggWgWjK
+    KfgWWWggWggWWgjK
+    KfgWgWggWggWgWjK
+    KfgWgWggWggWgWjK
+    KfggggggggggggjK
+    KfggggggggggggjK
     KgjjjjjjjjjjjjjK
     KKKKKKKKKKKKKKKK
     ```
@@ -2036,18 +2041,18 @@
     ```text
     KKKKKKKKKKKKKKKK
     KfffffffffffffgK
-    KfgggggKKKKgggjK
-    KfgggKKFLLLKKgjK
-    KfggKFLHLLHLLKjK
-    KfKKKFLLHHLLLKjK
-    KfKLKLHLLLLHJKjK
-    KfKLKLLLHHLLJKjK
-    KfKKKLLHLLHJJKjK
-    KfggKKKKKKKKKKjK
-    KfgggKLLKgKLLKjK
-    KfgggKLLKgKLLKjK
-    KfgggKJJKgKJJKjK
-    KfgggKKKKgKKKKjK
+    KfWWWgWWWgggggjK
+    KfWgggWgWgggggjK
+    KfWWWgWWWggWWWjK
+    KfggWgWgggggggjK
+    KfWWWgWgggggggjK
+    KfggggggggggggjK
+    KfggggKKKKggggjK
+    KfgggKW122KgggjK
+    KfgggK1223KgggjK
+    KfgggK2233KgggjK
+    KfgggK2334KgggjK
+    KfggggKKKKggggjK
     KgjjjjjjjjjjjjjK
     KKKKKKKKKKKKKKKK
     ```
@@ -2056,18 +2061,18 @@
     ```text
     KKKKKKKKKKKKKKKK
     KfffffffffffffgK
-    KfKgggggKgggggjK
-    KfKKggggKKggggjK
-    KfKBKgggKBKgggjK
-    KfKBBKggKBBKggjK
-    KfKABBKgKABBKgjK
-    KfKABBBKKABBBKjK
-    KfKBBYYKKBBYYKjK
-    KfKBYYKgKBYYKgjK
-    KfKYYKggKYYKggjK
-    KfKYKgggKYKgggjK
-    KfKKggggKKggggjK
-    KfKgggggKgggggjK
+    KfWWWgWWWgggggjK
+    KfWgggWgWgggWgjK
+    KfWWWgWWWggWWWjK
+    KfggWgWgggggWgjK
+    KfWWWgWgggggggjK
+    KfggggggggggggjK
+    KfggggKKKKggggjK
+    KfgggKW122KgggjK
+    KfgggK1223KgggjK
+    KfgggK2233KgggjK
+    KfgggK2334KgggjK
+    KfggggKKKKggggjK
     KgjjjjjjjjjjjjjK
     KKKKKKKKKKKKKKKK
     ```
@@ -2122,18 +2127,18 @@
     ```text
     ...KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK...
     ...KfffffffffffffgK..........KfffffffffffffgK..........KfffffffffffffgK..........KfffffffffffffgK..........KfffffffffffffgK..........KfffffffffffffgK..........KfffffffffffffgK...
-    ...KfgggggKKgggggjK..........KfggggKKKKggggjK..........KfgggggKKKKgggjK..........KfKgggggKgggggjK..........KfgggggKKgggggjK..........KfgggggKKgggggjK..........KfggggggggggYgjK...
-    ...KfggggKW6KggggjK..........KfgggKW122KgggjK..........KfgggKKFLLLKKgjK..........KfKKggggKKggggjK..........KfggggKwxKggggjK..........KfggggKaaKggggjK..........KfggggggggGYWYjK...
-    ...KfgggK5566KgggjK..........KfgggK1223KgggjK..........KfggKFLHLLHLLKjK..........KfKBKgggKBKgggjK..........KfgggKwwxxKgggjK..........KfgggKaOOdKgggjK..........KfgggggggGggYgjK...
-    ...KfggK55KK66KggjK..........KfgggK2233KgggjK..........KfKKKFLLHHLLLKjK..........KfKBBKggKBBKggjK..........KfggKwwwxxxKggjK..........KfggKaOBBdbKggjK..........KfgggKKKKgggggjK...
-    ...KfgK55KggK66KgjK..........KfgggK2334KgggjK..........KfKLKLHLLLLHJKjK..........KfKABBKgKABBKgjK..........KfgKKKKwxKKKKgjK..........KfgKaOBAABdbKgjK..........KfgKWWfggjKgggjK...
-    ...KfKKKKggggKKKKjK..........KfggggKKKKggggjK..........KfKLKLLLHHLLJKjK..........KfKABBBKKABBBKjK..........KfggggKwxKggggjK..........KfKOOBAAAABbbKjK..........KfKWfffgggjKggjK...
-    ...KfgggggKKgggggjK..........KfgKKKKggKKKKgjK..........KfKKKLLHLLHJJKjK..........KfKBBYYKKBBYYKjK..........KfKKKKKKKKKKKKjK..........KfKdOBAAAABbbKjK..........KfKWfffggjjKggjK...
-    ...KfggggKW6KggggjK..........KfKW122KKW122KjK..........KfggKKKKKKKKKKjK..........KfKBYYKgKBYYKgjK..........KfKeeeeeeeeeeKjK..........KfKdOBBAABBbbKjK..........KfKffgggjjjKggjK...
-    ...KfgggK5566KgggjK..........KfK1223KK1223KjK..........KfgggKLLKgKLLKjK..........KfKYYKggKYYKggjK..........KfKffffffffffKjK..........KfKRdBBBBBBbRKjK..........KfKfggggjjvKggjK...
-    ...KfggK55KK66KggjK..........KfK2233KK2233KjK..........KfgggKLLKgKLLKjK..........KfKYKgggKYKgggjK..........KfKKKKKKKKKKKKjK..........KfgKRRdBBbRRKgjK..........KfKgggggjjvKggjK...
-    ...KfgK55KggK66KgjK..........KfK2334KK2334KjK..........KfgggKJJKgKJJKjK..........KfKKggggKKggggjK..........KfggggKwxKggggjK..........KfggKtRRRRtKggjK..........KfgKgjjvvvKgggjK...
-    ...KfKKKKggggKKKKjK..........KfgKKKKggKKKKgjK..........KfgggKKKKgKKKKjK..........KfKgggggKgggggjK..........KfggggKKKKggggjK..........KfgggKKKKKKgggjK..........KfgggKKKKgggggjK...
+    ...KfggggggggggWgjK..........KfggggKKKKggggjK..........KfWWWgWWWgggggjK..........KfWWWgWWWgggggjK..........KfgggggKKgggggjK..........KfgggggKKgggggjK..........KfggggggggggYgjK...
+    ...KfgggggggggWWWjK..........KfgggKW122KgggjK..........KfWgggWgWgggggjK..........KfWgggWgWgggWgjK..........KfggggKwxKggggjK..........KfggggKaaKggggjK..........KfggggggggGYWYjK...
+    ...KfggggggggggWgjK..........KfgggK1223KgggjK..........KfWWWgWWWggWWWjK..........KfWWWgWWWggWWWjK..........KfgggKwwxxKgggjK..........KfgggKaOOdKgggjK..........KfgggggggGggYgjK...
+    ...KfggggggggggggjK..........KfgggK2233KgggjK..........KfggWgWgggggggjK..........KfggWgWgggggWgjK..........KfggKwwwxxxKggjK..........KfggKaOBBdbKggjK..........KfgggKKKKgggggjK...
+    ...KfggggggggggggjK..........KfgggK2334KgggjK..........KfWWWgWgggggggjK..........KfWWWgWgggggggjK..........KfgKKKKwxKKKKgjK..........KfgKaOBAABdbKgjK..........KfgKWWfggjKgggjK...
+    ...KfggWggWWWgWgWjK..........KfggggKKKKggggjK..........KfggggggggggggjK..........KfggggggggggggjK..........KfggggKwxKggggjK..........KfKOOBAAAABbbKjK..........KfKWfffgggjKggjK...
+    ...KfgWgWggWggWgWjK..........KfgKKKKggKKKKgjK..........KfggggKKKKggggjK..........KfggggKKKKggggjK..........KfKKKKKKKKKKKKjK..........KfKdOBAAAABbbKjK..........KfKWfffggjjKggjK...
+    ...KfgWWWggWggWWgjK..........KfKW122KKW122KjK..........KfgggKW122KgggjK..........KfgggKW122KgggjK..........KfKeeeeeeeeeeKjK..........KfKdOBBAABBbbKjK..........KfKffgggjjjKggjK...
+    ...KfgWgWggWggWgWjK..........KfK1223KK1223KjK..........KfgggK1223KgggjK..........KfgggK1223KgggjK..........KfKffffffffffKjK..........KfKRdBBBBBBbRKjK..........KfKfggggjjvKggjK...
+    ...KfgWgWggWggWgWjK..........KfK2233KK2233KjK..........KfgggK2233KgggjK..........KfgggK2233KgggjK..........KfKKKKKKKKKKKKjK..........KfgKRRdBBbRRKgjK..........KfKgggggjjvKggjK...
+    ...KfggggggggggggjK..........KfK2334KK2334KjK..........KfgggK2334KgggjK..........KfgggK2334KgggjK..........KfggggKwxKggggjK..........KfggKtRRRRtKggjK..........KfgKgjjvvvKgggjK...
+    ...KfggggggggggggjK..........KfgKKKKggKKKKgjK..........KfggggKKKKggggjK..........KfggggKKKKggggjK..........KfggggKKKKggggjK..........KfgggKKKKKKgggjK..........KfgggKKKKgggggjK...
     ...KgjjjjjjjjjjjjjK..........KgjjjjjjjjjjjjjK..........KgjjjjjjjjjjjjjK..........KgjjjjjjjjjjjjjK..........KgjjjjjjjjjjjjjK..........KgjjjjjjjjjjjjjK..........KgjjjjjjjjjjjjjK...
     ...KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK..........KKKKKKKKKKKKKKKK...
     ..................................................................................................................................................................................
@@ -2144,7 +2149,7 @@
     jjjjjjjjjjjjjjjjjjjjjj....jjjjjjjjjjjjjjjjjjjjjj....jjjjjjjjjjjjjjjjjjjjjj....jjjjjjjjjjjjjjjjjjjjjj....jjjjjjjjjjjjjjjjjjjjjj....jjjjjjjjjjjjjjjjjjjjjj....jjjjjjjjjjjjjjjjjjjjjj
     ```
 
-17. [D17] 功能型磚塊 第 1 批（新增，待確認）：
+17. [D17] 功能型磚塊 第 1 批（使用者已確認，2026-10-26）：
     - 範圍：雷射磚、閃電磚、死神磚的磚體、數字位置、被擊中、破壞，以及三種「發動效果」；第 2 批（爆炸、彩虹、傳送）之後再畫，本項不含
     - 規格（README）：雷射＝分水平、垂直、十字 3 種，水平打橫向一整排、垂直打直向一整欄、十字兩者都打，讓整排或整欄可破壞磚層數減 1，被不可破壞磚或任何功能型磚擋下（使用者 2026-10-26 決定：功能型磚不受影響、不扣次數、不發動、不破壞；擋板槍的子彈打到功能型磚同樣被擋下、磚不受影響），被碰時次數減 1（README 原寫減 2 為筆誤，使用者已改）；閃電＝打出和剩餘次數一樣多的閃電，各打隨機一塊可破壞磚減 2 層，不打不可破壞磚，被碰時次數減 1；死神＝直接破壞碰到的球；雷射、閃電的使用次數都是 1~9 隨機（死神同為 1~9 隨機），歸零時磚破壞
     - 使用者已決定（本項遵守）：尺寸 32×16；剩餘次數用 D12 的 5×7 像素數字顯示、最多 9（1 位數）；「無敵」期間沿用 D14 `invincible_a_overlay`；不會被炸彈標記（不畫標記）；效果一併繪製
@@ -2176,7 +2181,7 @@
 
     | 磚 | T1 | T2 | T3（主色） | T4 | T5 | 說明 |
     |---|---|---|---|---|---|---|
-    | 雷射（洋紅） | `@` #FFC2DF | `5` #FF6FB5 | `#` #EA4FA6 | `6` #B02A78 | `%` #6E1650 | T2、T4 沿用 D16 的品紅 `5`、`6`；新增 3 色 |
+    | 雷射（洋紅） | `@` #FFC2DF | `5` #FF6FB5 | `#` #EA4FA6 | `6` #B02A78 | `%` #6E1650 | T2、T4 沿用 D01 的品紅 `5`、`6`；新增 3 色 |
     | 閃電（電青） | `+` #C8FFF0 | `=` #7DEFD6 | `~` #1FC4AA | `*` #138C80 | `&` #0B544E | 新增 5 色 |
     | 死神（骨白） | `0` #FFF8E4 | `9` #EFE4CB | `$` #D9C9A8 | `^` #A08E6C | `!` #5C503C | 新增 5 色；`!` 同時是骷髏本體色 |
 
@@ -2858,7 +2863,7 @@
     - 遊戲程式要處理：雷射光束（水平、垂直、十字）的分段拼接與裁切、垂直光束置中偏移（x ＋ 8）、垂直光束穿過擋板高度但不影響球與擋板、十字兩個方向同步換幀、光束被不可破壞磚或任何功能型磚擋下的判斷（各方向獨立；被擋的功能型磚不受影響；擋板槍的子彈打到功能型磚也被擋下、磚不受影響）、閃電多道時各道落雷依序錯開（建議每道間隔 80 ms，實作時再調）、閃電道數取碰觸前的剩餘次數、功能型磚不吃球的攻擊力加成且每次碰觸只觸發一次、閃電跳過功能型磚與不可破壞磚、各效果與 D12 被擊中的同步時機、繪製順序（磚 → 無敵疊加 → 效果 → 球光暈 → 球本體）
     - 玩家開啟系統「減少動態」時：雷射光束與落雷固定只播 F2（或 F2 相當的 1 幀 60 ms），不播其他幀（建議，請使用者確認）
 
-    待使用者確認：目前無（D17 本身仍待使用者逐項確認）
+    待使用者確認：目前無（D17 本身已由使用者確認，2026-10-26）
 
     使用者已決定（已寫入對應段落）：
     - 閃電道數＝碰觸前的剩餘次數；多道錯開時間為建議值（80 ms），實作時再調
@@ -2870,7 +2875,7 @@
     - 骨白死神磚的無敵外框：維持現狀，實機有問題再提
     - 死神被碰時只播 D12 被擊中 1 幀，不畫咬合圖
 
-18. [D18] 功能型磚塊 第 2 批（已修改，待再確認；爆炸效果 4 幀已重畫）：
+18. [D18] 功能型磚塊 第 2 批（使用者已確認，2026-10-26）：
     - 範圍：爆炸磚、彩虹磚、傳送磚的磚體、被擊中、破壞（或不需要）、發動效果；第 1 批（雷射、閃電、死神）見 D17，不在本項
     - 規格（README）：爆炸＝被球觸碰時爆炸，以自己為中心周圍的可破壞磚不論層數直接破壞，僅能觸碰 1 次，觸碰後自己也被破壞；彩虹＝被球觸碰時隨機挑畫面中可破壞磚的一種顏色（不含魔王），把該顏色的所有磚破壞；傳送＝一定成雙成對（兩兩一組），被球碰到的為入口，其餘為出口，出口隨機選，出來的角度也隨機，沒有次數限制；以上為 README 原文，與下方「使用者已決定」不同處以「已決定」為準
     - 使用者已決定（本項遵守）：
@@ -3769,6 +3774,890 @@
 
     待使用者決定：
     - 目前無（使用者已決定：子彈 4×8、速度 600 px/s、最短間隔 300 ms；實作時仍可依手感調整）
+
+20. [D20] 增益道具掉落圖示（使用者已確認，2026-10-26）：
+    - 範圍：增益道具第 1 批，共 13 個道具圖示、2 張增益底板、3 幀拾取效果；減益道具是第 2 批，本項不含；掉出底部不畫效果
+    - 依據：README 玩法第 3 點（道具）；調色盤 D01；風格 D02；球 D15；HUD 圖示 D16；槍的子彈 D19
+    - 風格沿用 D01、D02：光源左上、1 px `K` 描邊、5 階色階、不用抖色、漸層、隨機點；欄、列從 0 起算
+    - 顏色：全部沿用 D01，**不新增顏色、不新增符號**（D01 不需更新）；底板用電青 `+ = ~ *`（D17 閃電磚也用這組色，但形狀不同），標記字用 `K`
+    - 使用者已決定（本項遵守）：16×16 正方形（底板加 12×12 內容框，同 D16）；增益與減益外框形狀相同、只靠底板顏色分（增益亮、減益暗紫）；掉落時 2 幀呼吸，只換底板，內容不動；穿透、火焰、炸彈沿用 D16 的 12×12 圖案（強化、減速改為 SP/ATK 文字畫法，與 D16 一致）；擋板長度 3 種同圖案、右上角標 `+`、`++`、`max`；拾取畫約 3 幀；外形各不相同
+    - 底板（`item_plate_buff_f1`、`item_plate_buff_f2`）：
+
+    | 部位 | F1（亮） | F2（暗） | 灰階 Y（F1 → F2） |
+    |---|---|---|---|
+    | 最外圈 | `K` | `K` | 29 |
+    | 內圈 上緣、左緣（含第 1 列第 1~13 欄、第 1 欄第 2~13 列） | `+` | `~` | 237 → 144 |
+    | 內圈 下緣、右緣、右上與左下轉角 | `=` | 下緣、右緣 `*`；右上、左下轉角 `~` | 202 → 102 / 144 |
+    | 底板面（第 2~13 欄、第 2~13 列的透明處） | `~` | `~` | 144（兩幀相同） |
+
+    - 道具圖 F1 = 把內容畫在 F1 底板上；底板面 `~` 兼作內容的透明處
+    - **F2 規則（寫死在轉檔工具）**：F2 = 把道具 F1 圖的底板換成 `item_plate_buff_f2`；做法：逐像素比對，凡與 `item_plate_buff_f1` 同位置、同代號的像素，改成 `item_plate_buff_f2` 同位置的像素，其餘（內容）不動；所有道具共用，所以 13 個道具不再另畫 F2 圖；內容不使用 `+ = ~ *`，不會被誤換
+    - 呼吸：F1、F2 各 400 ms，一輪 800 ms（與 D15 光暈一致）；所有掉落中的道具共用同一個時鐘；玩家開啟系統「減少動態」時固定顯示 F1
+    - 增益底板為什麼選電青（取捨）：
+      - 與七色磚、魔王暗紫灰（Y 52~80）、珍珠白球（Y 210）、鋼灰擋板、黃色子彈、洋紅光束都不同色相
+      - 面 `~` 的 Y 為 144，比預計的減益暗紫面（建議 `p`，Y 73）亮 71；相對亮度對比約 4.1:1；F1 亮圈 `+` `=` 更亮，灰階下仍分得開
+      - 面不選更亮的 `=`（Y 202）：D16 炸彈的黃火花 `Y`（209）、`W` 會幾乎消失
+    - 預計減益底板（第 2 批，僅供對照，本項不畫）：同樣的外框結構，面 `p`（Y 73）、亮邊 `V`（104）、暗邊 `q`（46）；呼吸時 F2 亮邊不比 F1 亮
+
+    各道具外形與顏色（外形各不相同，不靠顏色辨識；內容都在底板的 12×12 內容框內）：
+
+    | 道具 | 圖 id | 外形記號 | 主要顏色（D01 代號） | 來源 |
+    |---|---|---|---|---|
+    | 擋板小幅增加 + | `item_paddle_len_1` | 全寬擋板加底下量尺括弧；右上 K 色小十字 1 個 | 擋板：青 `w` `x`、鋼灰 `e`；標記 `K` | 新畫 |
+    | 擋板大幅增加 ++ | `item_paddle_len_2` | 同上；右上 K 色小十字 2 個 | 同上 | 新畫 |
+    | 擋板最大化 max | `item_paddle_len_max` | 同上；右上 K 色 3×5 字形 MAX | 同上 | 新畫 |
+    | 穿透 | `item_pierce` | 向上的箭穿過橫板 | 青 `w` `x`、鋼灰 `e` `f` | D16 照抄 |
+    | 火焰 | `item_flame` | 水滴狀火焰、頂端尖 | 橙 `a` `O` `d` `b`、黃 `A` `B`、紅 `R` `t` | D16 照抄 |
+    | 炸彈 | `item_bomb` | 圓炸彈加右上引信火花 | 鋼灰 `f` `g` `j`、`v`、引信 `G`、火花 `Y` `W` | D16 照抄 |
+    | 減速 | `item_slow` | 珍珠白球加左上 SP、右上 − | `K`（文字）、珍珠白 `W` `1`~`4` | 使用者已確認（SP/ATK 畫法），與 D16 同 |
+    | 分裂 | `item_split` | 1 顆 6×6 珍珠白球（同 `item_slow`），右上文字 x2 | `K`（文字）、珍珠白 `W` `1`~`4` | 2026-10-26 使用者要求改為 1 球 + x2 |
+    | 強化 | `item_reinforce` | 文字 ATK 加右上 +（ATK 在 + 下方，無球） | `K`（文字） | 使用者已確認（SP/ATK 畫法），與 D16 同 |
+    | 吸附 | `item_sticky` | 6×6 珍珠白球直接貼在擋板上緣 | 珍珠白 `W` `1`~`4`、擋板 `w` `e`、`K` | 新畫；2026-10-26 使用者要求移除綠色黏液 |
+    | 金球 | `item_golden_ball` | 12×12 圓形金球（四角削圓）、球面中央一個 K 色「$」（5×7）、左上白高光 | 黃 `A` `B` `Y` `C` `D`、`$` 用 `K` | 新畫；2026-10-26 使用者要求 ? 改為 $ |
+    | 擋板移動速度增加 | `item_paddle_speed` | 擋板加左上 SP、右上 + | `K`（文字）、擋板青 `w` `x`、鋼灰 `e` `f` | 使用者已確認（SP/ATK 畫法，取代翅膀） |
+    | 槍 | `item_gun` | 擋板上兩根直砲管，管口各一發子彈 | 鋼灰 `e` `f`、黃 `A` `B` `Y` `C`（子彈沿用 D19 色） | 新畫 |
+
+    - 色盲照顧：外形輪廓互異（橫條＋括弧、箭、火焰、圓炸彈、SP−加球、球加 x2、ATK 字樣、球貼擋板、帶 $ 的大球、SP+加擋板、雙砲管）；顏色只是輔助；SP/ATK 是文字記號，辨識靠字，不靠色
+    - 金球為什麼分得開：D15 球是 8×8 珍珠白、沒有標記；金幣磚是 32×16 的錢幣；金球是 12×12 黃色大球（四角削圓、左上高光），球面有 K 色「$」（2026-10-26 使用者要求，取代「?」）；與金幣磚的差別是外形（12×12 圓球對 32×16 長方磚）與電青亮邊底板，見回報比較
+    - 擋板長度 3 款共用同一個圖案，只有右上標記不同；標記全部在內容框內（第 11~13 欄為止、第 2~6 列內），沒有超出 16×16；「max」字形只有 3×5，已是這個空間的極限；max 佔滿上緣，使用者已決定可以（2026-10-26），見「已知限制」
+    - 2026-10-26 使用者已確認（SP/ATK 畫法；適用 `item_slow`、`item_paddle_speed`、`item_reinforce`）：速度與攻擊類改為文字畫法；文字為 3×5 像素字、1 px 筆畫，全在 12×12 內容框內
+      - 球速（`item_slow`）與擋板速度（`item_paddle_speed`）：左上 SP（內容框第 0~6 欄、第 0~4 列），右上符號在第 9~11 欄（− 在第 2 列；+ 在第 1~3 列），SP 與符號之間空第 7、8 欄
+      - `item_slow`：下方 6×6 珍珠白球（第 3~8 欄、第 6~11 列）；`item_paddle_speed`：下方 12 欄寬、4 列高擋板（第 7~10 列）
+      - `item_reinforce`：右上 +（第 9~11 欄、第 0~2 列），下方 ATK（第 1~11 欄、第 5~9 列），不畫球；大幅增加用 ++、減少用 −（通則，與 `item_paddle_len_2` 一致）
+      - 文字對比：`K` 對底板面 `~` 約 9:1；D16 的 `W` 對面 `g` 約 6.2:1
+      - 限制：字形 3×5，SP、ATK 在小螢幕上要靠近看；球縮成 6×6；D16 加速的黃色三角已不存在，加速與減速只差右上 +／−（1 px 筆畫），色盲與小螢幕下較易混淆
+
+    拾取效果（`item_pickup_f1`~`f3`）：
+
+    | 幀 | 圖 id | 內容 | 尺寸 | 幀時間 |
+    |---|---|---|---|---|
+    | F1 | `item_pickup_f1` | 實心白色圓盤（12×12），邊緣淺電青 `+` | 20×20 | 60 ms |
+    | F2 | `item_pickup_f2` | 擴大的 1 px 圓環（18×18）、中間縮小的 6×6 亮核、四個斜角各 2×2 白火花 | 20×20 | 60 ms |
+    | F3 | `item_pickup_f3` | 只剩 8 個散開的小點 | 20×20 | 60 ms |
+    | 合計 | - | 全程 180 ms | - | 與 D12 小磚破壞（60 ms）一致 |
+
+    - 觸發：擋板碰到道具的那一幀，道具圖立刻移除，改播效果；播一次，播完移除
+    - 位置：效果圖左上角 = 道具圖左上角 − (2, 2)，即中心對齊道具中心；效果留在碰到的位置，不跟著擋板移動
+    - 效果不加 `K` 描邊（例外，同 D19 效果圖）：1~3 幀的短暫亮光，加黑邊會變髒點
+    - 增益與減益共用同一組拾取效果（減益在第 2 批沿用，不另畫；若使用者想要減益專用效果，第 2 批再提）
+    - 掉出畫面底部：不播任何效果，直接移除
+
+    已知限制：
+    - **HUD 炸彈圖案在亮底板上的火花對比低**：引信 `G`（Y 189）與火花 `Y`（209）、`W`（255）沒有 `K` 描邊，放在面 `~`（Y 144）上，對比約 1.6:1（`Y`）、2.2:1（`W`）；炸彈本體有 `K` 描邊，仍清楚。使用者已知並接受（2026-10-26），維持現狀不改圖案
+    - 其他 4 個沿用的圖案（穿透、火焰、強化、減速）都有完整 `K` 描邊，與底板分得開；但減速的綠、穿透的青與底板同為冷色，色盲玩家要靠 `K` 描邊與形狀
+    - 「max」字形只有 3×5、筆畫 1 px 的 `K`，約 9×15 手機像素一個字，戶外可能要靠近看；「+」「++」在小螢幕也只有 3×3；使用者已知並接受（2026-10-26），含 max 佔滿上緣
+    - 電青底板與 D17 閃電磚同色系：磚是 32×16 的長方磚、道具是 16×16 的方塊且有亮邊，形狀不同；使用者已決定用電青底板並接受此限制（2026-10-26）；未用色盲模擬器驗證，請 QA 或使用者複核
+    - 對比數字為手算近似值，背景色未實測
+
+    需工具支援（規則寫死在轉檔工具；要修改請通知 PM，由工程師改工具）：
+    - 所有 `item_` 圖直接輸出，不套磚的自動規則（不換色、不產被擊中白色版、不產破壞幀）
+    - 道具 F2 圖自動產生：依上方「F2 規則」，由 F1 圖與兩張底板產生（輸出 id 建議 `<道具 id>_f2`）
+
+    給工程師的需求：
+    - 不需要新的後端資料或 API
+    - 遊戲程式處理：道具 F1、F2 的 400 ms 輪播與共用時鐘；碰到擋板時改播拾取效果；掉出底部直接移除；道具掉落速度、碰撞範圍不在本項
+
+    使用者已決定（2026-10-26）：
+    - 增益底板用電青：可以
+    - 炸彈火花在亮底板上的對比：維持現狀（方案 A），不改圖案
+    - `item_paddle_len_max` 的 max 佔滿上緣：可以
+
+    使用者已決定（2026-10-26，續）：
+    - 減益拾取效果不另畫，共用 D20 `item_pickup_f1`~`f3`
+
+    圖寬：16　圖高：16
+    增益底板 F1（亮）（id: item_plate_buff_f1）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    增益底板 F2（暗）（id: item_plate_buff_f2）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K~~~~~~~~~~~~~~K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~~~~~~~~~~~~~*K
+    K~*************K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板小幅增加 +（id: item_paddle_len_1）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~~~~~~K~=K
+    K+~~~~~~~~~KKK=K
+    K+~~~~~~~~~~K~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+KKKKKKKKKKKK=K
+    K+KweeeeeeeexK=K
+    K+KKKKKKKKKKKK=K
+    K+~~~~~~~~~~~~=K
+    K+K~~~~~~~~~~K=K
+    K+KKKKKKKKKKKK=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板大幅增加 ++（id: item_paddle_len_2）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~~K~~~K~=K
+    K+~~~~~KKK~KKK=K
+    K+~~~~~~K~~~K~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+KKKKKKKKKKKK=K
+    K+KweeeeeeeexK=K
+    K+KKKKKKKKKKKK=K
+    K+~~~~~~~~~~~~=K
+    K+K~~~~~~~~~~K=K
+    K+KKKKKKKKKKKK=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板最大化 max（id: item_paddle_len_max）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~K~K~~K~~K~K=K
+    K+~KKK~K~K~K~K=K
+    K+~KKK~KKK~~K~=K
+    K+~K~K~K~K~K~K=K
+    K+~K~K~K~K~K~K=K
+    K+~~~~~~~~~~~~=K
+    K+KKKKKKKKKKKK=K
+    K+KweeeeeeeexK=K
+    K+KKKKKKKKKKKK=K
+    K+~~~~~~~~~~~~=K
+    K+K~~~~~~~~~~K=K
+    K+KKKKKKKKKKKK=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    穿透（id: item_pierce）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~KK~~~~~=K
+    K+~~~~KwxK~~~~=K
+    K+~~~KwwxxK~~~=K
+    K+~~KwwwxxxK~~=K
+    K+~KKKKwxKKKK~=K
+    K+~~~~KwxK~~~~=K
+    K+KKKKKKKKKKKK=K
+    K+KeeeeeeeeeeK=K
+    K+KffffffffffK=K
+    K+KKKKKKKKKKKK=K
+    K+~~~~KwxK~~~~=K
+    K+~~~~KKKK~~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    火焰（id: item_flame）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~KK~~~~~=K
+    K+~~~~KaaK~~~~=K
+    K+~~~KaOOdK~~~=K
+    K+~~KaOBBdbK~~=K
+    K+~KaOBAABdbK~=K
+    K+KOOBAAAABbbK=K
+    K+KdOBAAAABbbK=K
+    K+KdOBBAABBbbK=K
+    K+KRdBBBBBBbRK=K
+    K+~KRRdBBbRRK~=K
+    K+~~KtRRRRtK~~=K
+    K+~~~KKKKKK~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    炸彈（id: item_bomb）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~~~~~~Y~=K
+    K+~~~~~~~~GYWY=K
+    K+~~~~~~~G~~Y~=K
+    K+~~~KKKK~~~~~=K
+    K+~KWWfggjK~~~=K
+    K+KWfffgggjK~~=K
+    K+KWfffggjjK~~=K
+    K+KffgggjjjK~~=K
+    K+KfggggjjvK~~=K
+    K+KgggggjjvK~~=K
+    K+~KgjjvvvK~~~=K
+    K+~~~KKKK~~~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    減速（id: item_slow）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+KKK~KKK~~~~~=K
+    K+K~~~K~K~~~~~=K
+    K+KKK~KKK~~KKK=K
+    K+~~K~K~~~~~~~=K
+    K+KKK~K~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~KKKK~~~~=K
+    K+~~~KW122K~~~=K
+    K+~~~K1223K~~~=K
+    K+~~~K2233K~~~=K
+    K+~~~K2334K~~~=K
+    K+~~~~KKKK~~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    分裂（id: item_split）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~~~~~KKK=K
+    K+~~~~~K~K~~~K=K
+    K+~~~~~~K~~KKK=K
+    K+~~~~~K~K~K~~=K
+    K+~~~~~~~~~KKK=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~KKKK~~~~=K
+    K+~~~KW122K~~~=K
+    K+~~~K1223K~~~=K
+    K+~~~K2233K~~~=K
+    K+~~~K2334K~~~=K
+    K+~~~~KKKK~~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    強化（id: item_reinforce）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~~~~~~K~=K
+    K+~~~~~~~~~KKK=K
+    K+~~~~~~~~~~K~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~K~~KKK~K~K=K
+    K+~K~K~~K~~K~K=K
+    K+~KKK~~K~~KK~=K
+    K+~K~K~~K~~K~K=K
+    K+~K~K~~K~~K~K=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    吸附（id: item_sticky）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~KKKK~~~~=K
+    K+~~~KW122K~~~=K
+    K+~~~K1223K~~~=K
+    K+~~~K2233K~~~=K
+    K+~~~K2334K~~~=K
+    K+~~~~KKKK~~~~=K
+    K+KKKKKKKKKKKK=K
+    K+KweeeeeeeexK=K
+    K+KKKKKKKKKKKK=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    金球（id: item_golden_ball）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~~KKKKKK~~~=K
+    K+~KKAABYYYKK~=K
+    K+~KWABYYYYCK~=K
+    K+KAABYYKYYYCK=K
+    K+KABYYKKKKYCK=K
+    K+KBYYKYKYYYCK=K
+    K+KYYYYKKKYYCK=K
+    K+KYYYYYKYKYCK=K
+    K+KYYYKKKKYCCK=K
+    K+~KYYYYKCCCK~=K
+    K+~KKCCCDDDKK~=K
+    K+~~~KKKKKK~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板移動速度增加（id: item_paddle_speed）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+KKK~KKK~~~~~=K
+    K+K~~~K~K~~~K~=K
+    K+KKK~KKK~~KKK=K
+    K+~~K~K~~~~~K~=K
+    K+KKK~K~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+~~~~~~~~~~~~=K
+    K+KKKKKKKKKKKK=K
+    K+KweeeeeeeewK=K
+    K+KxffffffffxK=K
+    K+KKKKKKKKKKKK=K
+    K+~~~~~~~~~~~~=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    槍（id: item_gun）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K+++++++++++++=K
+    K+~~KK~~~~KK~~=K
+    K+~KAAK~~KAAK~=K
+    K+~KAYK~~KAYK~=K
+    K+~KYCK~~KYCK~=K
+    K+~KKKK~~KKKK~=K
+    K+~KefK~~KefK~=K
+    K+~KefK~~KefK~=K
+    K+~KefK~~KefK~=K
+    K+~KefK~~KefK~=K
+    K+KKKKKKKKKKKK=K
+    K+KweeeeeeeexK=K
+    K+KKKKKKKKKKKK=K
+    K==============K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：20　圖高：20
+    拾取 F1（閃光）（id: item_pickup_f1）：
+    ```text
+    ....................
+    ....................
+    ....................
+    ....................
+    .......++++++.......
+    .....++WWWWWW++.....
+    .....+WWWWWWWW+.....
+    ....+WWWWWWWWWW+....
+    ....+WWWWWWWWWW+....
+    ....+WWWWWWWWWW+....
+    ....+WWWWWWWWWW+....
+    ....+WWWWWWWWWW+....
+    ....+WWWWWWWWWW+....
+    .....+WWWWWWWW+.....
+    .....++WWWWWW++.....
+    .......++++++.......
+    ....................
+    ....................
+    ....................
+    ....................
+    ```
+
+    圖寬：20　圖高：20
+    拾取 F2（圓環擴大）（id: item_pickup_f2）：
+    ```text
+    ....................
+    .......++++++.......
+    .....++......==.....
+    ....+..........=....
+    ...+WW........WW=...
+    ..+.WW........WW.=..
+    .+................~.
+    .+......++++......~.
+    .+.....++++++.....~.
+    .+.....++++++.....~.
+    .+.....++++++.....~.
+    .+.....++++++.....~.
+    .+......++++......~.
+    .+................~.
+    ..=.WW........WW.~..
+    ...=WW........WW~...
+    ....=..........~....
+    .....==......~~.....
+    .......~~~~~~.......
+    ....................
+    ```
+
+    圖寬：20　圖高：20
+    拾取 F3（散點）（id: item_pickup_f3）：
+    ```text
+    ....................
+    .........++.........
+    ....................
+    ....................
+    ....+..........=....
+    ....................
+    ....................
+    ....................
+    ....................
+    .+................=.
+    .+................=.
+    ....................
+    ....................
+    ....................
+    ....................
+    ....=..........~....
+    ....................
+    ....................
+    .........~~.........
+    ....................
+    ```
+
+21. [D21] 減益道具掉落圖示（使用者已確認，2026-10-26）：
+    - 範圍：減益道具（第 2 批），共 14 個道具圖示、2 張減益底板；拾取效果共用 D20 的 `item_pickup_f1`~`f3`（使用者已決定），不另畫；掉出底部不畫效果
+    - 規格全部沿用 D20：16×16；底板加 12×12 內容框（內容在底板第 2~13 欄、第 2~13 列）；呼吸 2 幀只換底板，各 400 ms；道具只畫 F1；**F2 規則同 D20**（逐像素比對，與 `item_plate_debuff_f1` 同位置同代號的像素改成 `item_plate_debuff_f2` 的對應像素，內容不動；內容不使用 `_ < > ,`）；位置從 0 起算
+    - 文字：3×5 像素字、1 px 筆畫、全部在內容框內；**暗底板上文字用白 `W`**
+    - 新增顏色 4 色（符號 `_ < > ,`，已加入 D01 並標「D21 用」，色數統計為 82 色）：
+
+    | 代號 | HEX | 用途 | 灰階 Y |
+    |---|---|---|---|
+    | `_` | #B85CB0 | F1 上緣、左緣內圈 | 129 |
+    | `<` | #8C3F86 | F1 下緣、右緣內圈與轉角 | 94 |
+    | `>` | #6A2166 | 底板面（內容透明處） | 63 |
+    | `,` | #45143F | F2 下緣、右緣內圈 | 40 |
+
+    - 底板結構同 D20：最外圈 `K`；F1 = 上、左內圈 `_`、下、右內圈與兩個轉角 `<`；F2 = 上、左內圈與轉角同面 `>`、下、右內圈 `,`、下左轉角 `>`；呼吸時內圈在 F1 亮、F2 暗
+    - 暗紫底板為什麼這樣選（取捨）：
+      - 色相偏洋紅的暗紫（約 300°），與多層磚紫（`m n V p q`，偏藍紫約 265°）、魔王暗紫灰（`u Q Z z v`，低飽和）有色相與飽和度差
+      - 亮度：面 `>` Y 63，比 D20 電青面 `~`（Y 144）暗 81；相對亮度比約 4.7:1；整塊平均也明顯更暗
+      - **如實說明：灰階上面 `>`（Y 63）與紫磚 `p`（73）、`q`（46）、魔王 `Z`（80）、`z`（52）落在同一段，差 10~17，分辨主要靠色相、飽和度、正方形外形與亮邊內圈，不靠灰階**
+    - 內容在暗底板上的處理：
+      - `K` 描邊對面 `>` 只有約 1.6:1，所以擋板、球的外框不用 `K`：擋板外框改 `i`（淺鋼灰）、球外框改 `3`（珍珠白 T4）、黑球外框用 `e`（鋼灰亮面）；磚與小偷臉有亮色填色，保留 `K` 描邊
+      - 文字 `W` 對面 `>` 約 10.4:1
+
+    各道具外形與顏色（外形各不相同；內容都在 12×12 內容框內）：
+
+    | 道具 | 圖 id | 外形記號 | 主要顏色（D01 代號） |
+    |---|---|---|---|
+    | 擋板小幅減少 | `item_paddle_len_down_1` | 同 D20 擋板長度圖案（擋板加下方量尺括弧），右上 −（3×1，第 9~11 欄、第 1 列） | 擋板：外框 `i`、青 `w` `x`、鋼灰 `e`；括弧 `i`；−：`W` |
+    | 擋板大幅減少 | `item_paddle_len_down_2` | 同上，右上 −−（第 5~7、9~11 欄、第 1 列） | 同上 |
+    | 擋板最短化 | `item_paddle_len_min` | 同上，右上 3×5 字形 MIN（佔滿上緣，同 max 作法，第 1~11 欄、第 0~4 列） | 同上 |
+    | 加速 | `item_fast` | 6×6 珍珠白球加左上 SP、右上 +（同 D16 `hud_icon_fast`；球第 3~8 欄、第 6~11 列） | 珍珠白 `W` `1`~`4`、外框 `3`；文字 `W` |
+    | 擋板移動速度減少 | `item_paddle_speed_down` | 擋板加左上 SP、右上 −（對應 D20 `item_paddle_speed`；擋板第 7~10 列） | 擋板外框 `i`、青 `w` `x`、鋼灰 `e` `f`；文字 `W` |
+    | 融合 | `item_merge` | 1 顆球加右上 ÷2（對應 D20 `item_split` 的 x2；球位置相同；÷ 在第 5~7 欄、2 在第 9~11 欄、第 0~4 列） | 珍珠白球、外框 `3`；文字 `W` |
+    | 回血 | `item_heal` | 一塊綠磚（12×6，第 6~11 列）加左上 HP、右上 + | 綠 `E` `F` `L` `H` `J`、`K` 描邊；文字 `W` |
+    | 範圍回血 | `item_heal_area` | 三塊綠磚向右下階梯疊在一起（各 8×4），加左上 HP、右上 + | 綠 `F` `L` `H` `J`、`K` 描邊；文字 `W` |
+    | 黑洞 | `item_blackhole` | 黑色圓核加一圈橘黃吸積環（10×10，第 0~9 欄、第 2~11 列），右上留空 | 環：黃 `A` `B` `Y`、橙 `O` `d`；核 `K` |
+    | 大黑洞 | `item_blackhole_big` | 與黑洞同圖案，右上角（第 9~11 欄、第 0~2 列）加白色 + | 同黑洞；+：`W` |
+    | 無敵 | `item_invincible` | 兩塊磚交錯：左下多層磚、右上不可破壞磚（蓋在多層磚上）；2026-10-26 使用者要求移除箭頭；2026-10-26 使用者要求兩塊磚整體上移 1 列（磚佔第 2~10 列，第 11 列為底板面） | 多層磚用藍（`M` `N` `U` `P` `S`）；不可破壞磚用 D14 鋼板（`i` `e` `f` `g` `j` 邊、`s` `y` 面）；描邊 `K` |
+    | 隱形 | `item_invisible` | 虛線外框的擋板，內部透明（露出底板面）；上、下緣各一列為 WW>WW>>WW>WW；2026-10-26 試過括號旁空 2 格的版本，使用者選回原版 | 虛線 `W` |
+    | 小偷 | `item_thief` | 蒙面小偷的臉：紅白條紋小帽、黑色眼罩加兩個白眼、皮膚、一抹嘴 | 帽：紅 `R` `t`、白 `W`；眼罩 `K`；膚 `?` `-`（D18 褐） |
+    | 黑球 | `item_black_ball` | 與 D20 金球同外形（12×12 圓球），球面黑色系，中央白色「?」，外框銀灰 | 球面：`u` `Q` `Z` `z` `v`（魔王色階，當黑球用）；外框 `i` `e` `f`；「?」`W` |
+
+    - 磚塊在 12×12 內縮小時保留的特徵：
+      - 多層磚：用藍色階（與 D14 的範例同為藍）；無數字，因為 12×12 放不下
+      - 不可破壞磚：D14 的鋼灰框、深槍金屬面 `s` 與斜紋 `y`；省略中央螺栓
+      - 回血的綠磚：沿用 D12 的斜面概念（上、左亮，下、右暗），無裂痕、無數字
+    - 色盲照顧：14 個外形輪廓互異（擋板加括弧、球加 SP、擋板加 SP、球加 ÷2、單磚、疊磚、黑洞環、兩磚交錯、虛線擋板、人臉、帶「?」的大球）；SP/HP/MIN/÷2 為文字記號，靠字辨識，不靠色
+    - 整批的對應（文字記號系統）：SP＝速度、HP＝血量、ATK＝攻擊；右上 + 加、− 減、++ 與 −− 大幅；增益在 D20、減益在 D21
+
+    容易混淆的組合（如實寫出）：
+    - 加速（`item_fast`）與 D20 減速（`item_slow`）、D16 `hud_icon_fast`/`hud_icon_slow`：只差右上 +／−（1 px 筆畫）
+    - 擋板小幅減少、大幅減少只差 −／−−；與 D20 擋板長度三款只差右上符號與底板顏色
+    - 回血與範圍回血：磚的數量（1 對 3），小螢幕下要看清楚；範圍回血使用者已接受（2026-10-26）
+    - 黑洞與大黑洞：只差右上的 +
+    - 黑球與 D20 金球：外形相同，靠底板（暗紫對電青）與球色（黑對黃）分；灰階下球面較暗但有銀灰外框
+    - 暗紫底板與魔王、紫磚在灰階下接近（見上）；使用者已知並接受（2026-10-26）；未用色盲模擬器驗證，請 QA 或使用者複核
+    - 「K」描邊在暗底板上不顯眼：磚與小偷臉的輪廓靠亮色填色辨識
+
+    給工程師的需求：
+    - 不需要新的後端資料或 API
+    - 轉檔：與 D20 同規則，`item_` 圖直接輸出，道具 F2 由兩張底板自動產生（`<道具 id>_f2`）
+    - 遊戲程式：呼吸 400 ms 共用時鐘；拾取時播 D20 的 `item_pickup_f1`~`f3`
+
+    使用者已決定（2026-10-26）：
+    - 小偷的臉（`item_thief`）：接受現在的設計
+    - 暗紫底板在灰階下與紫磚、魔王接近：接受（主要靠色相分辨）
+    - 範圍回血（`item_heal_area`）：接受現在的設計
+
+    圖寬：16　圖高：16
+    減益底板 F1（亮）（id: item_plate_debuff_f1）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    減益底板 F2（暗）（id: item_plate_debuff_f2）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K>>>>>>>>>>>>>>K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>>>>>>>>>>>>>,K
+    K>,,,,,,,,,,,,,K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板小幅減少 −（id: item_paddle_len_down_1）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>WWW<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_iiiiiiiiiiii<K
+    K_iweeeeeeeexi<K
+    K_iiiiiiiiiiii<K
+    K_>>>>>>>>>>>><K
+    K_i>>>>>>>>>>i<K
+    K_iiiiiiiiiiii<K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板大幅減少 −−（id: item_paddle_len_down_2）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>WWW>WWW<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_iiiiiiiiiiii<K
+    K_iweeeeeeeexi<K
+    K_iiiiiiiiiiii<K
+    K_>>>>>>>>>>>><K
+    K_i>>>>>>>>>>i<K
+    K_iiiiiiiiiiii<K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板最短化 min（id: item_paddle_len_min）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>W>W>WWW>WWW<K
+    K_>WWW>>W>>W>W<K
+    K_>WWW>>W>>W>W<K
+    K_>W>W>>W>>W>W<K
+    K_>W>W>WWW>W>W<K
+    K_>>>>>>>>>>>><K
+    K_iiiiiiiiiiii<K
+    K_iweeeeeeeexi<K
+    K_iiiiiiiiiiii<K
+    K_>>>>>>>>>>>><K
+    K_i>>>>>>>>>>i<K
+    K_iiiiiiiiiiii<K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    加速（id: item_fast）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_WWW>WWW>>>>><K
+    K_W>>>W>W>>>W><K
+    K_WWW>WWW>>WWW<K
+    K_>>W>W>>>>>W><K
+    K_WWW>W>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>3333>>>><K
+    K_>>>3W1223>>><K
+    K_>>>312233>>><K
+    K_>>>322333>>><K
+    K_>>>323343>>><K
+    K_>>>>3333>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    擋板移動速度減少（id: item_paddle_speed_down）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_WWW>WWW>>>>><K
+    K_W>>>W>W>>>>><K
+    K_WWW>WWW>>WWW<K
+    K_>>W>W>>>>>>><K
+    K_WWW>W>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_iiiiiiiiiiii<K
+    K_iweeeeeeeewi<K
+    K_ixffffffffxi<K
+    K_iiiiiiiiiiii<K
+    K_>>>>>>>>>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    融合（id: item_merge）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>W>>WWW<K
+    K_>>>>>>>>>>>W<K
+    K_>>>>>WWW>WWW<K
+    K_>>>>>>>>>W>><K
+    K_>>>>>>W>>WWW<K
+    K_>>>>>>>>>>>><K
+    K_>>>>3333>>>><K
+    K_>>>3W1223>>><K
+    K_>>>312233>>><K
+    K_>>>322333>>><K
+    K_>>>323343>>><K
+    K_>>>>3333>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    回血（id: item_heal）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_W>W>WWW>>>>><K
+    K_W>W>W>W>>>W><K
+    K_WWW>WWW>>WWW<K
+    K_W>W>W>>>>>W><K
+    K_W>W>W>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_KKKKKKKKKKKK<K
+    K_KEEEFFFFFFFK<K
+    K_KFLLLLLLLLHK<K
+    K_KLLLLLLLLHHK<K
+    K_KHHHHHHHHHJK<K
+    K_KKKKKKKKKKKK<K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    範圍回血（id: item_heal_area）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_W>W>WWW>>>>><K
+    K_W>W>W>W>>>W><K
+    K_WWW>WWW>>WWW<K
+    K_W>W>W>>>>>W><K
+    K_W>W>W>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_KKKKKKKK>>>><K
+    K_KHKKKKKKKK>><K
+    K_KJKLKKKKKKKK<K
+    K_KKKHKFFFFFFK<K
+    K_>>KKKLLLLLLK<K
+    K_>>>>KKKKKKKK<K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    黑洞（id: item_blackhole）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>AAAA>>>>><K
+    K_>AAOOOOBB>>><K
+    K_>AOOKKOdY>>><K
+    K_AOOKKKKddY>><K
+    K_AOKKKKKKdY>><K
+    K_AOKKKKKKdY>><K
+    K_AOOKKKKddY>><K
+    K_>BddKKddY>>><K
+    K_>BYddddYY>>><K
+    K_>>>YYYY>>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    大黑洞（id: item_blackhole_big）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>>>>>W><K
+    K_>>>>>>>>>WWW<K
+    K_>>>AAAA>>>W><K
+    K_>AAOOOOBB>>><K
+    K_>AOOKKOdY>>><K
+    K_AOOKKKKddY>><K
+    K_AOKKKKKKdY>><K
+    K_AOKKKKKKdY>><K
+    K_AOOKKKKddY>><K
+    K_>BddKKddY>>><K
+    K_>BYddddYY>>><K
+    K_>>>YYYY>>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    無敵（id: item_invincible）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>KKKKKKKKK<K
+    K_>>>KiiiiiieK<K
+    K_>>>KesysysgK<K
+    K_KKKKeysysygK<K
+    K_KMNKfgggggjK<K
+    K_KNUKKKKKKKKK<K
+    K_KUUUUUUPK>>><K
+    K_KPPPPPPSK>>><K
+    K_KKKKKKKKK>>><K
+    K_>>>>>>>>>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    隱形（id: item_invisible）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_WW>WW>>WW>WW<K
+    K_W>>>>>>>>>>W<K
+    K_W>>>>>>>>>>W<K
+    K_WW>WW>>WW>WW<K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K_>>>>>>>>>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    小偷（id: item_thief）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>KKKKKK>>><K
+    K_>KWRWRWRWRK><K
+    K_>KttttttttK><K
+    K_>K??????--K><K
+    K_>KKKKKKKKKK><K
+    K_>KKWWKKWWKK><K
+    K_>KKKKKKKKKK><K
+    K_>K??????--K><K
+    K_>K???KK?--K><K
+    K_>>K?????-K>><K
+    K_>>>KKKKKK>>><K
+    K_>>>>>>>>>>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
+    圖寬：16　圖高：16
+    黑球（id: item_black_ball）：
+    ```text
+    KKKKKKKKKKKKKKKK
+    K_____________<K
+    K_>>>iiiiie>>><K
+    K_>iiQQZzzzee><K
+    K_>iuQZzzzzve><K
+    K_iQQZzzzzzzve<K
+    K_iQZzzWWzzzvf<K
+    K_iZzzzzzWzzvf<K
+    K_izzzzzWzzzvf<K
+    K_izzzzzzzzzvf<K
+    K_ezzzzzWzzvvf<K
+    K_>ezzzzzvvvf><K
+    K_>eevvvvvvff><K
+    K_>>>efffff>>><K
+    K<<<<<<<<<<<<<<K
+    KKKKKKKKKKKKKKKK
+    ```
+
 ---
 
 ## 七色對應方案比較（舊稿；D12 原採用方案 C）

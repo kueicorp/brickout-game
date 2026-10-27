@@ -12,12 +12,17 @@
 #   3. 示意盤面：尺寸 360×640、左右邊框、×3 為最近鄰
 #   4. 資訊(不計失敗):D12 對比表(七色 T3 對 `W`、`K`)以 WCAG 公式重算，與設計稿手算值並列;
 #      D23 各主題 T3 與七色 T3、魔王 `Z` 的 RGB 歐氏距離
+#   5. laser_beam_layout.json 的 file 路徑(相對於 json 所在資料夾)全小寫、都指到實際存在的檔案(預覽與遊戲輸出各查一次);
+#      預覽工具產生的檔案與遊戲輸出的實際檔名都必須全小寫(區分大小寫比對);
+#      遊戲輸出：檔案集合 = 預覽的原尺寸檔(不含 _x6、_x8、overview、board_sample)扣掉排除規則($gameExclude)、
+#      內容逐位元組相同、.import 必須有對應的 PNG、清單檔 .generated_files.txt 與檔案集合一致且不列排除的檔案
 # 為了獨立，本腳本不沿用 md_to_png.gd 的檔名與規則解析：區塊依標題開頭或 id 查找，
 # 層數對應、數字位置、描邊、裂痕範圍依 PM 交付的 D12、D17 規格寫在下方常數。
 # 用法:powershell -ExecutionPolicy Bypass -File tools\pixelart\verify.ps1 [-OutDir <輸出資料夾>] [-Md <設計稿路徑>]
 #   -OutDir 預設為 docs\design\preview;反向測試時可指向複製出來的資料夾
 #   -Md 預設為 docs\design\pixel-art-bricks.md;驗證設計稿副本的輸出時指定
-param([string]$OutDir = '', [string]$Md = '')
+#   -GameDir 預設為 game\art\generated;給空字串或加 -NoGame 時不檢查遊戲輸出
+param([string]$OutDir = '', [string]$Md = '', [string]$GameDir = '', [switch]$NoGame)
 Add-Type -AssemblyName System.Drawing
 Add-Type -ReferencedAssemblies System.Drawing -TypeDefinition @'
 using System;
@@ -236,14 +241,14 @@ foreach ($it in $itemSpec.Keys) {
         $g = $b.Grid
         if ($null -eq $p1 -or $null -eq $p2 -or $g.Count -ne 16 -or $g[0].Length -ne 16) { Fail "$it $id 或其底板不是 16x16,無法驗證 F2"; continue }
         # 字元比較須區分大小寫(調色盤代號大小寫有別),所以用 -ceq
-        $itemF2["${it}_${id}_f2"] = [string[]]@(0..15 | ForEach-Object { $y = $_; -join @(0..15 | ForEach-Object { if ($g[$y][$_] -ceq $p1[$y][$_]) { $p2[$y][$_] } else { $g[$y][$_] } }) })
+        $itemF2["${it}_${id}_f2".ToLower()] = [string[]]@(0..15 | ForEach-Object { $y = $_; -join @(0..15 | ForEach-Object { if ($g[$y][$_] -ceq $p1[$y][$_]) { $p2[$y][$_] } else { $g[$y][$_] } }) })
     }
     if ($n -ne $itemSpec[$it][2]) { Fail "$it 道具數 $n,應為 $($itemSpec[$it][2])" }
 }
 
 # ---- PM 交付的 D23 主題邊框規格：對照表(表頭第一欄「序」)中「邊框材質」含「A 苔石」且「做法」=「換色」的列，
 #      以 T3 推算 T1~T5 = T3 逐通道 × 147、116、90、67、46 ÷ 90(四捨五入，上限 255),替換 3 張苔石網格的槽位 ( ) [ ] {;
-#      T3 灰階 Y(0.299R + 0.587G + 0.114B)在 80~95、三通道最大減最小 ≤ 45;輸出 D23_<id>_t<序號兩位>
+#      T3 灰階 Y(0.299R + 0.587G + 0.114B)在 80~95、三通道最大減最小 ≤ 45;輸出 d23_<id>_t<序號兩位>(檔名全小寫)
 $mossIds = 'border_moss_tile', 'border_moss_top_tile', 'border_moss_corner_tl'
 $mossGrids = @{}; foreach ($id in $mossIds) { $mossGrids[$id] = Get-ById 'D23' $id }
 $themeOut = [ordered]@{}   # 輸出檔名(不含 .png)-> 期望網格與調色盤
@@ -278,7 +283,7 @@ foreach ($l in $lines) {
         $chan = @($rgb | ForEach-Object { [math]::Min(255, [int][math]::Floor($_ * $ratio[$t] / 90 + 0.5)) })
         $tp[$slots[$t]] = [Convert]::ToInt32(('FF{0:X2}{1:X2}{2:X2}' -f $chan[0], $chan[1], $chan[2]), 16)
     }
-    foreach ($id in $mossIds) { if ($null -ne $mossGrids[$id]) { $themeOut[('D23_{0}_t{1:D2}' -f $id, $seq)] = [pscustomobject]@{ Grid = $mossGrids[$id]; Pal = $tp } } }
+    foreach ($id in $mossIds) { if ($null -ne $mossGrids[$id]) { $themeOut[('d23_{0}_t{1:D2}' -f $id, $seq)] = [pscustomobject]@{ Grid = $mossGrids[$id]; Pal = $tp } } }
 }
 if ($themeT3.Count + $themeSkip -eq 0) { Fail 'D23 邊框依主題對照表解析不到任何列' }
 
@@ -306,7 +311,7 @@ for ($k = 0; $k -lt $blocks.Count; $k++) { if (-not $used[$k]) { Fail "設計稿
 # 殘留判斷不寫死項目代號：檔名的項目代號必須出現在設計稿裡;放大版必須有對應的原尺寸檔
 $items = @{}; foreach ($b in $blocks) { $items[$b.Item] = $true }
 foreach ($f in Get-ChildItem $out -Filter 'D*.png') {
-    if ($f.Name -match '^(D\d+)_' -and -not $items[$Matches[1]]) { Fail "殘留的舊圖 $($f.Name):設計稿中沒有項目 $($Matches[1])" }
+    if ($f.Name -match '^(D\d+)_' -and -not $items[$Matches[1].ToUpper()]) { Fail "殘留的舊圖 $($f.Name):設計稿中沒有項目 $($Matches[1])" }
     if ($f.Name -match '^(.+)_x\d+\.png$' -and -not (Test-Path (Join-Path $out "$($Matches[1]).png"))) { Fail "殘留的放大圖 $($f.Name):沒有對應的原尺寸檔" }
 }
 "單張 PNG:$($files.Count) 張"
@@ -635,6 +640,80 @@ foreach ($seq in $themeT3.Keys) {
     $near = @($colorOrder | ForEach-Object { [pscustomobject]@{ N = $_; D = (Dist $t3v $pal[$tiers[$_][2]]) } } | Sort-Object D)[0]
     $yy = 0.299 * (($t3v -shr 16) -band 0xFF) + 0.587 * (($t3v -shr 8) -band 0xFF) + 0.114 * ($t3v -band 0xFF)
     "  主題 {0,2}  #{1:X6}  Y {2:N1}  最近七色 {3} {4:N1}  Z {5:N1}" -f $seq, ($t3v -band 0xFFFFFF), $yy, $near.N, $near.D, (Dist $t3v $pal[[char]'Z'])
+}
+
+# ================================================================ 5. 光束路徑與遊戲輸出
+# laser_beam_layout.json 的 file 相對於 json 所在資料夾(sprites/)
+function Check-BeamPaths($dir, $label) {
+    $sd = Join-Path $dir 'sprites'; $jp = Join-Path $sd 'laser_beam_layout.json'
+    if (-not (Test-Path $jp)) { Fail "$label 缺少 sprites/laser_beam_layout.json"; return }
+    $j = [IO.File]::ReadAllText($jp, [Text.Encoding]::UTF8) | ConvertFrom-Json
+    $props = @($j.pieces.PSObject.Properties)
+    if ($props.Count -eq 0) { Fail "$label laser_beam_layout.json 沒有任何分段" }
+    # Test-Path 不分大小寫，所以另查路徑必須全小寫(磁碟上的實際檔名由下方的大小寫檢查負責)
+    foreach ($pc in $props) { if ($pc.Value.file -cmatch '[A-Z]') { Fail "$label laser_beam_layout.json 的 $($pc.Name) 路徑 $($pc.Value.file) 含大寫" } }
+    foreach ($pc in $props) { if (-not (Test-Path -LiteralPath (Join-Path $sd $pc.Value.file) -PathType Leaf)) { Fail "$label laser_beam_layout.json 的 $($pc.Name) 路徑 $($pc.Value.file) 找不到檔案" } }
+    "$label laser_beam_layout.json:$($props.Count) 個路徑已檢查"
+}
+Check-BeamPaths $out '預覽'
+
+# 輸出檔名必須全小寫:Windows 不分大小寫，-match / Test-Path 都看不出差別，所以用 -cmatch 查磁碟上的實際檔名
+function Check-Lowercase($names, $label) {
+    $bad = @($names | Where-Object { $_ -cmatch '[A-Z]' })
+    foreach ($n in $bad) { Fail "$label 檔名含大寫 $n" }
+    "$label 檔名大小寫:$(@($names).Count) 個已檢查，含大寫 $($bad.Count) 個"
+}
+# 預覽頂層只查工具產生的檔名格式(與 md_to_png.gd 清檔規則相同,-match 不分大小寫才抓得到舊的 D12_*);final/ 等子資料夾不查
+Check-Lowercase @(Get-ChildItem $out -File | Where-Object { $_.Name -match '^(d\d+_.+|overview|board_sample(_x\d+)?)\.png$' } | ForEach-Object { $_.Name }) '預覽'
+Check-Lowercase @(Get-ChildItem $spr -File | ForEach-Object { "sprites/$($_.Name)" }) '預覽'
+
+# PM 交付的遊戲排除規則：只給設計參考的版面線框(layout_)、範例圖(_example)、D14 無敵疊加的兩張範例;
+# 這些圖預覽照舊輸出，但不可出現在遊戲輸出與清單檔
+$gameExclude = 'layout_|_example|^d14_invincible_a_(blue7|red)\.png$'
+
+$game = if ($NoGame) { '' } elseif ($PSBoundParameters.ContainsKey('GameDir')) { $GameDir } else { Join-Path $root 'game\art\generated' }
+if ($game -ne '') {
+    if (-not (Test-Path $game)) { Fail "找不到遊戲輸出資料夾 $game" } else {
+        # 期望 = 預覽的原尺寸檔扣掉排除規則;相對路徑用 / 分隔，與清單檔一致
+        $want = [ordered]@{}; $excluded = @()
+        foreach ($x in Get-ChildItem $out -File -Filter '*.png') { if ($x.Name -notmatch '_x\d+\.png$' -and $x.Name -notmatch '^(overview|board_sample)') { $want[$x.Name] = $x.FullName } }
+        foreach ($x in Get-ChildItem $spr -File) { if ($x.Name -match '\.(png|json)$' -and $x.Name -notmatch '_x\d+\.png$') { $want["sprites/$($x.Name)"] = $x.FullName } }
+        foreach ($rel in @($want.Keys)) { if ($rel -match $gameExclude) { $excluded += $rel; $want.Remove($rel) } }
+        "遊戲排除(預覽有、遊戲不放):$($excluded.Count) 個 — $($excluded -join ', ')"
+        $have = @{}
+        foreach ($x in Get-ChildItem $game -Force) {
+            if ($x.PSIsContainer) { if ($x.Name -ne 'sprites') { Fail "遊戲輸出有多餘的資料夾 $($x.Name)" }; continue }
+            $have[$x.Name] = $x.FullName
+        }
+        if (Test-Path (Join-Path $game 'sprites')) {
+            foreach ($x in Get-ChildItem (Join-Path $game 'sprites') -Force) {
+                if ($x.PSIsContainer) { Fail "遊戲輸出有多餘的資料夾 sprites/$($x.Name)"; continue }
+                $have["sprites/$($x.Name)"] = $x.FullName
+            }
+        }
+        Check-Lowercase @($have.Keys) '遊戲'
+        foreach ($rel in $have.Keys) {
+            if ($rel -match $gameExclude) { Fail "遊戲輸出不應有排除清單的檔案 $rel"; continue }
+            if ($want.Contains($rel)) { continue }
+            if ($rel -eq '.generated_files.txt') { continue }
+            if ($rel -match '^(.+)\.import$') { if (-not $want.Contains($Matches[1])) { Fail "遊戲輸出有殘留的 $rel(沒有對應的檔案)" }; continue }
+            if ($rel -match '(_x\d+\.png|^overview\.png|^board_sample.*\.png)$') { Fail "遊戲輸出不應有放大版、總覽或盤面圖 $rel" } else { Fail "遊戲輸出有多餘或殘留的檔案 $rel" }
+        }
+        $same = 0
+        foreach ($rel in $want.Keys) {
+            if (-not $have.ContainsKey($rel)) { Fail "遊戲輸出缺少 $rel"; continue }
+            if ((Get-FileHash -LiteralPath $have[$rel] -Algorithm SHA256).Hash -ne (Get-FileHash -LiteralPath $want[$rel] -Algorithm SHA256).Hash) { Fail "遊戲輸出 $rel 與預覽內容不同" } else { $same++ }
+        }
+        $mf = Join-Path $game '.generated_files.txt'
+        if (-not (Test-Path $mf)) { Fail '遊戲輸出缺少清單檔 .generated_files.txt' } else {
+            $listed = @([IO.File]::ReadAllLines($mf) | Where-Object { $_ -ne '' } | Sort-Object)
+            foreach ($l in $listed) { if ($l -match $gameExclude) { Fail "清單檔列出排除清單的檔案 $l" } }
+            # -cne:清單項目大小寫不同也算不一致(sync 只接受全小寫項目)
+            if (($listed -join '|') -cne ((@($want.Keys) | Sort-Object) -join '|')) { Fail '清單檔 .generated_files.txt 與應有的檔案集合不一致' }
+        }
+        Check-BeamPaths $game '遊戲'
+        "遊戲輸出:應有 $($want.Count) 個檔案，逐位元組相同 $same 個(另有 .import $(@($have.Keys | Where-Object { $_ -match '\.import$' }).Count) 個)"
+    }
 }
 
 "檢查完成：區塊 $($blocks.Count) 個，調色盤 $($pal.Count) 色，失敗 $fail 項"

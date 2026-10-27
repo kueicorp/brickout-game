@@ -11,13 +11,15 @@ extends SceneTree
 ##   3b. 依 D20、D21「F2 規則」由道具 F1 與底板產生各道具的 F2(單張圖 <項目>_<道具 id>_f2,不放進總覽圖);
 ##   3c. 依 D23「邊框依主題對照表」把苔石邊框網格換成各主題色(單張圖 D23_<網格 id>_t<序號>,不放進總覽圖);
 ##   4. 依 D13 拼接規則，由擋板分段拼出各長度、各狀態的擋板圖(sprites/paddle_*.png);
-##   5. 產生總覽圖 overview.png 與示意盤面 board_sample.png。
+##   5. 產生總覽圖 overview.png 與示意盤面 board_sample.png;
+##   6. 有指定遊戲輸出資料夾時，把原尺寸單張圖、精靈圖與 JSON 複製過去(不含放大版、總覽、盤面與 GAME_EXCLUDE_RE),見 sync_game_dir()。
+## 所有輸出檔名都是全小寫(例:設計稿 D12 的 boss_f2 → d12_boss_f2.png);下文的「D23_…」等寫法指設計稿項目。
 ## 調色盤、換色表、被擊中規則、擋板長度與拼接參數從設計稿解析;設計稿標明「寫死在轉檔工具」的規則
 ## (多層磚數字位置、裂痕範圍、功能型磚數字位置、垂直光束轉換等)寫在下方常數，並以設計稿的範例網格逐像素核對。
 ## 任何解析或檢查錯誤都會在刪檔、寫檔之前擋下。
 ##
 ## 執行方式(不需要 project.godot):
-##   Godot_console.exe --headless --script md_to_png.gd -- <md 路徑> <輸出資料夾>
+##   Godot_console.exe --headless --script md_to_png.gd -- <md 路徑> <輸出資料夾> [遊戲輸出資料夾]
 ## 一般請用同資料夾的 run.ps1。
 
 const SCALE_SINGLE := 8    # 單張放大版倍率
@@ -26,6 +28,12 @@ const SCALE_OVERVIEW := 6  # 總覽圖倍率
 const SCALE_BOARD := 3     # 示意盤面放大版倍率
 
 const SPRITE_DIR := "sprites"
+## 遊戲輸出資料夾內記錄上次產出檔案的清單(相對路徑，一行一個);以 . 開頭，Godot 編輯器不會匯入
+const GAME_MANIFEST := ".generated_files.txt"
+## 不複製到遊戲資料夾的檔案(預覽照舊輸出):只給設計參考的版面線框(layout_)、範例圖(_example)、
+## D14 無敵疊加的兩張範例(d14_invincible_a_overlay 是遊戲要用的疊加層，不排除)。
+## 比對對象是遊戲輸出的相對路徑(全小寫，如 d22_layout_640.png);sprites/laser_beam_layout.json 不含「layout_」所以不受影響
+const GAME_EXCLUDE_RE := "layout_|_example|^d14_invincible_a_(blue7|red)\\.png$"
 const RULE_ITEM := "D12"   # 母版與自動產生規則所在的設計稿項目
 
 # 格子尺寸來自 PM 交付的 D12 規格;母版實際尺寸不符時報錯
@@ -253,15 +261,16 @@ const RE_RPAREN := "[)\uFF09]"
 func _init() -> void:
 	var args := OS.get_cmdline_user_args()
 	if args.size() < 2:
-		printerr("用法: --headless --script md_to_png.gd -- <pixel-art-bricks.md> <輸出資料夾>")
+		printerr("用法: --headless --script md_to_png.gd -- <pixel-art-bricks.md> <輸出資料夾> [遊戲輸出資料夾]")
 		quit(2)
 		return
-	var err := run(args[0], args[1])
+	var err := run(args[0], args[1], args[2] if args.size() > 2 else "")
 	quit(err)
 
 
 ## 主流程。回傳 0 表示成功，非 0 表示失敗(錯誤訊息已印出)。
-func run(md_path: String, out_dir: String) -> int:
+## game_dir 為空字串時只輸出預覽資料夾。
+func run(md_path: String, out_dir: String, game_dir := "") -> int:
 	var f := FileAccess.open(md_path, FileAccess.READ)
 	if f == null:
 		printerr("讀不到設計稿: %s (%s)" % [md_path, error_string(FileAccess.get_open_error())])
@@ -322,40 +331,56 @@ func run(md_path: String, out_dir: String) -> int:
 		printerr("有 %d 個錯誤，未變動任何輸出檔" % errors.size())
 		return 1
 
+	# 遊戲資料夾建不起來(路徑錯、無權限)時，在任何清檔之前擋下
+	if game_dir != "":
+		var derr := DirAccess.make_dir_recursive_absolute(game_dir.path_join(SPRITE_DIR))
+		if derr != OK:
+			printerr("無法建立遊戲輸出資料夾: %s (%s),未變動任何輸出檔" % [game_dir, error_string(derr)])
+			return 1
+
 	var sprite_dir := out_dir.path_join(SPRITE_DIR)
 	DirAccess.make_dir_recursive_absolute(sprite_dir)
 	clean_old_outputs(out_dir, sprite_dir)
 
+	# 輸出檔名一律全小寫(內部名稱與錯誤訊息仍用設計稿的「D12_…」寫法，方便對照設計稿)
+	var game_files := PackedStringArray()  # 遊戲要用的原尺寸檔，相對於輸出資料夾
 	var images := {}  # name -> 原尺寸 Image
 	for b in blocks:
 		var img := render_grid(b["grid"], b.get("pal", palette))
 		images[b["name"]] = img
-		if save(img, out_dir.path_join(b["name"] + ".png")) != OK:
+		var fname: String = b["name"].to_lower()
+		game_files.append(fname + ".png")
+		if save(img, out_dir.path_join(fname + ".png")) != OK:
 			return 1
-		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [b["name"], SCALE_SINGLE])) != OK:
+		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [fname, SCALE_SINGLE])) != OK:
 			return 1
-		print("%-26s %dx%d" % [b["name"], img.get_width(), img.get_height()])
+		print("%-26s %dx%d" % [fname, img.get_width(), img.get_height()])
 
 	# 道具 F2:與單張圖同處、同樣附 ×8,但不放進 overview.png(不加入 images)
 	for name in item_f2:
 		var img := render_grid(item_f2[name], palette)
-		if save(img, out_dir.path_join(name + ".png")) != OK:
+		var fname: String = name.to_lower()
+		game_files.append(fname + ".png")
+		if save(img, out_dir.path_join(fname + ".png")) != OK:
 			return 1
-		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [name, SCALE_SINGLE])) != OK:
+		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [fname, SCALE_SINGLE])) != OK:
 			return 1
-		print("%-26s %dx%d" % [name, img.get_width(), img.get_height()])
+		print("%-26s %dx%d" % [fname, img.get_width(), img.get_height()])
 
 	# D23 主題邊框：同樣附 ×8、不放進 overview.png
 	for name in themes:
 		var img := render_grid(themes[name][0], themes[name][1])
-		if save(img, out_dir.path_join(name + ".png")) != OK:
+		var fname: String = name.to_lower()
+		game_files.append(fname + ".png")
+		if save(img, out_dir.path_join(fname + ".png")) != OK:
 			return 1
-		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [name, SCALE_SINGLE])) != OK:
+		if save(scaled(img, SCALE_SINGLE), out_dir.path_join("%s_x%d.png" % [fname, SCALE_SINGLE])) != OK:
 			return 1
-		print("%-26s %dx%d" % [name, img.get_width(), img.get_height()])
+		print("%-26s %dx%d" % [fname, img.get_width(), img.get_height()])
 
 	for sheet_name in sheets:
 		var img := render_grid(sheets[sheet_name]["grid"], palette)
+		game_files.append(SPRITE_DIR + "/" + sheet_name + ".png")
 		if save(img, sprite_dir.path_join(sheet_name + ".png")) != OK:
 			return 1
 		if save(scaled(img, SCALE_SPRITE), sprite_dir.path_join("%s_x%d.png" % [sheet_name, SCALE_SPRITE])) != OK:
@@ -364,6 +389,7 @@ func run(md_path: String, out_dir: String) -> int:
 
 	# 對照資料(給遊戲程式用):層數 → (顏色, 數字)、雷射光束分段尺寸與鏡射方式
 	for pair in [["layer_map.json", layer_map], ["laser_beam_layout.json", beam_layout]]:
+		game_files.append(SPRITE_DIR + "/" + pair[0])
 		if save_json(pair[1], sprite_dir.path_join(pair[0])) != OK:
 			return 1
 		print("%-26s" % [SPRITE_DIR + "/" + pair[0]])
@@ -378,6 +404,15 @@ func run(md_path: String, out_dir: String) -> int:
 		return 1
 
 	print("完成：%d 個區塊、%d 張道具 F2、%d 張主題邊框、%d 張精靈圖，輸出到 %s" % [blocks.size(), item_f2.size(), themes.size(), sheets.size(), out_dir])
+	if game_dir != "":
+		var exclude_re := RegEx.create_from_string(GAME_EXCLUDE_RE)
+		var to_game := PackedStringArray()
+		for rel in game_files:
+			if exclude_re.search(rel) == null:
+				to_game.append(rel)
+		if sync_game_dir(out_dir, game_dir, to_game) != OK:
+			return 1
+		print("遊戲輸出:%d 個檔案(排除 %d 個設計參考圖),輸出到 %s" % [to_game.size(), game_files.size() - to_game.size(), game_dir])
 	return 0
 
 
@@ -1161,19 +1196,20 @@ func build_layer_map() -> Dictionary:
 
 
 ## 雷射光束排版資料(D17「雷射分段拼接」):各分段的檔案、尺寸、由來與鏡射方式。拼接本身由遊戲程式處理。
+## file 相對於本 json 所在資料夾(sprites/),預覽與遊戲輸出的資料夾結構相同，所以同一份內容兩邊都能用。
 func build_beam_layout(blocks: Array) -> Dictionary:
 	var pieces := {}
 	for b in blocks:
 		var id: String = b["name"].trim_prefix(FUNC_ITEM + "_")
 		if b["item"] == FUNC_ITEM and id.begins_with("laser_beam_"):
-			pieces[id] = {"file": b["name"] + ".png", "w": b["grid"][0].length(), "h": b["grid"].size()}
+			pieces[id] = {"file": "../" + b["name"].to_lower() + ".png", "w": b["grid"][0].length(), "h": b["grid"].size()}
 	for spec in BEAM_V:
-		pieces[spec[0]] = {"file": SPRITE_DIR + "/" + spec[0] + ".png", "w": BEAM_SIZE, "h": BEAM_SIZE,
+		pieces[spec[0]] = {"file": spec[0] + ".png", "w": BEAM_SIZE, "h": BEAM_SIZE,
 			"from": spec[1], "transform": "rotate_ccw_90" if spec[2] == "ccw" else "flip_v"}
 	return {"pieces": pieces,
 		"mirror": {"left_block": "laser_beam_block_* 水平鏡射(左側被擋下)"},
 		"vertical_offset_x": BEAM_SIZE / 2,
-		"note": "水平中段可左右平鋪;垂直分段圖左緣 x = 磚左緣 x + 8;起點圖 32×16 覆蓋雷射磚整格"}
+		"note": "file 相對於本 json 所在資料夾;水平中段可左右平鋪;垂直分段圖左緣 x = 磚左緣 x + 8;起點圖 32×16 覆蓋雷射磚整格"}
 
 
 ## 依 D20、D21「F2 規則」產生道具 F2:道具 F1 與底板 F1 同位置、同代號的像素，改成底板 F2 同位置的像素，其餘不動。
@@ -1678,9 +1714,11 @@ func save_json(data: Dictionary, path: String) -> int:
 	return OK
 
 
-## 只刪除本工具產生的檔名格式，避免設計稿改名後留下過期的 PNG;其他檔案不動。
+## 只刪除本工具產生的檔名格式，避免設計稿改名後留下過期的 PNG;其他檔案不動(只看該層，不進子資料夾)。
+## 項目代號接受大寫 D:舊版輸出為「D12_…」,要一併清掉，才不會與新的全小寫檔並存;
+## 先刪再寫也讓 Windows 上的實際檔名變成小寫(覆寫同名檔會保留舊的大小寫)。
 func clean_old_outputs(out_dir: String, sprite_dir: String) -> void:
-	var targets := [[out_dir, "^(D\\d+_.+|overview|board_sample(_x\\d+)?)\\.png$"],
+	var targets := [[out_dir, "^([Dd]\\d+_.+|overview|board_sample(_x\\d+)?)\\.png$"],
 		[sprite_dir, "^((bricks?|paddle|laser_beam|rainbow)_[a-z0-9_]+(_x\\d+)?\\.png|layer_map\\.json|laser_beam_layout\\.json)$"]]
 	for t in targets:
 		var own_re := RegEx.create_from_string(t[1])
@@ -1690,6 +1728,44 @@ func clean_old_outputs(out_dir: String, sprite_dir: String) -> void:
 		for fname in dir.get_files():
 			if own_re.search(fname):
 				dir.remove(fname)
+
+
+## 把遊戲要用的檔案(files,相對路徑)從預覽資料夾複製到遊戲資料夾，內容逐位元組相同。
+## 只覆寫、不先刪除，讓 Godot 的 .import(含 UID)保持不變;
+## 上次清單(GAME_MANIFEST)中有、這次沒有的檔案才刪除，連同它的 .import。
+## 只依清單刪檔，所以遊戲資料夾內使用者自己放的檔案、或 -GameDir 指錯資料夾時，都不會被誤刪。
+## 回傳 OK 或錯誤碼(錯誤訊息已印出)。
+func sync_game_dir(out_dir: String, game_dir: String, files: PackedStringArray) -> int:
+	var keep := {}
+	for rel in files:
+		keep[rel] = true
+	var manifest := game_dir.path_join(GAME_MANIFEST)
+	if FileAccess.file_exists(manifest):
+		# 只接受「(sprites/)全小寫檔名.png|json」,清單被改壞時也不會刪到遊戲資料夾以外;
+		# 輸出檔名全小寫，含大寫的項目一律略過:Windows 檔名不分大小寫，
+		# 「D12_x.png」不在 keep 裡卻會指到仍在使用的 d12_x.png,刪下去會連 .import 一起誤刪
+		var safe := RegEx.create_from_string("^(" + SPRITE_DIR + "/)?[a-z0-9_]+\\.(png|json)$")
+		for line in FileAccess.get_file_as_string(manifest).split("\n", false):
+			var rel := line.strip_edges()
+			if keep.has(rel) or safe.search(rel) == null:
+				continue
+			for p in [game_dir.path_join(rel), game_dir.path_join(rel) + ".import"]:
+				if FileAccess.file_exists(p):
+					DirAccess.remove_absolute(p)
+					print("刪除舊檔 %s" % p)
+	for rel in files:
+		var err := DirAccess.copy_absolute(out_dir.path_join(rel), game_dir.path_join(rel))
+		if err != OK:
+			printerr("複製失敗: %s (%s)" % [game_dir.path_join(rel), error_string(err)])
+			return err
+	var f := FileAccess.open(manifest, FileAccess.WRITE)
+	if f == null:
+		var ferr := FileAccess.get_open_error()
+		printerr("寫入失敗: %s (%s)" % [manifest, error_string(ferr)])
+		return ferr
+	f.store_string("\n".join(files) + "\n")
+	f.close()
+	return OK
 
 
 func text_width(text: String, scale: int) -> int:

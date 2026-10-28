@@ -1,0 +1,58 @@
+[gd_resource type="Resource" script_class="GameConfig" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/game_config.gd" id="1_cfg"]
+
+[resource]
+script = ExtResource("1_cfg")
+level_path = "res://data/levels/level_test.json"
+game_time = 300.0
+max_layers = 69
+ball_speed = 240.0
+speed_tier_step = 0.15
+ball_tier_min = -3
+ball_tier_max = 4
+max_balls = 1000
+paddle_bounce_max_deg = 60.0
+launch_min_deg = 10.0
+min_angle_deg = 15.0
+split_angle_deg = 20.0
+brick_accel_unbreakable = 0.01
+brick_accel_other = 0.005
+brick_accel_paddle = 0.005
+brick_accel_max = 0.5
+paddle_speed = 450.0
+paddle_tier_min = -3
+paddle_tier_max = 4
+paddle_base_length = 85.0
+paddle_min_length = 32
+paddle_max_length = 320
+len_small_up = 1.2
+len_big_up = 1.6
+len_small_down = 0.8
+len_big_down = 0.4
+invisible_alpha = 0.0
+drop_chance = 0.3
+buff_ratio = 0.5
+effect_duration = 5.0
+item_fall_speed = 100.0
+reinforce_max = 7
+flame_damage = 2
+flame_splash = 1
+bomb_splash = 2
+heal_amount = 1
+heal_area_amount = 2
+heal_area_splash = 1
+bullet_speed = 600.0
+gun_cooldown = 0.3
+thief_min = 500
+thief_max = 5000
+replay_level = false
+score_per_layer = 100
+score_per_brick = 200
+score_buff = 200
+score_debuff = 50
+score_per_second = 2
+hud_alpha = 0.5
+debug_force_item = ""
+debug_start_balls = 1
+debug_enchant = ""

@@ -1,9 +1,10 @@
-## 單一關卡核心原型:多層磚與不可破壞磚、球、擋板、23 種道具效果、HUD、計分與勝敗。
+## 單一關卡核心原型:多層磚與不可破壞磚、球、擋板、22 種道具效果、HUD、計分與勝敗。
 ## 版面座標依 D28 v5 座標總表;可調數值全部讀自 data/game_config.tres。
 ## 球、擋板以原圖整數 PX 倍顯示,碰撞也用放大後的尺寸(README「基本數值」);
 ## 磚(含疊在上面的圖層)用 art/bricks40 的 40×20 圖以 1 倍顯示;
 ## 掉落道具與接取閃光用 art/items40 的 40×40、48×48 圖以 1 倍顯示;
-## HUD、UI 區、邊框、背景、擋板槍子彈維持原本的畫法。
+## HUD 圖示用 art/hud32 的 D34 32×32 圖以 1 倍顯示;
+## HUD 線段條、UI 區、邊框、背景、擋板槍子彈維持原本的畫法。
 ## 球可能上百顆,所以物件都存成資料、由固定順序的繪圖圖層一次畫完,不為每顆球建節點。
 extends Node2D
 
@@ -31,6 +32,11 @@ const BALL_R := 8.0
 const HUD_X := 24
 const HUD_Y := 424
 const HUD_STEP := 52
+## D35 方案 C:每欄格數 = 向下取整((H − 473) ÷ 52),格底端離擋板上緣(H − 45)至少留 12 px;
+## 800 高 = 6、707 高 = 4、640 高 = 3
+const HUD_COL_RESERVE := 473
+## D35 狀態種類;陣列順序就是同一幀同時出現(R10)與開局建立時的固定順序
+const HUD_KINDS: Array[String] = ["reinforce", "fever", "speed", "pierce", "flame", "bomb", Effects.PADDLE_LEN]
 const MIN_H := 640
 const MAX_H := 800
 
@@ -85,7 +91,9 @@ var time_left := 0.0
 var state := State.PLAYING
 var menu: ChoiceMenu = null
 var menu_queue: Array[bool] = []  # 待開的 3 選 1(true = 金球);同時接到兩顆時依序顯示
-var hud: Array = []           # 本幀 HUD 格:[圖示, 線段內容]
+var hud: Array = []           # 本幀 HUD 的格,依獲得順序:[圖示, 線段內容]
+## HUD 獲得順序清單(D35):存在中的狀態種類,最先獲得在前;重玩時場景重新載入自然清空
+var hud_order: Array[String] = []
 var _tex := {}
 var _layers: Array[DrawLayer] = []
 var _paddle_layer: DrawLayer
@@ -205,9 +213,11 @@ func _step(dt: float) -> void:
 		return
 	gun_cd = maxf(0.0, gun_cd - dt)
 	paddle_flash = maxf(0.0, paddle_flash - dt)
-	_update_paddle(dt)
+	# 先到期再移動擋板:擋板長度到期變回 85 的那一幀,就用新長度夾位置(BUG-1)。
+	# 到期仍在球、子彈、道具更新之前,其他效果的到期時序不變
 	for id in effects.tick(dt):
 		_on_expired(id)
+	_update_paddle(dt)
 	_update_balls(dt)
 	_update_bullets(dt)
 	_update_items(dt)
@@ -321,7 +331,8 @@ func _ball_paddle(b: Ball, left: int, length: int, py: int) -> bool:
 	paddle_flash = FRAME
 	var offset := b.pos.x - _paddle_center(length)
 	b.pos.y = py - BALL_R
-	if effects.sticky:
+	# 吸附到期後新碰到的球照常反彈;已經黏住的球維持 stuck,等玩家點擊由 _launch_stuck 發射
+	if effects.is_active("sticky"):
 		b.stuck = true
 		b.offset = offset
 		b.inside = {}
@@ -430,7 +441,8 @@ func _bullet_trace(x: float, y0: float, y1: float) -> Vector3i:
 
 
 func _fire_gun() -> void:
-	if not effects.gun or gun_cd > 0.0:
+	# 槍到期後不再發射;已在飛行中的子彈由 _update_bullets 照常飛完
+	if not effects.is_active("gun") or gun_cd > 0.0:
 		return
 	gun_cd = cfg.gun_cooldown
 	var length := _paddle_len()
@@ -629,10 +641,10 @@ func _apply_item(id: String) -> void:
 			effects.paddle_tier = Rules.step_tier(effects.paddle_tier, -1, cfg.paddle_tier_min, cfg.paddle_tier_max)
 		"reinforce":
 			effects.reinforce = mini(effects.reinforce + 1, cfg.reinforce_max)
-		"sticky":
-			effects.sticky = true
-		"gun":
-			effects.gun = true
+		"paddle_len_1", "paddle_len_2", "paddle_len_down_1", "paddle_len_down_2", "paddle_len_min":
+			effects.add_paddle_len(id, cfg)
+			# 變長後立刻重新夾位置(不移動),貼牆時這一幀就不會超出牆;3 選 1 暫停中也一樣
+			_update_paddle(0.0)
 		"split":
 			_split_balls()
 		"merge":
@@ -647,8 +659,9 @@ func _apply_item(id: String) -> void:
 		"black_ball":
 			menu_queue.append(false)
 		_:
-			# 其餘都是限時效果:擋板長度 6 種、穿透、火焰、炸彈、回血、範圍回血、黑洞、無敵、隱形
-			effects.add_timed(id, cfg.effect_duration)
+			# 其餘都是各自計時的限時效果:穿透、火焰、炸彈、吸附、槍、回血、範圍回血、黑洞、無敵、隱形;
+			# 秒數讀設定檔的 dur_<id>
+			effects.add_timed(id, cfg.get("dur_" + id))
 
 
 func _split_balls() -> void:
@@ -703,7 +716,7 @@ func _flame_on() -> bool:
 
 
 func _paddle_len() -> int:
-	return Rules.paddle_length(cfg.paddle_base_length, effects.paddle_factors(cfg), cfg.paddle_min_length, cfg.paddle_max_length)
+	return Rules.paddle_length(cfg.paddle_base_length, [effects.paddle_factor], cfg.paddle_min_length, cfg.paddle_max_length)
 
 
 func _paddle_left(length: int) -> int:
@@ -766,8 +779,9 @@ func _show_end_screen(text: String) -> void:
 
 func _t(name: String) -> Texture2D:
 	if not _tex.has(name):
-		# D31 磚圖放在 art/bricks40、D32 掉落道具在 art/items40,其餘在 art/generated
-		var dir := "bricks40" if name.begins_with("d31_") else "items40" if name.begins_with("d32_") else "generated"
+		# D31 磚圖放在 art/bricks40、D32 掉落道具在 art/items40、D34 HUD 圖示在 art/hud32,其餘在 art/generated
+		var dir := "bricks40" if name.begins_with("d31_") else "items40" if name.begins_with("d32_") \
+			else "hud32" if name.begins_with("d34_") else "generated"
 		_tex[name] = load("res://art/%s/%s.png" % [dir, name])
 	return _tex[name]
 
@@ -881,9 +895,10 @@ func _paint_paddle(ci: CanvasItem) -> void:
 	var length := _paddle_len()
 	var left := _paddle_left(length)
 	var py := _paddle_y()
-	var kind := "sticky" if effects.sticky else "normal"
-	var end_kind := "gun" if effects.gun else kind
-	var end_y := py - 4 * PX if effects.gun else py
+	var gun := effects.is_active("gun")
+	var kind := "sticky" if effects.is_active("sticky") else "normal"
+	var end_kind := "gun" if gun else kind
+	var end_y := py - 4 * PX if gun else py
 	var end_w := 8 * PX
 	var mid_w := 16 * PX
 	_draw_px(ci, _t("d13_paddle_%s_left" % end_kind), Vector2(left, end_y), tint)
@@ -906,32 +921,82 @@ func _paint_muzzle(ci: CanvasItem) -> void:
 			_draw_px(ci, _t("d19_gun_muzzle_flash_f1" if a["t"] < 0.05 else "d19_gun_muzzle_flash_f2"), a["pos"])
 
 
-## HUD 格(D16 排列順序、D28 補位):強化、fever(未做)、減速或加速(淨階數)、穿透、火焰、炸彈。
+## 依 D35 更新獲得順序清單 hud_order,回傳本幀 HUD 的格(依清單順序)。
+## 先移除不存在的(R2,後面自動補位),再依 HUD_KINDS 固定順序把新出現的接在最後(R1、R10);
+## 存在中的種類位置不動、只更新內容(R3、R5、R7)。只比對「本幀存在與否」,
+## 所以同一幀到期又再獲得視為一直存在(R11)。同一狀態下重複呼叫結果相同。
 func _hud_cells() -> Array:
-	var out := []
-	if effects.reinforce > 0:
-		out.append(["d16_hud_icon_reinforce", {"segments": cfg.reinforce_max, "filled": effects.reinforce}])
-	if effects.ball_tier < 0:
-		out.append(["d16_hud_icon_slow", {"segments": -cfg.ball_tier_min, "filled": -effects.ball_tier}])
-	elif effects.ball_tier > 0:
-		out.append(["d16_hud_icon_fast", {"segments": cfg.ball_tier_max, "filled": effects.ball_tier}])
-	for id in ["pierce", "flame", "bomb"]:
-		if effects.enchant == id:
-			out.append(["d16_hud_icon_" + id, {"fill": Rules.BAR_INNER}])
-		elif effects.is_active(id):
-			var rem := effects.remaining(id)
-			# 最後 1 秒填色在 W 與 G 之間每 100 ms 切換
-			var blink := not reduced_motion and rem <= 1.0 and int(rem * 10.0) % 2 == 1
-			out.append(["d16_hud_icon_" + id, {"fill": Rules.timebar_fill(rem, effects.total(id)), "color": Pal.G if blink else Pal.W}])
-	return out
+	var cells := {}
+	for kind in HUD_KINDS:
+		var cell := _hud_cell(kind)
+		if not cell.is_empty():
+			cells[kind] = cell
+	hud_order = hud_order.filter(func(k: String) -> bool: return cells.has(k))
+	for kind in HUD_KINDS:
+		if cells.has(kind) and kind not in hud_order:
+			hud_order.append(kind)
+	return hud_order.map(func(k: String) -> Array: return cells[k])
+
+
+## 一種狀態本幀的格 [圖示, 線段內容];不存在時回傳空陣列(D16 線段條、D34 圖示)。
+func _hud_cell(kind: String) -> Array:
+	match kind:
+		"reinforce":
+			if effects.reinforce > 0:
+				return ["d34_hud_icon_reinforce", {"segments": cfg.reinforce_max, "filled": effects.reinforce}]
+		"fever":
+			# shortcut: fever 玩法未做,恆不存在(不依球數,避免沒有玩法卻亮出 fever 格與光暈);實作 fever 時改成「球數 ≥ 50」並補線段內容
+			pass
+		"speed":
+			if effects.ball_tier < 0:
+				return ["d34_hud_icon_slow", {"segments": -cfg.ball_tier_min, "filled": -effects.ball_tier}]
+			if effects.ball_tier > 0:
+				return ["d34_hud_icon_fast", {"segments": cfg.ball_tier_max, "filled": effects.ball_tier}]
+		"pierce", "flame", "bomb":
+			if effects.enchant == kind:
+				return ["d34_hud_icon_" + kind, {"fill": Rules.BAR_INNER}]
+			if effects.is_active(kind):
+				return ["d34_hud_icon_" + kind, _timebar(kind)]
+		Effects.PADDLE_LEN:
+			return _hud_len_cell()
+	return []
+
+
+## 擋板長度格(D33、D34):共用計時進行中且實際長度 ≠ 基準時才顯示;
+## 比基準長 → +,比基準短或最短化生效中 → −。回傳 [圖示, 線段內容],不顯示時回傳空陣列。
+func _hud_len_cell() -> Array:
+	var length := _paddle_len()
+	var base := roundi(cfg.paddle_base_length)
+	if not effects.is_active(Effects.PADDLE_LEN) or length == base:
+		return []
+	var down := effects.paddle_min or length < base
+	return ["d34_hud_icon_paddle_len_down1" if down else "d34_hud_icon_paddle_len_up1", _timebar(Effects.PADDLE_LEN)]
+
+
+## 限時效果的連續時間條:剩餘 ÷ 總時間;最後 1 秒填色在 W 與 G 之間每 100 ms 切換(減少動態時不閃)。
+func _timebar(id: String) -> Dictionary:
+	var rem := effects.remaining(id)
+	var blink := not reduced_motion and rem <= 1.0 and int(rem * 10.0) % 2 == 1
+	return {"fill": Rules.timebar_fill(rem, effects.total(id)), "color": Pal.G if blink else Pal.W}
 
 
 func _paint_hud(ci: CanvasItem) -> void:
-	# 每格 44×44(D16 的 22×22 以 2 倍畫):圖示 32×32 在格內第 6 欄起,線段條 44×8 在第 36 列
+	# 每格 44×44:D34 圖示 32×32 以 1 倍畫在格內第 6 欄起,線段條 44×8 在第 36 列
 	for k in hud.size():
-		var y := HUD_Y + HUD_STEP * k
-		ci.draw_texture_rect(_t(hud[k][0]), Rect2(HUD_X + 6, y, 32, 32), false)
-		_draw_bar(ci, Vector2(HUD_X, y + 36), hud[k][1])
+		_draw_hud_cell(ci, _hud_slot(k), hud[k])
+
+
+## 第 i 格(從 0 起)的左上角(D35 方案 C):欄由左到右、欄內由上到下,一欄放滿就換下一欄。
+func _hud_slot(i: int) -> Vector2:
+	@warning_ignore("integer_division")
+	var per_col := (view_h - HUD_COL_RESERVE) / HUD_STEP
+	@warning_ignore("integer_division")
+	return Vector2(HUD_X + HUD_STEP * (i / per_col), HUD_Y + HUD_STEP * (i % per_col))
+
+
+func _draw_hud_cell(ci: CanvasItem, o: Vector2, cell: Array) -> void:
+	ci.draw_texture(_t(cell[0]), o + Vector2(6, 0))
+	_draw_bar(ci, o + Vector2(0, 36), cell[1])
 
 
 ## 2 倍線段條:外框 j、內部 20×2 逐欄上色。每個像素只畫一次,整組 50% 半透明時才不會因重疊變色。
@@ -974,13 +1039,18 @@ func _pickup_frame(t: float) -> int:
 
 
 func _paint_halos(ci: CanvasItem) -> void:
-	# 只要 HUD 有任何一格就顯示光暈;所有光暈畫在所有球本體之下,全部同相位呼吸
-	if hud.is_empty():
+	# 清單中有任何一格不是擋板長度才顯示光暈(D35);所有光暈畫在所有球本體之下,全部同相位呼吸
+	if not _halo_on():
 		return
 	var tex := _t("d15_ball_opt_c_halo_f1" if reduced_motion or _phase(0.8) < 0.4 else "d15_ball_opt_c_halo_f2")
 	# 光暈與消失動畫原圖 14×14、球 8×8,都以 PX 倍畫並以球心置中
 	for b in balls:
 		_draw_px(ci, tex, (b.pos - Vector2(7, 7) * PX).floor())
+
+
+## 球光暈是否顯示:獲得順序清單中有任何一格不是擋板長度(D35)。
+func _halo_on() -> bool:
+	return hud_order.any(func(k: String) -> bool: return k != Effects.PADDLE_LEN)
 
 
 func _paint_balls(ci: CanvasItem) -> void:

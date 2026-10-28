@@ -381,6 +381,19 @@ func _real_screens() -> void:
 			if w > ChoiceOption.TEXT_W:
 				over.append("%s %.0f" % [l, w])
 	_report("window font: all names/descs <= 216 px (widest '%s' %.1f)" % [worst_s, worst], over.is_empty(), str(over))
+	# 2026-10-28 道具秒數修訂:文字欄寬 216、每條最多 3 行,且 3 行的剛好 4 條(火焰、吸附、槍、範圍回血)
+	_report("ChoiceOption.TEXT_W == 216", ChoiceOption.TEXT_W == 216, str(ChoiceOption.TEXT_W))
+	var three := []
+	var too_many := []
+	for id in ItemDefs.BUFF + ItemDefs.DEBUFF:
+		var n: int = ItemDefs.desc_lines(id).size()
+		if n == 3:
+			three.append(id)
+		if n > 3:
+			too_many.append(id)
+	three.sort()
+	_report("every item desc <= 3 lines", too_many.is_empty(), str(too_many))
+	_report("3-line items = flame, gun, heal_area, sticky", three == ["flame", "gun", "heal_area", "sticky"], str(three))
 	for golden in [true, false]:
 		var tm := ChoiceMenu.new()
 		tm.setup(golden, ["slow"], 800, true)

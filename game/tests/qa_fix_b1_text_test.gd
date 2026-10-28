@@ -110,13 +110,16 @@ func _end_text_score(m) -> int:
 
 
 func _snapshot(m) -> Dictionary:
+	# 2026-10-28:吸附、槍改為限時效果(effects.timed),擋板長度改為 paddle_factor + 共用計時
 	return {"score": m.score, "ball_tier": m.effects.ball_tier, "paddle_tier": m.effects.paddle_tier,
-		"reinforce": m.effects.reinforce, "sticky": m.effects.sticky, "gun": m.effects.gun,
+		"reinforce": m.effects.reinforce, "sticky": m.effects.is_active("sticky"), "gun": m.effects.is_active("gun"),
+		"paddle_factor": m.effects.paddle_factor, "paddle_min": m.effects.paddle_min,
 		"timed": m.effects.timed.keys(), "menu_queue": m.menu_queue.size(), "balls": m.balls.size()}
 
 
+# 「擋板最大化」已移除,改用擋板大幅增加(仍是長度效果)
 const ALL_EFFECT_ITEMS := ["thief", "split", "gun", "sticky", "pierce", "fast", "paddle_speed",
-	"reinforce", "golden_ball", "black_ball", "merge", "invincible", "paddle_len_max"]
+	"reinforce", "golden_ball", "black_ball", "merge", "invincible", "paddle_len_2"]
 
 
 # ---------- B1 ----------
@@ -140,8 +143,9 @@ func _t_win_ball_same_frame() -> void:
 	_eq(_end_text_score(m), m.score, "end screen score equals score")
 	_eq(m.items.size(), 0, "items still disappear")
 	_eq(m.balls.size(), 2, "split/merge not applied")
-	_eq([m.effects.ball_tier, m.effects.paddle_tier, m.effects.reinforce, m.effects.sticky, m.effects.gun],
-		[0, 0, 0, false, false], "untimed effects not applied")
+	_eq([m.effects.ball_tier, m.effects.paddle_tier, m.effects.reinforce, m.effects.is_active("sticky"),
+		m.effects.is_active("gun"), m.effects.paddle_factor], [0, 0, 0, false, false, 1.0], "effects not applied")
+	_eq(m._paddle_len(), 85, "paddle length unchanged")
 	_eq(m.effects.timed.size(), 0, "timed effects not applied")
 	_eq(m.menu_queue.size(), 0, "golden/black ball not queued")
 	var anims_pickup: int = m.anims.filter(func(a) -> bool: return a["kind"] == "pickup").size()
@@ -269,7 +273,7 @@ func _t_after_end_frames() -> void:
 	var snap := _snapshot(m)
 	for id in ItemDefs.BUFF + ItemDefs.DEBUFF:
 		m._pickup(id, Vector2(100, 600))
-	_eq(_snapshot(m), snap, "_pickup of all 27 items after end: no change")
+	_eq(_snapshot(m), snap, "_pickup of all 26 items after end: no change")
 	m.bullets.append(Vector2(22, 68 + 17 * 20 + 2))
 	m._update_bullets(0.016)
 	_eq([m.score, m.grid[16][0].layers], [8000, 3], "bullet after end: no damage / score")
@@ -322,7 +326,9 @@ func _t_text_d29_exact() -> void:
 		var name := cols[2].strip_edges().replace("（僅重複關卡）", "")
 		var desc := Array(cols[3].strip_edges().split("｜"))
 		rows[id] = [name, desc, int(cols[5].strip_edges().replace("*", ""))]
-	_eq(rows.size(), 25, "D29 table has 25 items")
+	# 2026-10-28 道具秒數修訂:刪除「擋板最大化」列,共 24 種
+	_eq(rows.size(), 24, "D29 table has 24 items")
+	_ok(not rows.has("paddle_len_max"), "D29 table has no paddle_len_max")
 	for id in rows:
 		_ok(ItemDefs.exists(id), "D29 id exists in ItemDefs: %s" % id)
 		if not ItemDefs.exists(id):
@@ -340,25 +346,26 @@ func _t_text_d29_exact() -> void:
 
 
 func _t_text_values_format() -> void:
+	# 2026-10-28:單一 effect_duration 改為各道具 dur_*;格式規則不變
 	var c := GameConfig.new()
-	c.effect_duration = 5.0
+	c.dur_pierce = 5.0
 	c.len_small_up = 1.2
 	c.len_big_up = 2.0
 	c.len_small_down = 0.75
 	c.len_big_down = 0.5
 	var v := ItemDefs._values(c)
-	_eq([v["dur"], v["len_small_up"], v["len_big_up"], v["len_small_down"], v["len_big_down"]],
+	_eq([v["dur_pierce"], v["len_small_up"], v["len_big_up"], v["len_small_down"], v["len_big_down"]],
 		["5", "1.2", "2", "0.75", "0.5"], "float formatting")
-	c.effect_duration = 7.5
-	_eq(ItemDefs._values(c)["dur"], "7.5", "7.5 stays 7.5")
-	c.effect_duration = 10.0
-	_eq(ItemDefs._values(c)["dur"], "10", "10.0 -> 10")
-	c.effect_duration = 0.5
-	_eq(ItemDefs._values(c)["dur"], "0.5", "0.5 stays 0.5")
-	c.effect_duration = 0.0
-	_eq(ItemDefs._values(c)["dur"], "0", "0.0 -> 0")
-	c.effect_duration = 120.25
-	_eq(ItemDefs._values(c)["dur"], "120.25", "120.25 stays")
+	c.dur_pierce = 7.5
+	_eq(ItemDefs._values(c)["dur_pierce"], "7.5", "7.5 stays 7.5")
+	c.dur_pierce = 10.0
+	_eq(ItemDefs._values(c)["dur_pierce"], "10", "10.0 -> 10")
+	c.dur_pierce = 0.5
+	_eq(ItemDefs._values(c)["dur_pierce"], "0.5", "0.5 stays 0.5")
+	c.dur_pierce = 0.0
+	_eq(ItemDefs._values(c)["dur_pierce"], "0", "0.0 -> 0")
+	c.dur_pierce = 120.25
+	_eq(ItemDefs._values(c)["dur_pierce"], "120.25", "120.25 stays")
 	c.thief_min = 0
 	c.thief_max = 100000
 	_eq([ItemDefs._values(c)["thief_min"], ItemDefs._values(c)["thief_max"]], ["0", "100000"], "int values")
@@ -374,7 +381,10 @@ func _all_text() -> String:
 
 
 func _t_text_follows_config() -> void:
-	var keys := ["effect_duration", "len_small_up", "len_big_up", "len_small_down", "len_big_down",
+	# 2026-10-28:各道具秒數獨立(dur_*),每個設不同值,確認每條說明對到自己的欄位
+	var keys := ["dur_paddle_len", "dur_pierce", "dur_flame", "dur_bomb", "dur_sticky", "dur_gun",
+		"dur_heal", "dur_heal_area", "dur_blackhole", "dur_invincible", "dur_invisible",
+		"len_small_up", "len_big_up", "len_small_down", "len_big_down",
 		"flame_damage", "flame_splash", "reinforce_max", "heal_amount", "heal_area_amount",
 		"heal_area_splash", "thief_min", "thief_max"]
 	var old := {}
@@ -382,7 +392,17 @@ func _t_text_follows_config() -> void:
 		old[k] = cfg.get(k)
 	var default_text := _all_text()
 	_ok(not ("{" in default_text or "}" in default_text), "defaults: no leftover braces")
-	cfg.effect_duration = 7.5
+	cfg.dur_paddle_len = 31.0
+	cfg.dur_pierce = 21.0
+	cfg.dur_flame = 22.0
+	cfg.dur_bomb = 7.5
+	cfg.dur_sticky = 33.0
+	cfg.dur_gun = 12.0
+	cfg.dur_heal = 13.0
+	cfg.dur_heal_area = 14.0
+	cfg.dur_blackhole = 6.0
+	cfg.dur_invincible = 15.0
+	cfg.dur_invisible = 16.0
 	cfg.len_small_up = 1.25
 	cfg.len_big_up = 2.0
 	cfg.len_small_down = 0.7
@@ -396,21 +416,22 @@ func _t_text_follows_config() -> void:
 	cfg.thief_min = 100
 	cfg.thief_max = 900
 	var expect := {
-		"paddle_len_1": ["長度變成1.25倍", "持續7.5秒"],
-		"paddle_len_2": ["長度變成2倍", "持續7.5秒"],
-		"paddle_len_max": ["變成整個關卡區寬", "持續7.5秒"],
-		"pierce": ["穿過磚塊並減1層", "持續7.5秒"],
-		"flame": ["撞到的磚塊減3層", "周圍一圈減2層", "持續7.5秒"],
+		"paddle_len_1": ["長度變成1.25倍", "持續31秒"],
+		"paddle_len_2": ["長度變成2倍", "持續31秒"],
+		"pierce": ["穿過磚塊並減1層", "持續21秒"],
+		"flame": ["撞到的磚塊減3層", "周圍一圈減2層", "持續22秒"],
 		"bomb": ["撞到的磚塊被標記", "7.5秒後全部爆炸"],
 		"reinforce": ["每次撞磚多減1層", "最多加9層"],
-		"paddle_len_down_1": ["長度變成0.7倍", "持續7.5秒"],
-		"paddle_len_down_2": ["長度變成0.3倍", "持續7.5秒"],
-		"paddle_len_min": ["縮到最短，持續7.5秒"],
-		"heal": ["撞到的磚塊加4層", "持續7.5秒"],
-		"heal_area": ["撞到的磚塊加6層", "周圍一圈加5層", "持續7.5秒"],
-		"blackhole": ["球碰到擋板就消失", "持續7.5秒"],
-		"invincible": ["所有磚塊無法破壞", "魔王除外，持續7.5秒"],
-		"invisible": ["擋板變成透明", "持續7.5秒"],
+		"sticky": ["球碰到擋板會黏住", "點一下才發射", "持續33秒"],
+		"gun": ["點畫面，兩端各射1發", "減1層 不觸發功能磚", "持續12秒"],
+		"paddle_len_down_1": ["長度變成0.7倍", "持續31秒"],
+		"paddle_len_down_2": ["長度變成0.3倍", "持續31秒"],
+		"paddle_len_min": ["縮到最短，持續31秒"],
+		"heal": ["撞到的磚塊加4層", "持續13秒"],
+		"heal_area": ["撞到的磚塊加6層", "周圍一圈加5層", "持續14秒"],
+		"blackhole": ["球碰到擋板就消失", "持續6秒"],
+		"invincible": ["所有磚塊無法破壞", "魔王除外，持續15秒"],
+		"invisible": ["擋板變成透明", "持續16秒"],
 		"thief": ["偷走100到900分", "分數最低到0"],
 	}
 	for id in expect:
@@ -418,7 +439,7 @@ func _t_text_follows_config() -> void:
 	var changed_text := _all_text()
 	_ok(not ("{" in changed_text or "}" in changed_text), "changed: no leftover braces")
 	# 沒有佔位的說明不應受影響
-	for id in ["slow", "split", "sticky", "golden_ball", "paddle_speed", "gun", "fast",
+	for id in ["slow", "split", "golden_ball", "paddle_speed", "fast",
 			"paddle_speed_down", "merge", "blackhole_big", "black_ball"]:
 		_eq(changed_text.contains(ItemDefs.item_name(id)), true, "name kept %s" % id)
 	for k in keys:
@@ -435,6 +456,6 @@ func _t_text_menu_a11y() -> void:
 	for o in menu._options:
 		names.append(o.accessibility_name)
 	_eq(names, ["小偷，偷走500到5000分，分數最低到0，按兩下選擇",
-		"無敵，所有磚塊無法破壞，魔王除外，持續5秒，按兩下選擇",
-		"範圍回血，撞到的磚塊加2層，周圍一圈加1層，持續5秒，按兩下選擇"], "a11y labels with substituted values")
+		"無敵，所有磚塊無法破壞，魔王除外，持續10秒，按兩下選擇",
+		"範圍回血，撞到的磚塊加2層，周圍一圈加1層，持續10秒，按兩下選擇"], "a11y labels with substituted values")
 	menu.free()

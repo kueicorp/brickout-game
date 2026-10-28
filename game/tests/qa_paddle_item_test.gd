@@ -298,8 +298,9 @@ func _t_length_change() -> void:
 	_push_drag(4)
 	m._update_paddle(1.0 / 60.0)
 	_near(m.paddle_x, 20.0 + len / 2.0 + 4.0, "grow at left edge then drag right 4: moves immediately")
-	# 最大化 320:不能動
-	m._apply_item("paddle_len_max")
+	# 長到 320(2026-10-28「擋板最大化」已移除;163 × 1.6 × 1.6 = 417 → 夾到 320):不能動
+	m._apply_item("paddle_len_2")
+	m._apply_item("paddle_len_2")
 	len = m._paddle_len()
 	_eq(len, 320, "max 320")
 	_push_drag(50)
@@ -631,10 +632,12 @@ func _t_item_art() -> void:
 
 ## 擋板長度表:[道具組合, 預期長度](與 qa_accel_paddle_test 相同)
 const LEN_TABLE := [[[], 85], [["paddle_len_1"], 102], [["paddle_len_2"], 136], [["paddle_len_down_1"], 68],
-	[["paddle_len_down_2"], 34], [["paddle_len_max"], 320], [["paddle_len_min"], 32],
+	[["paddle_len_down_2"], 34], [["paddle_len_min"], 32],
 	[["paddle_len_1", "paddle_len_2"], 163], [["paddle_len_down_1", "paddle_len_down_2"], 32],
 	[["paddle_len_2", "paddle_len_down_2"], 54], [["paddle_len_1", "paddle_len_down_1"], 82],
-	[["paddle_len_max", "paddle_len_min"], 120]]
+	# 2026-10-28:「擋板最大化」已移除;同一種撿兩次再乘、大增 ×4 夾到 320
+	[["paddle_len_1", "paddle_len_1"], 122],
+	[["paddle_len_2", "paddle_len_2", "paddle_len_2", "paddle_len_2"], 320]]
 
 
 ## 匯入後的貼圖和磁碟上的 PNG 逐像素比對;完全透明的像素只比 alpha(匯入可能改透明像素的 RGB)。
@@ -668,7 +671,13 @@ func _t_items40_art() -> void:
 			expected["d32_item_%s_f%d.png" % [id, f]] = Vector2i(40, 40)
 	for f in [1, 2, 3]:
 		expected["d32_item_pickup_f%d.png" % f] = Vector2i(48, 48)
-	_eq(expected.size(), 57, "57 expected files (27 ids x F1/F2 + pickup F1~F3)")
+	# 2026-10-28:「擋板最大化」移出道具清單;其後使用者清理檔案,圖檔已刪除
+	_ok(not (ItemDefs.BUFF + ItemDefs.DEBUFF).has("paddle_len_max"), "paddle_len_max not in item lists")
+	for f in [1, 2]:
+		var p := "res://art/items40/d32_item_paddle_len_max_f%d.png" % f
+		_ok(not FileAccess.file_exists(p), "paddle_len_max art removed: %s" % p)
+		_ok(not FileAccess.file_exists(p + ".import"), "paddle_len_max .import removed: %s" % p)
+	_eq(expected.size(), 55, "55 expected files (26 ids x F1/F2 + pickup F1~F3)")
 	var on_disk := []
 	for f in DirAccess.get_files_at("res://art/items40"):
 		if f.ends_with(".png"):
@@ -676,7 +685,7 @@ func _t_items40_art() -> void:
 	on_disk.sort()
 	var keys := expected.keys()
 	keys.sort()
-	_eq(on_disk, keys, "art/items40 png set == expected 57 names (no missing, no extra)")
+	_eq(on_disk, keys, "art/items40 png set == expected 55 names (no missing, no extra)")
 	var ok_count := 0
 	for file in keys:
 		var name: String = file.get_basename()
@@ -784,13 +793,9 @@ func _t_items40_catch_states() -> void:
 		for id in st:
 			m._apply_item(id)
 		var on := []
+		# 2026-10-28:吸附、槍改為限時;長度道具改為共用計時鍵 Effects.PADDLE_LEN
 		for id in st:
-			if id == "sticky":
-				on.append(m.effects.sticky)
-			elif id == "gun":
-				on.append(m.effects.gun)
-			else:
-				on.append(m.effects.is_active(id))
+			on.append(m.effects.is_active(Effects.PADDLE_LEN if id.begins_with("paddle_len") else id))
 		_ok(not on.has(false), "%s active" % [st])
 		m.paddle_x = 180.0
 		m.target_x = 180.0
@@ -957,7 +962,7 @@ func _t_heal_rule() -> void:
 	_eq(_layers(m4, 7, 16), 11, "pierce entry with heal: +1")
 	# 規格未寫:穿透結束時球仍在磚內,回血仍生效 → 記錄行為
 	m4.effects.add_timed("heal", 100.0)
-	for id in m4.effects.tick(cfg.effect_duration + 0.01):
+	for id in m4.effects.tick(cfg.dur_pierce + 0.01):
 		m4._on_expired(id)
 	print("INFO pierce expires during heal, ball inside brick: layers=%d (-999 = destroyed)" % _layers(m4, 7, 16))
 	m4.free()
@@ -965,7 +970,7 @@ func _t_heal_rule() -> void:
 	var m5 = _fresh()
 	_brick(m5, 7, 16, 10)
 	m5._apply_item("heal")
-	for id in m5.effects.tick(cfg.effect_duration + 0.01):
+	for id in m5.effects.tick(cfg.dur_heal + 0.01):
 		m5._on_expired(id)
 	m5._ball_hit_brick(Vector2i(7, 16))
 	_eq(_layers(m5, 7, 16), 9, "after heal expires: damage again")

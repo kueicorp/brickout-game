@@ -411,7 +411,10 @@ func _t_multi_same_frame() -> void:
 	var m2 = _fresh()
 	m2.paddle_x = 180.0
 	m2.target_x = 180.0
-	m2._apply_item("paddle_len_max")   # 320 寬,放得下 20 顆
+	# 2026-10-28:「擋板最大化」已移除;大幅增加 ×4 = 85 × 1.6^4 → 夾到 320 寬,放得下 20 顆
+	for i in 4:
+		m2._apply_item("paddle_len_2")
+	_eq(m2._paddle_len(), 320, "paddle 320 wide for 20 balls")
 	m2._update_paddle(0.0)
 	var left: int = m2._paddle_left(m2._paddle_len())
 	for i in 20:
@@ -520,7 +523,9 @@ func _t_high_speed_paddle() -> void:
 					for k in 9:
 						var m = _fresh()
 						if item != "":
-							m.effects.add_timed(item, 99999.0)
+							# 2026-10-28:長度改走 add_paddle_len(共用計時),給足時間避免中途到期
+							m.effects.add_paddle_len(item, m.cfg)
+							m.effects.timed[Effects.PADDLE_LEN]["remaining"] = 99999.0
 						m._update_paddle(0.0)
 						m.effects.ball_tier = 4
 						m.brick_accel = acc

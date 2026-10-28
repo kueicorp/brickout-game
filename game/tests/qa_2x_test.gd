@@ -405,10 +405,15 @@ func _t_gun_geometry() -> void:
 	var lc := _barrel_cols("d13_paddle_gun_left")
 	var rc := _barrel_cols("d13_paddle_gun_right")
 	print("INFO gun barrel source cols: left %s, right %s" % [lc, rc])
-	for length_item in ["", "paddle_len_min", "paddle_len_down_2", "paddle_len_2", "paddle_len_max"]:
+	# 2026-10-28:「擋板最大化」已移除;"max" = 大幅增加 ×4(85 × 1.6^4 → 夾到 320)
+	for length_item in ["", "paddle_len_min", "paddle_len_down_2", "paddle_len_2", "max"]:
 		var m = _fresh()
 		m._apply_item("gun")
-		if length_item != "":
+		if length_item == "max":
+			for i in 4:
+				m._apply_item("paddle_len_2")
+			_eq(m._paddle_len(), 320, "max: 4 x paddle_len_2 -> 320")
+		elif length_item != "":
 			m._apply_item(length_item)
 		var len: int = m._paddle_len()
 		m.paddle_x = 20.0 + len / 2.0 if len == 320 else 180.0

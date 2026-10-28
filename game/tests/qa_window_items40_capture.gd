@@ -1,5 +1,5 @@
 ## QA 視窗短測(非 headless):D32 掉落道具 40×40 與接取閃光 48×48(art/items40)。
-## - 27 種道具 F1(減少動態)、F2(動態時截到的 F2 幀)以 1 倍逐像素對照原圖;位置 = 磚中心 − 20(含小數 pos)。
+## - 26 種道具(2026-10-28 刪「擋板最大化」)F1(減少動態)、F2(動態時截到的 F2 幀)以 1 倍逐像素對照原圖;位置 = 磚中心 − 20(含小數 pos)。
 ## - 閃光 F1~F3 逐像素對照原圖(半透明像素依背景混色比對);中心 = 道具中心。
 ## - 呼吸:F1、F2 各 400 ms 共用時鐘(每幀截圖對照繪圖當下的 ticks);減少動態時固定 F1。
 ## - 道具以外的畫面不多畫(和背景截圖比對)。
@@ -113,6 +113,7 @@ func _setup() -> void:
 
 func _place() -> void:
 	var ids: Array = ItemDefs.BUFF + ItemDefs.DEBUFF
+	_report("26 item ids, no paddle_len_max", ids.size() == 26 and not ids.has("paddle_len_max"), str(ids.size()))
 	for k in ids.size():
 		var cell := Vector2i(k % 8, (k / 8) * 2)   # 第 0、2、4、6 排;含最左、最右欄
 		var pos: Vector2 = _m._cell_rect(cell).get_center() - Vector2(8, 8)

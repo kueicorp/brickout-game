@@ -1,10 +1,10 @@
-## 道具定義:27 張圖示對應 23 種效果(擋板長度增、減各 3 張圖)。
+## 道具定義:26 張圖示對應 22 種效果(擋板長度增 2 張、減 3 張圖;「擋板最大化」已移除,圖檔保留不用)。
 ## 名稱與說明照 docs/design/ui-menus.md D29 第六節(「｜」換行處拆成陣列)。
 class_name ItemDefs
 extends RefCounted
 
 const BUFF := [
-	"paddle_len_1", "paddle_len_2", "paddle_len_max", "pierce", "flame", "bomb", "slow",
+	"paddle_len_1", "paddle_len_2", "pierce", "flame", "bomb", "slow",
 	"split", "reinforce", "sticky", "golden_ball", "paddle_speed", "gun",
 ]
 const DEBUFF := [
@@ -19,31 +19,30 @@ const CONFIG_PATH := "res://data/game_config.tres"
 ## id → [名稱, 說明各行]。{鍵} 由 desc_lines 換成設定檔的值(對照見 _values),
 ## 改設定檔後說明文字跟著變;沒有對應設定欄位的數字(1階、2倍等)維持寫死。
 const TEXT := {
-	"paddle_len_1": ["擋板小幅增加", ["長度變成{len_small_up}倍", "持續{dur}秒"]],
-	"paddle_len_2": ["擋板大幅增加", ["長度變成{len_big_up}倍", "持續{dur}秒"]],
-	"paddle_len_max": ["擋板最大化", ["變成整個關卡區寬", "持續{dur}秒"]],
-	"pierce": ["穿透", ["穿過磚塊並減1層", "持續{dur}秒"]],
-	"flame": ["火焰", ["撞到的磚塊減{flame_damage}層", "周圍一圈減{flame_splash}層", "持續{dur}秒"]],
-	"bomb": ["炸彈", ["撞到的磚塊被標記", "{dur}秒後全部爆炸"]],
+	"paddle_len_1": ["擋板小幅增加", ["長度變成{len_small_up}倍", "持續{dur_paddle_len}秒"]],
+	"paddle_len_2": ["擋板大幅增加", ["長度變成{len_big_up}倍", "持續{dur_paddle_len}秒"]],
+	"pierce": ["穿透", ["穿過磚塊並減1層", "持續{dur_pierce}秒"]],
+	"flame": ["火焰", ["撞到的磚塊減{flame_damage}層", "周圍一圈減{flame_splash}層", "持續{dur_flame}秒"]],
+	"bomb": ["炸彈", ["撞到的磚塊被標記", "{dur_bomb}秒後全部爆炸"]],
 	"slow": ["減速", ["球速下降1階"]],
 	"split": ["分裂", ["場上的球變2倍"]],
 	"reinforce": ["強化", ["每次撞磚多減1層", "最多加{reinforce_max}層"]],
-	"sticky": ["吸附", ["球碰到擋板會黏住", "點一下才發射"]],
+	"sticky": ["吸附", ["球碰到擋板會黏住", "點一下才發射", "持續{dur_sticky}秒"]],
 	"golden_ball": ["金球", ["三選一"]],
 	"paddle_speed": ["擋板移動速度增加", ["移動速度上升1階"]],
-	"gun": ["槍", ["點畫面任何位置", "擋板兩端各射1發", "減1層 不觸發功能磚"]],
-	"paddle_len_down_1": ["擋板小幅減少", ["長度變成{len_small_down}倍", "持續{dur}秒"]],
-	"paddle_len_down_2": ["擋板大幅減少", ["長度變成{len_big_down}倍", "持續{dur}秒"]],
-	"paddle_len_min": ["擋板最短化", ["縮到最短，持續{dur}秒"]],
+	"gun": ["槍", ["點畫面，兩端各射1發", "減1層 不觸發功能磚", "持續{dur_gun}秒"]],
+	"paddle_len_down_1": ["擋板小幅減少", ["長度變成{len_small_down}倍", "持續{dur_paddle_len}秒"]],
+	"paddle_len_down_2": ["擋板大幅減少", ["長度變成{len_big_down}倍", "持續{dur_paddle_len}秒"]],
+	"paddle_len_min": ["擋板最短化", ["縮到最短，持續{dur_paddle_len}秒"]],
 	"fast": ["加速", ["球速上升1階"]],
 	"paddle_speed_down": ["擋板移動速度減少", ["移動速度下降1階"]],
 	"merge": ["融合", ["場上的球減半"]],
-	"heal": ["回血", ["撞到的磚塊加{heal_amount}層", "持續{dur}秒"]],
-	"heal_area": ["範圍回血", ["撞到的磚塊加{heal_area_amount}層", "周圍一圈加{heal_area_splash}層", "持續{dur}秒"]],
-	"blackhole": ["黑洞", ["球碰到擋板就消失", "持續{dur}秒"]],
+	"heal": ["回血", ["撞到的磚塊加{heal_amount}層", "持續{dur_heal}秒"]],
+	"heal_area": ["範圍回血", ["撞到的磚塊加{heal_area_amount}層", "周圍一圈加{heal_area_splash}層", "持續{dur_heal_area}秒"]],
+	"blackhole": ["黑洞", ["球碰到擋板就消失", "持續{dur_blackhole}秒"]],
 	"blackhole_big": ["大黑洞", ["全場的球只剩1顆"]],
-	"invincible": ["無敵", ["所有磚塊無法破壞", "魔王除外，持續{dur}秒"]],
-	"invisible": ["隱形", ["擋板變成透明", "持續{dur}秒"]],
+	"invincible": ["無敵", ["所有磚塊無法破壞", "魔王除外，持續{dur_invincible}秒"]],
+	"invisible": ["隱形", ["擋板變成透明", "持續{dur_invisible}秒"]],
 	"thief": ["小偷", ["偷走{thief_min}到{thief_max}分", "分數最低到0"]],
 	"black_ball": ["黑球", ["三選一"]],
 }
@@ -75,7 +74,10 @@ static func desc_lines(id: String) -> Array:
 ## TEXT 佔位鍵 → 設定值字串。整數值的 float 去掉「.0」(5.0 → 5、1.2 不變),符合 D29 寫法。
 static func _values(cfg: GameConfig) -> Dictionary:
 	var out := {
-		"dur": cfg.effect_duration, "len_small_up": cfg.len_small_up, "len_big_up": cfg.len_big_up,
+		"dur_paddle_len": cfg.dur_paddle_len, "dur_pierce": cfg.dur_pierce, "dur_flame": cfg.dur_flame,
+		"dur_bomb": cfg.dur_bomb, "dur_sticky": cfg.dur_sticky, "dur_gun": cfg.dur_gun, "dur_heal": cfg.dur_heal,
+		"dur_heal_area": cfg.dur_heal_area, "dur_blackhole": cfg.dur_blackhole,
+		"dur_invincible": cfg.dur_invincible, "dur_invisible": cfg.dur_invisible, "len_small_up": cfg.len_small_up, "len_big_up": cfg.len_big_up,
 		"len_small_down": cfg.len_small_down, "len_big_down": cfg.len_big_down,
 		"flame_damage": cfg.flame_damage, "flame_splash": cfg.flame_splash, "reinforce_max": cfg.reinforce_max,
 		"heal_amount": cfg.heal_amount, "heal_area_amount": cfg.heal_area_amount,

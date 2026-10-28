@@ -29,6 +29,13 @@ func _init() -> void:
 	_test_brick_accel()
 	_test_paddle_center()
 	_test_high_speed_no_tunnel()
+	_test_item_durations()
+	_test_sticky_gun_expiry()
+	_test_hud_icons()
+	_test_hud_len_cell()
+	_test_hud_order()
+	_test_hud_slots()
+	_test_paddle_in_wall_on_len_change()
 	# _init 時 root 還不在樹裡,加進去的節點不會跑 _ready;等一幀再測要用到樹的選單
 	await process_frame
 	_test_choice_menu_layout()
@@ -97,36 +104,55 @@ func _test_effect_time() -> void:
 
 func _test_paddle_length() -> void:
 	var cfg := GameConfig.new()
-	# 單一道具換算(README:基準 85、小增 102、大增 136、小減 68、大減 34、最大化 320、最短 32)
-	var expect := {"": 85, "paddle_len_1": 102, "paddle_len_2": 136, "paddle_len_max": 320,
+	# 單一道具換算(README:基準 85、小增 102、大增 136、小減 68、大減 34、最短 32)
+	var expect := {"": 85, "paddle_len_1": 102, "paddle_len_2": 136,
 		"paddle_len_down_1": 68, "paddle_len_down_2": 34, "paddle_len_min": 32}
 	for id in expect:
-		var e := Effects.new()
-		if id != "":
-			e.add_timed(id, 5.0)
-		_eq(_len(e, cfg), expect[id], "paddle length %s" % id)
+		_eq(_len(_with([id] if id != "" else []), cfg), expect[id], "paddle length %s" % id)
 	# 疊加相乘、上下限 32~320
 	_eq(_len(_with(["paddle_len_1", "paddle_len_2"]), cfg), 163, "85 x 1.2 x 1.6 -> 163.2 -> 163")
-	_eq(_len(_with(["paddle_len_max", "paddle_len_1"]), cfg), 320, "capped at 320")
-	_eq(_len(_with(["paddle_len_max", "paddle_len_2", "paddle_len_1"]), cfg), 320, "capped at 320 (three ups)")
+	_eq(_len(_with(["paddle_len_2", "paddle_len_2", "paddle_len_2"]), cfg), 320, "85 x 1.6^3 = 348 -> capped at 320")
 	_eq(_len(_with(["paddle_len_down_2", "paddle_len_min"]), cfg), 32, "floored at 32")
 	_eq(_len(_with(["paddle_len_down_2", "paddle_len_down_1"]), cfg), 32, "85 x 0.4 x 0.8 -> 27.2 -> floored at 32")
-	_eq(_len(_with(["paddle_len_max", "paddle_len_down_1"]), cfg), 256, "320 x 0.8")
 	_eq(_len(_with(["paddle_len_2", "paddle_len_down_2"]), cfg), 54, "85 x 1.6 x 0.4 -> 54.4 -> 54")
 	_eq(_len(_with(["paddle_len_1", "paddle_len_down_1"]), cfg), 82, "85 x 1.2 x 0.8 -> 81.6 -> 82")
+	_eq(_len(_with(["paddle_len_min", "paddle_len_2"]), cfg), 51, "min (32/85) x 1.6 -> 51.2 -> 51")
 	# 設定檔(實際遊戲用的)與程式預設值一致
 	var tres := load("res://data/game_config.tres") as GameConfig
 	_eq([tres.paddle_base_length, tres.paddle_min_length, tres.paddle_max_length], [85.0, 32, 320], "config paddle lengths")
+	_test_paddle_len_shared_timer(cfg)
+
+
+## 規格 B:所有長度道具共用一個 30 秒計時;每撿一個就再乘倍率並把計時重設為 30(不累加)。
+func _test_paddle_len_shared_timer(cfg: GameConfig) -> void:
+	var e := Effects.new()
+	e.add_paddle_len("paddle_len_1", cfg)
+	_eq([_len(e, cfg), e.remaining(Effects.PADDLE_LEN), e.total(Effects.PADDLE_LEN)], [102, 30.0, 30.0], "len_1: 102, timer 30")
+	e.tick(10.0)
+	e.add_paddle_len("paddle_len_1", cfg)
+	_eq([_len(e, cfg), e.remaining(Effects.PADDLE_LEN), e.total(Effects.PADDLE_LEN)], [122, 30.0, 30.0],
+		"same kind again: 85 -> 102 -> 122, timer reset to 30 (not 50)")
+	e.tick(5.0)
+	e.add_paddle_len("paddle_len_down_1", cfg)
+	_eq([_len(e, cfg), e.remaining(Effects.PADDLE_LEN)], [98, 30.0], "down_1 multiplies in: 85 x 1.44 x 0.8 -> 98, timer reset")
+	_eq(e.timed.keys(), [Effects.PADDLE_LEN], "length items share one timer entry")
+	e.add_timed("pierce", 40.0)
+	_eq(e.tick(29.9), [] as Array[String], "still active at 29.9 s")
+	_eq(e.tick(0.2), [Effects.PADDLE_LEN] as Array[String], "shared timer expires at 30 s")
+	_eq([_len(e, cfg), e.paddle_factor, e.paddle_min, e.is_active("pierce")], [85, 1.0, false, true],
+		"expired: back to 85, other timed effects untouched")
+	e.add_paddle_len("paddle_len_min", cfg)
+	_eq([_len(e, cfg), e.paddle_min], [32, true], "min after expiry starts fresh from 85")
 
 
 func _len(e: Effects, cfg: GameConfig) -> int:
-	return Rules.paddle_length(cfg.paddle_base_length, e.paddle_factors(cfg), cfg.paddle_min_length, cfg.paddle_max_length)
+	return Rules.paddle_length(cfg.paddle_base_length, [e.paddle_factor], cfg.paddle_min_length, cfg.paddle_max_length)
 
 
 func _with(ids: Array) -> Effects:
 	var e := Effects.new()
 	for id in ids:
-		e.add_timed(id, 5.0)
+		e.add_paddle_len(id, GameConfig.new())
 	return e
 
 
@@ -183,12 +209,18 @@ func _test_hud_bars() -> void:
 
 
 func _test_items() -> void:
-	_eq(ItemDefs.BUFF.size() + ItemDefs.DEBUFF.size(), 27, "27 icons")
+	_eq(ItemDefs.BUFF.size() + ItemDefs.DEBUFF.size(), 26, "26 icons (paddle_len_max removed)")
 	for id in ItemDefs.BUFF + ItemDefs.DEBUFF:
 		_eq(ResourceLoader.exists(ItemDefs.icon_path(id, false)) and ResourceLoader.exists(ItemDefs.icon_path(id, true)), true, "icon exists %s" % id)
 		_eq(ItemDefs.TEXT.has(id), true, "text exists %s" % id)
+	# 擋板最大化已移除:不在掉落池、金球池、說明表;圖檔也已刪除
+	var all_pools: Array = ItemDefs.drop_pool(true, true) + ItemDefs.drop_pool(false, true) \
+		+ ItemDefs.choice_pool(true, true) + ItemDefs.choice_pool(false, true)
+	_eq(["paddle_len_max" in all_pools, ItemDefs.exists("paddle_len_max"), ItemDefs.TEXT.has("paddle_len_max")],
+		[false, false, false], "paddle_len_max not in any pool / text")
+	_eq(ResourceLoader.exists("res://art/items40/d32_item_paddle_len_max_f1.png"), false, "paddle_len_max art removed")
 	var gold := ItemDefs.choice_pool(true, false)
-	_eq([gold.size(), "golden_ball" in gold], [12, false], "golden pool 12 without golden ball")
+	_eq([gold.size(), "golden_ball" in gold], [11, false], "golden pool 11 without golden ball")
 	var dark := ItemDefs.choice_pool(false, false)
 	_eq([dark.size(), "black_ball" in dark, "thief" in dark], [12, false, false], "black pool 12, no thief on new level")
 	_eq(ItemDefs.choice_pool(false, true).size(), 13, "black pool 13 with thief on replay")
@@ -205,20 +237,27 @@ func _test_items() -> void:
 		ok = ok and picks.size() == 3 and uniq.size() == 3
 	_eq(ok, true, "3 distinct picks from pool")
 	# 說明文字從設定檔產生:預設值要與 D29 字面一致,改設定後跟著變
-	_eq(ItemDefs.desc_lines("paddle_len_1"), ["長度變成1.2倍", "持續5秒"], "D29 text paddle_len_1")
-	_eq(ItemDefs.desc_lines("bomb"), ["撞到的磚塊被標記", "5秒後全部爆炸"], "D29 text bomb")
+	_eq(ItemDefs.desc_lines("paddle_len_1"), ["長度變成1.2倍", "持續30秒"], "D29 text paddle_len_1")
+	_eq(ItemDefs.desc_lines("bomb"), ["撞到的磚塊被標記", "10秒後全部爆炸"], "D29 text bomb")
 	_eq(ItemDefs.desc_lines("thief"), ["偷走500到5000分", "分數最低到0"], "D29 text thief")
-	_eq(ItemDefs.desc_lines("heal_area"), ["撞到的磚塊加2層", "周圍一圈加1層", "持續5秒"], "D29 text heal_area")
+	_eq(ItemDefs.desc_lines("heal_area"), ["撞到的磚塊加2層", "周圍一圈加1層", "持續10秒"], "D29 text heal_area")
+	_eq(ItemDefs.desc_lines("gun"), ["點畫面，兩端各射1發", "減1層 不觸發功能磚", "持續10秒"], "D29 text gun")
+	_eq(ItemDefs.desc_lines("sticky"), ["球碰到擋板會黏住", "點一下才發射", "持續30秒"], "D29 text sticky")
+	_test_item_text_matches_doc()
 	var cfg := load(ItemDefs.CONFIG_PATH) as GameConfig
-	var old := [cfg.effect_duration, cfg.thief_min, cfg.thief_max]
-	cfg.effect_duration = 7.5
+	var old := [cfg.dur_invincible, cfg.dur_paddle_len, cfg.thief_min, cfg.thief_max]
+	cfg.dur_invincible = 7.5
+	cfg.dur_paddle_len = 12.0
 	cfg.thief_min = 100
 	cfg.thief_max = 900
-	_eq(ItemDefs.desc_lines("invincible"), ["所有磚塊無法破壞", "魔王除外，持續7.5秒"], "text follows effect_duration")
+	_eq(ItemDefs.desc_lines("invincible"), ["所有磚塊無法破壞", "魔王除外，持續7.5秒"], "text follows dur_invincible")
+	_eq([ItemDefs.desc_lines("paddle_len_down_2")[1], ItemDefs.desc_lines("paddle_len_min")[0]],
+		["持續12秒", "縮到最短，持續12秒"], "text follows dur_paddle_len")
 	_eq(ItemDefs.desc_lines("thief")[0], "偷走100到900分", "text follows thief range")
-	cfg.effect_duration = old[0]
-	cfg.thief_min = old[1]
-	cfg.thief_max = old[2]
+	cfg.dur_invincible = old[0]
+	cfg.dur_paddle_len = old[1]
+	cfg.thief_min = old[2]
+	cfg.thief_max = old[3]
 	# 每個說明都不能殘留未代入的 {鍵}
 	var leftover := []
 	for id in ItemDefs.TEXT:
@@ -226,6 +265,34 @@ func _test_items() -> void:
 			if "{" in line:
 				leftover.append(id)
 	_eq(leftover, [], "no unfilled placeholders")
+
+
+## 說明文字逐字對照 docs/design/ui-menus.md D29 第六節表格(「| `item_<id>` | 名稱 | 說明(｜換行) |」)。
+func _test_item_text_matches_doc() -> void:
+	var path := ProjectSettings.globalize_path("res://").path_join("../docs/design/ui-menus.md")
+	var f := FileAccess.open(path, FileAccess.READ)
+	_eq(f != null, true, "ui-menus.md readable")
+	if f == null:
+		return
+	var re := RegEx.create_from_string("^\\s*\\| `item_(\\w+)` \\| ([^|]+) \\| ([^|]+) \\|")
+	var seen := []
+	var bad := []
+	for line in f.get_as_text().split("\n"):
+		var m := re.search(line)
+		if m == null:
+			continue
+		var id := m.get_string(1)
+		seen.append(id)
+		# 「小偷（僅重複關卡）」的括號是給工程師的條件,畫面只顯示「小偷」
+		var name := m.get_string(2).strip_edges().replace("（僅重複關卡）", "")
+		var lines := Array(m.get_string(3).strip_edges().split("｜"))
+		if not ItemDefs.TEXT.has(id) or ItemDefs.item_name(id) != name or ItemDefs.desc_lines(id) != lines:
+			bad.append(id)
+	_eq(bad, [], "item text matches D29 table")
+	var ids := (ItemDefs.BUFF + ItemDefs.DEBUFF).filter(func(id: String) -> bool: return id not in ["golden_ball", "black_ball"])
+	seen.sort()
+	ids.sort()
+	_eq(seen, ids, "D29 table lists exactly the 24 non-menu items")
 
 
 func _test_level() -> void:
@@ -264,8 +331,12 @@ func _test_config() -> void:
 	_eq(cfg != null, true, "config loads as GameConfig")
 	if cfg == null:
 		return
-	_eq([cfg.ball_speed, cfg.paddle_speed, cfg.drop_chance, cfg.effect_duration, cfg.game_time],
-		[240.0, 450.0, 0.3, 5.0, 300.0], "config basic values")
+	_eq([cfg.ball_speed, cfg.paddle_speed, cfg.drop_chance, cfg.game_time],
+		[240.0, 450.0, 0.3, 300.0], "config basic values")
+	_eq([cfg.dur_paddle_len, cfg.dur_pierce, cfg.dur_flame, cfg.dur_bomb, cfg.dur_sticky, cfg.dur_gun,
+		cfg.dur_heal, cfg.dur_heal_area, cfg.dur_blackhole, cfg.dur_invincible, cfg.dur_invisible],
+		[30.0, 20.0, 20.0, 10.0, 30.0, 10.0, 10.0, 10.0, 5.0, 10.0, 10.0], "config item durations (README)")
+	_eq("effect_duration" in cfg, false, "shared effect_duration removed")
 	_eq([cfg.debug_force_item, cfg.debug_start_balls], ["", 1], "debug defaults")
 
 
@@ -370,7 +441,7 @@ func _test_item_rect() -> void:
 	m.free()
 
 
-## D32 掉落道具 27 種 × F1/F2 都是 40×40、接取閃光 3 幀都是 48×48,而且 _t 會到 art/items40 找。
+## D32 掉落道具 26 種 × F1/F2 都是 40×40、接取閃光 3 幀都是 48×48,而且 _t 會到 art/items40 找。
 func _test_item_textures() -> void:
 	var m := _bare_main()
 	var bad := []
@@ -386,7 +457,7 @@ func _test_item_textures() -> void:
 		var tex: Texture2D = m._t("d32_item_pickup_f%d" % f)
 		if tex == null or tex.get_size() != Vector2(48, 48):
 			bad.append("pickup_f%d" % f)
-	_eq([count, bad], [57, []], "57 D32 item textures load with correct size")
+	_eq([count, bad], [55, []], "55 D32 item textures load with correct size (26 x 2 + 3)")
 	_eq(m._t("d32_item_slow_f1").resource_path, "res://art/items40/d32_item_slow_f1.png", "d32 loads from art/items40")
 	m.free()
 
@@ -482,7 +553,7 @@ func _test_scaled_geometry() -> void:
 	_eq(m.balls.size(), 1, "only ball whose top passed view_h is removed")
 	_eq(m.balls[0].pos.y < vh + 8.0, true, "ball still touching screen kept")
 	# 槍:原尺寸子彈 4 寬置中於放大後砲管(槍端 16 寬的第 4~11 欄),從砲管上方射出
-	m.effects.gun = true
+	m._apply_item("gun")
 	m._fire_gun()
 	var left: int = m._paddle_left(m._paddle_len())
 	_eq(m.bullets, [Vector2(left + 6, 739), Vector2(left + 85 - 16 + 6, 739)], "bullets centered on 2x barrels")
@@ -655,7 +726,7 @@ func _test_paddle_accel() -> void:
 	_eq(is_equal_approx(m.brick_accel, 0.005), true, "bounce counted once")
 	# 吸附:黏住那次 +0.005,之後跟著擋板移動好幾幀都不加
 	m.brick_accel = 0.0
-	m.effects.sticky = true
+	m._apply_item("sticky")
 	b.pos = Vector2(180, py - 4)
 	b.dir = Vector2(0, 1)
 	m.balls.assign([b])
@@ -664,7 +735,7 @@ func _test_paddle_accel() -> void:
 	for i in 30:
 		m._update_balls(1.0 / 60.0)
 	_eq(is_equal_approx(m.brick_accel, 0.005), true, "sticky: following paddle adds nothing")
-	m.effects.sticky = false
+	m.effects.timed.erase("sticky")
 	# 黑洞:球碰擋板消失,不加速
 	m.brick_accel = 0.0
 	m.effects.add_timed("blackhole", 5.0)
@@ -715,7 +786,7 @@ func _test_paddle_center() -> void:
 		m._ball_paddle(b, left, length, py)
 		_eq(b.dir.is_equal_approx(Vector2.UP), true, "len %d: center hit bounces at 0 deg (dir %s)" % [length, b.dir])
 		# 吸附:打在畫出來的正中央 → 黏住的球圓心 = 畫出來的中心
-		m.effects.sticky = true
+		m._apply_item("sticky")
 		b.pos = Vector2(center, py - 4)
 		b.dir = Vector2(0, 1)
 		m._ball_paddle(b, left, length, py)
@@ -793,3 +864,297 @@ func _test_high_speed_no_tunnel() -> void:
 							break
 					_eq([ok, bounced], [true, true], "dt %.3f len %d x %.1f angle %d: ball bounces off paddle at 3.2x" % [dt, length, tx, a])
 			p.free()
+
+
+## 規格 A:各限時道具撿到後的秒數;擋板長度以外再撿到累積;沒寫秒數的道具維持整局(不進計時)。
+func _test_item_durations() -> void:
+	var expect := {"pierce": 20.0, "flame": 20.0, "bomb": 10.0, "sticky": 30.0, "gun": 10.0, "heal": 10.0,
+		"heal_area": 10.0, "blackhole": 5.0, "invincible": 10.0, "invisible": 10.0}
+	for id in expect:
+		var m := _bare_main()
+		m._apply_item(id)
+		_eq([m.effects.remaining(id), m.effects.total(id)], [expect[id], expect[id]], "%s lasts %d s" % [id, expect[id]])
+		m.effects.tick(1.0)
+		m._apply_item(id)
+		_eq(m.effects.remaining(id), expect[id] * 2.0 - 1.0, "%s picked again accumulates" % id)
+		m.free()
+	for id in ["paddle_len_1", "paddle_len_2", "paddle_len_down_1", "paddle_len_down_2", "paddle_len_min"]:
+		var m := _bare_main()
+		m._apply_item(id)
+		_eq([m.effects.timed.keys(), m.effects.remaining(Effects.PADDLE_LEN)], [[Effects.PADDLE_LEN], 30.0], "%s uses shared 30 s timer" % id)
+		m.free()
+	var w := _bare_main()
+	for id in ["slow", "fast", "split", "reinforce", "paddle_speed", "paddle_speed_down", "merge", "blackhole_big", "thief",
+		"golden_ball", "black_ball"]:
+		w._apply_item(id)
+	_eq(w.effects.timed.is_empty(), true, "whole-game items are not timed")
+	w.free()
+
+
+## 吸附到期:黏住的球保留到點擊才發射,新碰到擋板的球反彈。槍到期:不再發射,飛行中的子彈照常飛。
+func _test_sticky_gun_expiry() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _bare_main()
+	_empty_grid(m)
+	var py: int = m._paddle_y()
+	m._apply_item("sticky")
+	var a = main_script.Ball.new()
+	a.pos = Vector2(180, py - 4)
+	a.dir = Vector2.DOWN
+	m.balls.assign([a])
+	m._update_balls(0.01)
+	_eq(a.stuck, true, "sticky: ball sticks")
+	_eq(m.effects.tick(30.0), ["sticky"] as Array[String], "sticky expires at 30 s")
+	m._update_balls(0.5)
+	_eq([a.stuck, a.pos.y], [true, py - 8.0], "sticky expired: stuck ball stays on paddle")
+	var b = main_script.Ball.new()
+	b.pos = Vector2(200, py - 4)
+	b.dir = Vector2.DOWN
+	m.balls.append(b)
+	m._update_balls(0.01)
+	_eq([b.stuck, b.dir.y < 0.0], [false, true], "sticky expired: new ball bounces")
+	_touch(m, 100, false)
+	_eq([a.stuck, a.dir.y < 0.0], [false, true], "sticky expired: stuck ball launches on tap release")
+	# 槍
+	m._apply_item("gun")
+	m._fire_gun()
+	_eq(m.bullets.size(), 2, "gun fires 2 bullets")
+	m.gun_cd = 0.0
+	_eq(m.effects.tick(10.0), ["gun"] as Array[String], "gun expires at 10 s")
+	m._fire_gun()
+	_eq(m.bullets.size(), 2, "gun expired: no new bullets")
+	var y0: float = m.bullets[0].y
+	m._update_bullets(0.01)
+	_eq([m.bullets.size(), m.bullets[0].y < y0], [2, true], "gun expired: flying bullets keep flying")
+	m.free()
+
+
+## 規格 D:HUD 圖示改用 art/hud32 的 D34 32×32 圖(fever 只對好路徑)。
+func _test_hud_icons() -> void:
+	var m := _bare_main()
+	var bad := []
+	for id in ["reinforce", "slow", "fast", "pierce", "flame", "bomb", "fever", "paddle_len_up1", "paddle_len_down1"]:
+		var tex: Texture2D = m._t("d34_hud_icon_" + id)
+		if tex == null or tex.get_size() != Vector2(32, 32) or tex.resource_path != "res://art/hud32/d34_hud_icon_%s.png" % id:
+			bad.append(id)
+	_eq(bad, [], "9 D34 HUD icons load from art/hud32 as 32x32")
+	m.effects.reinforce = 2
+	m.effects.ball_tier = -1
+	m._apply_item("pierce")
+	m._apply_item("flame")
+	m._apply_item("bomb")
+	_eq(m._hud_cells().map(func(c: Array) -> String: return c[0]),
+		["d34_hud_icon_reinforce", "d34_hud_icon_slow", "d34_hud_icon_pierce", "d34_hud_icon_flame", "d34_hud_icon_bomb"],
+		"D34 icons; same-frame gains use fixed order")
+	m.effects.ball_tier = 2
+	_eq(m._hud_cells()[1][0], "d34_hud_icon_fast", "fast uses D34 icon")
+	m.free()
+
+
+## 規格 E:擋板長度格的顯示條件、圖示、時間條;只有擋板長度格時不亮光暈。
+func _test_hud_len_cell() -> void:
+	var m := _bare_main()
+	_eq(m._hud_len_cell(), [], "no length effect: no cell")
+	m._apply_item("paddle_len_1")
+	_eq(m._hud_len_cell(), ["d34_hud_icon_paddle_len_up1", {"fill": 20, "color": Pal.W}], "102 > 85: + icon, full bar")
+	_eq([m._hud_cells().size(), m._halo_on()], [1, false], "length cell alone: shown in list, no halo")
+	m.effects.tick(15.0)
+	_eq(m._hud_len_cell()[1]["fill"], 10, "bar = remaining 15 / 30")
+	m._apply_item("paddle_len_down_1")
+	_eq([m._paddle_len(), m._hud_len_cell()], [82, ["d34_hud_icon_paddle_len_down1", {"fill": 20, "color": Pal.W}]],
+		"82 < 85: - icon, bar reset to full")
+	# 最後 1 秒閃爍(剩 0.95 → 第 9 個 100 ms 為奇數 → G);減少動態時不閃
+	m.effects.tick(29.05)
+	_eq(m._hud_len_cell()[1], {"fill": 1, "color": Pal.G}, "last second blinks")
+	m.reduced_motion = true
+	_eq(m._hud_len_cell()[1]["color"], Pal.W, "reduced motion: no blink")
+	m.effects.tick(1.0)
+	_eq([m._hud_len_cell(), m._paddle_len()], [[], 85], "expired: no cell, back to 85")
+	# 最短化生效中:乘到比 85 長仍顯示 −
+	m._apply_item("paddle_len_min")
+	for i in 3:
+		m._apply_item("paddle_len_2")
+	_eq([m._paddle_len() > 85, m._hud_len_cell()[0]], [true, "d34_hud_icon_paddle_len_down1"], "min active: - icon even when > 85")
+	m.free()
+	# 實際長度剛好 85:不顯示,但計時照走
+	var e := _bare_main()
+	var old_up: float = e.cfg.len_small_up
+	e.cfg.len_small_up = 1.25
+	e._apply_item("paddle_len_1")
+	e._apply_item("paddle_len_down_1")
+	_eq([e._paddle_len(), e._hud_len_cell(), e.effects.is_active(Effects.PADDLE_LEN)], [85, [], true], "length = 85: hidden, timer runs")
+	e.cfg.len_small_up = old_up
+	e.free()
+
+
+## 本幀更新後的獲得順序清單(轉成一般陣列方便比對)。
+func _order(m: Node2D) -> Array:
+	m._hud_cells()
+	var out := []
+	out.assign(m.hud_order)
+	return out
+
+
+## D35:HUD 依獲得順序排列(R1~R12)、光暈條件。
+func _test_hud_order() -> void:
+	var m := _bare_main()
+	_eq(_order(m), [], "empty list")
+	# R1 新獲得接在最後;R2 移除後補位、再獲得排最後
+	m._apply_item("flame")
+	_eq(_order(m), ["flame"], "R1 flame")
+	m.effects.tick(15.0)
+	m._apply_item("reinforce")
+	_eq(_order(m), ["flame", "reinforce"], "R1 reinforce appended")
+	m._apply_item("bomb")
+	_eq(_order(m), ["flame", "reinforce", "bomb"], "R1 bomb appended")
+	m.effects.tick(5.0)
+	_eq(_order(m), ["reinforce", "bomb"], "R2 flame expired: rest move up")
+	m._apply_item("flame")
+	_eq(_order(m), ["reinforce", "bomb", "flame"], "R2 flame again counts as new")
+	# R3 存在中再獲得:位置不動,只更新內容
+	m._apply_item("flame")
+	m._apply_item("reinforce")
+	_eq(_order(m), ["reinforce", "bomb", "flame"], "R3 same kind again: order kept")
+	_eq(m._hud_cells()[0][1]["filled"], 2, "R3 reinforce bar updated to 2")
+	# R11 同一幀到期又再獲得:視為一直存在
+	m.effects.tick(m.effects.remaining("bomb"))
+	m._apply_item("bomb")
+	_eq(_order(m), ["reinforce", "bomb", "flame"], "R11 expire + regain same frame: order kept")
+	m.free()
+
+	# R4 速度淨階數歸 0 移除,再非 0 排最後;R5 一次跨過 0 位置不動、只換圖示
+	var s := _bare_main()
+	s._apply_item("fast")
+	_order(s)
+	s._apply_item("reinforce")
+	_eq(_order(s), ["speed", "reinforce"], "R4 setup")
+	s._apply_item("slow")
+	_eq(_order(s), ["reinforce"], "R4 net 0: speed removed")
+	s._apply_item("slow")
+	_eq([_order(s), s._hud_cells()[1][0]], [["reinforce", "speed"], "d34_hud_icon_slow"], "R4 non-zero again: appended")
+	s._apply_item("bomb")
+	s.effects.ball_tier = 1
+	_eq([_order(s), s._hud_cells()[1][0]], [["reinforce", "speed", "bomb"], "d34_hud_icon_fast"], "R5 jump over 0: same slot, icon flips")
+	s.free()
+
+	# R6 擋板長度回到 85 移除,再 ≠ 85 排最後;R7 +/− 翻轉沒經過 85 位置不動
+	var p := _bare_main()
+	p._apply_item("paddle_len_1")
+	_order(p)
+	p._apply_item("reinforce")
+	_eq(_order(p), [Effects.PADDLE_LEN, "reinforce"], "R6 setup")
+	p.effects.tick(30.0)
+	_eq(_order(p), ["reinforce"], "R6 back to 85: removed")
+	p._apply_item("paddle_len_down_1")
+	_order(p)
+	p._apply_item("bomb")
+	_eq([_order(p), p._hud_cells()[1][0]], [["reinforce", Effects.PADDLE_LEN, "bomb"], "d34_hud_icon_paddle_len_down1"],
+		"R6 != 85 again: appended (then bomb)")
+	p._apply_item("paddle_len_2")
+	_eq([p._paddle_len() > 85, _order(p), p._hud_cells()[1][0]],
+		[true, ["reinforce", Effects.PADDLE_LEN, "bomb"], "d34_hud_icon_paddle_len_up1"], "R7 - to + without 85: same slot")
+	p.free()
+
+	# R10 同一幀多個新增依固定順序;先移除再新增
+	var f := _bare_main()
+	for id in ["paddle_len_1", "bomb", "flame", "pierce", "fast", "reinforce"]:
+		f._apply_item(id)
+	_eq(_order(f), ["reinforce", "speed", "pierce", "flame", "bomb", Effects.PADDLE_LEN], "R10 same-frame gains in fixed order")
+	f.effects.tick(10.0)
+	f.effects.reinforce = 0
+	_eq(_order(f), ["speed", "pierce", "flame", Effects.PADDLE_LEN], "bomb and reinforce gone")
+	# 同一幀:穿透、火焰到期,同時獲得炸彈與強化 → 先移除,再依固定順序(強化 → 炸彈)接在最後
+	f.effects.tick(10.0)
+	f._apply_item("bomb")
+	f._apply_item("reinforce")
+	_eq(_order(f), ["speed", Effects.PADDLE_LEN, "reinforce", "bomb"], "R10 removals first, then same-frame gains in fixed order")
+	f.free()
+
+	# R8 附魔開局建立、永不移除;附魔與限時穿透同時在開局時穿透在前
+	var a := _bare_main()
+	a.effects.enchant = "flame"
+	_eq(_order(a), ["flame"], "R8 enchant flame built at start")
+	a._apply_item("reinforce")
+	a._apply_item("flame")
+	a.effects.tick(1000.0)
+	_eq(_order(a), ["flame", "reinforce"], "R8 enchant never removed, regain keeps slot")
+	a.free()
+	var b := _bare_main()
+	b.effects.enchant = "flame"
+	b._apply_item("pierce")
+	_eq(_order(b), ["pierce", "flame"], "R8/R10 start: pierce before flame")
+	b.free()
+	# R12 重玩 = 場景重新載入、新實例:清單只由附魔重建
+	var r := _bare_main()
+	r.effects.enchant = "pierce"
+	_eq(_order(r), ["pierce"], "R12 fresh game: only enchant")
+	r.free()
+
+	# fever 玩法未做:球數 ≥ 50 也不出現
+	var v := _bare_main()
+	for i in 60:
+		v.balls.append(load("res://scripts/main.gd").Ball.new())
+	_eq(_order(v), [], "fever not implemented: never in list")
+	# 光暈:清單中有非擋板長度的格才亮
+	_eq(v._halo_on(), false, "halo off: empty")
+	v._apply_item("paddle_len_down_1")
+	_order(v)
+	_eq(v._halo_on(), false, "halo off: only length")
+	v._apply_item("bomb")
+	_order(v)
+	_eq(v._halo_on(), true, "halo on: length + bomb")
+	v.effects.tick(10.0)
+	_order(v)
+	_eq(v._halo_on(), false, "halo off: bomb gone")
+	v.free()
+
+
+## D35 方案 C 格位:每欄格數 = floor((H − 473) / 52),欄由左到右、欄內由上到下;跨欄補位。
+func _test_hud_slots() -> void:
+	var m := _bare_main()
+	var expect := {
+		800: [Vector2(24, 424), Vector2(24, 476), Vector2(24, 528), Vector2(24, 580), Vector2(24, 632), Vector2(24, 684), Vector2(76, 424)],
+		707: [Vector2(24, 424), Vector2(24, 476), Vector2(24, 528), Vector2(24, 580), Vector2(76, 424), Vector2(76, 476), Vector2(76, 528)],
+		640: [Vector2(24, 424), Vector2(24, 476), Vector2(24, 528), Vector2(76, 424), Vector2(76, 476), Vector2(76, 528), Vector2(128, 424)],
+	}
+	for h in expect:
+		m.view_h = h
+		_eq(range(7).map(func(i: int) -> Vector2: return m._hud_slot(i)), expect[h], "H %d: 7 slots" % h)
+	# 707 高:第 5 格在第 2 欄;前面一格結束後跨欄補到第 1 欄最後一格
+	m.view_h = 707
+	for id in ["reinforce", "fast", "pierce", "flame", "bomb"]:
+		m._apply_item(id)
+	_order(m)
+	_eq(m._hud_slot(m.hud_order.find("bomb")), Vector2(76, 424), "707: 5th cell in column 2")
+	m.effects.reinforce = 0
+	_order(m)
+	_eq(m._hud_slot(m.hud_order.find("bomb")), Vector2(24, 580), "707: cross-column refill")
+	m.free()
+
+
+## BUG-1:擋板長度到期或變長的那一幀,擋板就在牆內(左右都夾在 20~340)。
+func _test_paddle_in_wall_on_len_change() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _bare_main()
+	_empty_grid(m)
+	m.time_left = 100.0
+	var ball = main_script.Ball.new()
+	ball.stuck = true
+	m.balls.assign([ball])
+	m._apply_item("paddle_len_down_1")
+	m.target_x = 1000.0
+	m._update_paddle(10.0)
+	_eq(m._paddle_left(68) + 68, 340, "short paddle at right wall")
+	m.effects.tick(29.99)
+	m._step(0.02)
+	var left: int = m._paddle_left(m._paddle_len())
+	_eq([m._paddle_len(), left, left + m._paddle_len()], [85, 255, 340], "expiry frame: back to 85 and inside right wall")
+	# 貼牆時變長:同一幀就夾回牆內
+	m._apply_item("paddle_len_2")
+	var len2: int = m._paddle_len()
+	_eq(m._paddle_left(len2) + len2, 340, "grow at right wall: inside wall at once")
+	m.target_x = -1000.0
+	m._update_paddle(10.0)
+	m._apply_item("paddle_len_2")
+	_eq(m._paddle_left(m._paddle_len()), 20, "grow at left wall: inside wall at once")
+	m.free()

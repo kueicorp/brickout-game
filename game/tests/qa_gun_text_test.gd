@@ -4,7 +4,9 @@
 extends SceneTree
 
 const DOC := "../docs/design/ui-menus.md"
-const GUN := ["點畫面任何位置", "擋板兩端各射1發", "減1層 不觸發功能磚"]
+# 2026-10-28 道具秒數修訂:第 1 行合併為「點畫面，兩端各射1發」,新增第 3 行秒數(dur_gun = 10)
+const GUN := ["點畫面，兩端各射1發", "減1層 不觸發功能磚", "持續10秒"]
+const GUN_RAW := ["點畫面，兩端各射1發", "減1層 不觸發功能磚", "持續{dur_gun}秒"]
 
 var _passed := 0
 var _failed := 0
@@ -46,7 +48,7 @@ func _ok(cond: bool, label: String) -> void:
 
 func _t_literal() -> void:
 	_eq(ItemDefs.item_name("gun"), "槍", "name")
-	_eq(ItemDefs.TEXT["gun"][1], GUN, "raw TEXT")
+	_eq(ItemDefs.TEXT["gun"][1], GUN_RAW, "raw TEXT")
 	_eq(ItemDefs.desc_lines("gun"), GUN, "desc_lines")
 	_eq(ItemDefs.desc_lines("gun").size(), 3, "3 lines")
 
@@ -75,7 +77,7 @@ func _t_doc_line() -> void:
 
 
 func _t_space() -> void:
-	var s: String = ItemDefs.desc_lines("gun")[2]
+	var s: String = ItemDefs.desc_lines("gun")[1]
 	var i := s.find("層")
 	_eq(s.unicode_at(i + 1), 0x20, "char after 層 is U+0020")
 	_eq(s.count(" "), 1, "exactly one half-width space")
@@ -84,40 +86,41 @@ func _t_space() -> void:
 		_eq(l, l.strip_edges(), "no leading/trailing spaces: %s" % l)
 
 
-## 其他 26 個道具文字的快照(預設設定);槍以外任何改動都會失敗。
+## 其他 25 個道具文字的快照(預設設定,2026-10-28 道具秒數修訂後);槍以外任何改動都會失敗。
+## 「擋板最大化」已移除,不得再出現在 TEXT。
 func _t_others() -> void:
 	var expect := {
-		"paddle_len_1": ["擋板小幅增加", ["長度變成1.2倍", "持續5秒"]],
-		"paddle_len_2": ["擋板大幅增加", ["長度變成1.6倍", "持續5秒"]],
-		"paddle_len_max": ["擋板最大化", ["變成整個關卡區寬", "持續5秒"]],
-		"pierce": ["穿透", ["穿過磚塊並減1層", "持續5秒"]],
-		"flame": ["火焰", ["撞到的磚塊減2層", "周圍一圈減1層", "持續5秒"]],
-		"bomb": ["炸彈", ["撞到的磚塊被標記", "5秒後全部爆炸"]],
+		"paddle_len_1": ["擋板小幅增加", ["長度變成1.2倍", "持續30秒"]],
+		"paddle_len_2": ["擋板大幅增加", ["長度變成1.6倍", "持續30秒"]],
+		"pierce": ["穿透", ["穿過磚塊並減1層", "持續20秒"]],
+		"flame": ["火焰", ["撞到的磚塊減2層", "周圍一圈減1層", "持續20秒"]],
+		"bomb": ["炸彈", ["撞到的磚塊被標記", "10秒後全部爆炸"]],
 		"slow": ["減速", ["球速下降1階"]],
 		"split": ["分裂", ["場上的球變2倍"]],
 		"reinforce": ["強化", ["每次撞磚多減1層", "最多加7層"]],
-		"sticky": ["吸附", ["球碰到擋板會黏住", "點一下才發射"]],
+		"sticky": ["吸附", ["球碰到擋板會黏住", "點一下才發射", "持續30秒"]],
 		"golden_ball": ["金球", ["三選一"]],
 		"paddle_speed": ["擋板移動速度增加", ["移動速度上升1階"]],
-		"paddle_len_down_1": ["擋板小幅減少", ["長度變成0.8倍", "持續5秒"]],
-		"paddle_len_down_2": ["擋板大幅減少", ["長度變成0.4倍", "持續5秒"]],
-		"paddle_len_min": ["擋板最短化", ["縮到最短，持續5秒"]],
+		"paddle_len_down_1": ["擋板小幅減少", ["長度變成0.8倍", "持續30秒"]],
+		"paddle_len_down_2": ["擋板大幅減少", ["長度變成0.4倍", "持續30秒"]],
+		"paddle_len_min": ["擋板最短化", ["縮到最短，持續30秒"]],
 		"fast": ["加速", ["球速上升1階"]],
 		"paddle_speed_down": ["擋板移動速度減少", ["移動速度下降1階"]],
 		"merge": ["融合", ["場上的球減半"]],
-		"heal": ["回血", ["撞到的磚塊加1層", "持續5秒"]],
-		"heal_area": ["範圍回血", ["撞到的磚塊加2層", "周圍一圈加1層", "持續5秒"]],
+		"heal": ["回血", ["撞到的磚塊加1層", "持續10秒"]],
+		"heal_area": ["範圍回血", ["撞到的磚塊加2層", "周圍一圈加1層", "持續10秒"]],
 		"blackhole": ["黑洞", ["球碰到擋板就消失", "持續5秒"]],
 		"blackhole_big": ["大黑洞", ["全場的球只剩1顆"]],
-		"invincible": ["無敵", ["所有磚塊無法破壞", "魔王除外，持續5秒"]],
-		"invisible": ["隱形", ["擋板變成透明", "持續5秒"]],
+		"invincible": ["無敵", ["所有磚塊無法破壞", "魔王除外，持續10秒"]],
+		"invisible": ["隱形", ["擋板變成透明", "持續10秒"]],
 		"thief": ["小偷", ["偷走500到5000分", "分數最低到0"]],
 		"black_ball": ["黑球", ["三選一"]],
 	}
-	_eq(ItemDefs.TEXT.size(), 27, "TEXT has 27 ids")
+	_eq(ItemDefs.TEXT.size(), 26, "TEXT has 26 ids")
+	_ok(not ItemDefs.TEXT.has("paddle_len_max"), "paddle_len_max removed from TEXT")
 	for id in expect:
 		_eq([ItemDefs.item_name(id), ItemDefs.desc_lines(id)], expect[id], "unchanged %s" % id)
-	_eq(ItemDefs.BUFF.size() + ItemDefs.DEBUFF.size(), 27, "id lists unchanged size")
+	_eq(ItemDefs.BUFF.size() + ItemDefs.DEBUFF.size(), 26, "id lists size")
 	_ok(ItemDefs.is_buff("gun"), "gun still buff")
 
 
@@ -128,15 +131,16 @@ func _t_a11y() -> void:
 	var names := []
 	for o in menu._options:
 		names.append(o.accessibility_name)
-	_eq(names[1], "槍，點畫面任何位置，擋板兩端各射1發，減1層 不觸發功能磚，按兩下選擇", "gun a11y label")
+	_eq(names[1], "槍，點畫面，兩端各射1發，減1層 不觸發功能磚，持續10秒，按兩下選擇", "gun a11y label")
 	_eq(names[0], "減速，球速下降1階，按兩下選擇", "neighbour label unaffected")
 	for n in names:
 		_ok(not n.contains("雷射"), "no old wording: %s" % n)
 	menu.free()
 
 
-## 只印出寬度資訊(目前是預設字型,不列入通過/失敗);選項文字區寬 208 px。
+## 只印出寬度資訊(目前是預設字型,不列入通過/失敗);選項文字區寬 216 px(D29 修訂)。
+## 實際寬度驗收在 qa_durations_hud_test.gd(用選單實際字型)。
 func _t_width() -> void:
 	var font := ThemeDB.fallback_font
 	for l in ItemDefs.desc_lines("gun"):
-		print("INFO gun line width (fallback font, 22px): %s -> %d px (limit 208)" % [l, int(font.get_string_size(l, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x)])
+		print("INFO gun line width (fallback font, 22px): %s -> %d px (limit 216)" % [l, int(font.get_string_size(l, HORIZONTAL_ALIGNMENT_LEFT, -1, 22).x)])

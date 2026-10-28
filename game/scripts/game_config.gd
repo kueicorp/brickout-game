@@ -59,8 +59,19 @@ extends Resource
 @export var drop_chance := 0.3
 ## 掉落時是增益道具的機率(其餘為減益)。
 @export var buff_ratio := 0.5
-## 限時道具的持續秒數。
-@export var effect_duration := 5.0
+## 限時道具各自的持續秒數(README 道具一節);欄位名 = "dur_" + 道具 id,main.gd 以此對應。
+## 擋板長度 5 種道具共用 dur_paddle_len 一個計時(撿到就重設,不累加)。
+@export var dur_paddle_len := 30.0
+@export var dur_pierce := 20.0
+@export var dur_flame := 20.0
+@export var dur_bomb := 10.0
+@export var dur_sticky := 30.0
+@export var dur_gun := 10.0
+@export var dur_heal := 10.0
+@export var dur_heal_area := 10.0
+@export var dur_blackhole := 5.0
+@export var dur_invincible := 10.0
+@export var dur_invisible := 10.0
 ## 道具掉落速度(px/s;假設)。
 @export var item_fall_speed := 100.0
 @export var reinforce_max := 7

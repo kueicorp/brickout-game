@@ -458,14 +458,24 @@ func _t_high_speed_bricks() -> void:
 	m2.free()
 
 
+## 2026-10-28:長度改為 effects.add_paddle_len(倍率連乘 + 共用計時);「擋板最大化」已移除,
+## "max" 以大幅增加 ×4(85 × 1.6^4 = 557 → 夾到 320)代替。測試會跑很多秒的模擬時間,
+## 共用計時給足時間,避免中途到期變回 85。
+func _set_len(m, item: String) -> void:
+	if item == "":
+		return
+	var ids := ["paddle_len_2", "paddle_len_2", "paddle_len_2", "paddle_len_2"] if item == "max" else [item]
+	for id in ids:
+		m.effects.add_paddle_len(id, m.cfg)
+	m.effects.timed[Effects.PADDLE_LEN]["remaining"] = 99999.0
+
+
 ## 3.2 倍速往下撞擋板(各長度、各角度、各位置),每顆都要被接住反彈,不能穿過擋板。
 func _t_high_speed_paddle() -> void:
-	for item in ["", "paddle_len_min", "paddle_len_down_2", "paddle_len_1", "paddle_len_max"]:
+	for item in ["", "paddle_len_min", "paddle_len_down_2", "paddle_len_1", "max"]:
 		for dt in [FPS, MainScript.MAX_DT]:
 			var m = _fresh()
-			if item != "":
-				# 測試會跑很多秒的模擬時間,長度道具給足時間,避免中途到期變回 85
-				m.effects.add_timed(item, 99999.0)
+			_set_len(m, item)
 			m.time_left = 99999.0
 			m.effects.ball_tier = 4
 			m.brick_accel = 1.0
@@ -555,11 +565,10 @@ func _t_high_speed_multi_ball() -> void:
 			_eq(m.brick_accel, 1.0, "%s: accel stays at cap" % tag)
 			m.free()
 	# 擋板:所有球同一幀抵達擋板(距離相同),各長度
-	for item in ["paddle_len_min", "", "paddle_len_max"]:
+	for item in ["paddle_len_min", "", "max"]:
 		for dt in [FPS, MainScript.MAX_DT]:
 			var m = _fresh()
-			if item != "":
-				m.effects.add_timed(item, 99999.0)
+			_set_len(m, item)
 			m.time_left = 99999.0
 			m.effects.ball_tier = 4
 			m.brick_accel = 1.0
@@ -609,10 +618,12 @@ func _t_high_speed_multi_ball() -> void:
 ## 85 與各種道具長度:左右邊界、往回拖立刻動、像素不超出 x 20~339、道具 1 px 重疊接到。
 func _t_paddle_lengths() -> void:
 	var table := [[[], 85], [["paddle_len_1"], 102], [["paddle_len_2"], 136], [["paddle_len_down_1"], 68],
-		[["paddle_len_down_2"], 34], [["paddle_len_max"], 320], [["paddle_len_min"], 32],
+		[["paddle_len_down_2"], 34], [["paddle_len_min"], 32],
 		[["paddle_len_1", "paddle_len_2"], 163], [["paddle_len_down_1", "paddle_len_down_2"], 32],
 		[["paddle_len_2", "paddle_len_down_2"], 54], [["paddle_len_1", "paddle_len_down_1"], 82],
-		[["paddle_len_max", "paddle_len_min"], 120]]
+		# 2026-10-28:「擋板最大化」已移除;同一種撿兩次再乘、大增 ×4 夾到 320
+		[["paddle_len_1", "paddle_len_1"], 122],
+		[["paddle_len_2", "paddle_len_2", "paddle_len_2", "paddle_len_2"], 320]]
 	for row in table:
 		var m = _fresh()
 		for id in row[0]:

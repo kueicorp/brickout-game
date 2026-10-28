@@ -445,7 +445,9 @@ func _t_drops() -> void:
 	_ok(absf(br - 0.5) < 0.025, "buff ratio ~50%% (got %.3f)" % br)
 	_ok(not seen.has("thief"), "no thief when replay_level = false")
 	_ok(seen.has("golden_ball") and seen.has("black_ball"), "ball items can drop")
-	_eq(seen.size(), 26, "all 26 non-thief items appear")
+	# 2026-10-28:「擋板最大化」移出掉落池,非小偷道具 25 種
+	_eq(seen.size(), 25, "all 25 non-thief items appear")
+	_ok(not seen.has("paddle_len_max"), "paddle_len_max never drops")
 	cfg.replay_level = true
 	m.items.clear()
 	for i in 20000:
@@ -565,18 +567,21 @@ func _t_end_after_win_pickup() -> void:
 
 func _t_timed_accumulate() -> void:
 	var m = _fresh()
+	# 2026-10-28:穿透 20 秒;相同效果再撿到剩餘時間累積(18 + 20 = 38)
 	m._apply_item("pierce")
 	m.effects.tick(2.0)
 	m._apply_item("pierce")
-	_ok(is_equal_approx(m.effects.remaining("pierce"), 8.0), "pierce 3 + 5 = 8")
+	_ok(is_equal_approx(m.effects.remaining("pierce"), 38.0), "pierce 18 + 20 = 38 (got %.3f)" % m.effects.remaining("pierce"))
 	m._apply_item("flame")
 	m._apply_item("paddle_len_1")
 	m._apply_item("invisible")
-	_ok(m.effects.is_active("pierce") and m.effects.is_active("flame") and m.effects.is_active("paddle_len_1") and m.effects.is_active("invisible"), "different effects coexist")
+	_ok(m.effects.is_active("pierce") and m.effects.is_active("flame") and m.effects.is_active(Effects.PADDLE_LEN) and m.effects.is_active("invisible"), "different effects coexist")
+	# 吸附、槍改為限時(30、10 秒),不再整局有效
 	m._apply_item("sticky")
 	m._apply_item("gun")
+	_ok(m.effects.is_active("sticky") and m.effects.is_active("gun"), "sticky / gun active after pickup")
 	m.effects.tick(1000.0)
-	_ok(m.effects.sticky and m.effects.gun, "untimed buffs last whole game")
+	_ok(not m.effects.is_active("sticky") and not m.effects.is_active("gun"), "sticky / gun expire (no longer whole game)")
 	_kill(m)
 
 
@@ -615,29 +620,30 @@ func _t_speed() -> void:
 
 func _t_paddle_len_main() -> void:
 	var m = _fresh()
-	# 新規格:基準 85(原 128),最大化倍率 = 320/85、最短化倍率 = 32/85(上限 ÷ 基準、下限 ÷ 基準)
+	# 2026-10-28:「擋板最大化」已移除;長度上限 320 改由多次增加道具相乘達到
+	# (1.6^4 × 85 = 557 → 夾到 320);最短化倍率 = 32/85
 	_eq(m._paddle_len(), 85, "base 85")
-	m._apply_item("paddle_len_max")
-	_eq(m._paddle_len(), 320, "max 320")
+	for i in 4:
+		m._apply_item("paddle_len_2")
+	_eq(m._paddle_len(), 320, "max 320 (clamped)")
 	m.paddle_x = 20.0
 	m.target_x = 0.0
 	m._update_paddle(0.1)
 	_eq(m._paddle_left(320), 20, "full-width paddle starts at field left")
-	m._apply_item("paddle_len_min")
-	_eq(m._paddle_len(), 120, "max x min multiply = 85 x (320/85) x (32/85) = 120.47 -> 120")
 	_kill(m)
-	# README 長度道具換算(基準 85):小增 102、大增 136、小減 68、大減 34、最大化 320、最短 32
+	_ok(not ItemDefs.exists("paddle_len_max"), "paddle_len_max is no longer an item id")
+	# README 長度道具換算(基準 85):小增 102、大增 136、小減 68、大減 34、最短 32
 	var table := {
 		"paddle_len_1": 102, "paddle_len_2": 136, "paddle_len_down_1": 68,
-		"paddle_len_down_2": 34, "paddle_len_max": 320, "paddle_len_min": 32,
+		"paddle_len_down_2": 34, "paddle_len_min": 32,
 	}
 	for id in table:
 		var m2 = _fresh()
 		m2._apply_item(id)
 		_eq(m2._paddle_len(), table[id], "README length %s" % id)
 		_kill(m2)
-	# 疊加(基準 85):163.2→163、512→320、12.8→32、27.2→32(夾到下限)、54.4→54、81.6→82
-	for combo in [[["paddle_len_1", "paddle_len_2"], 163], [["paddle_len_2", "paddle_len_max"], 320],
+	# 疊加(基準 85):163.2→163、217.6→218(同一種撿 2 次再乘)、12.8→32、27.2→32(夾到下限)、54.4→54、81.6→82
+	for combo in [[["paddle_len_1", "paddle_len_2"], 163], [["paddle_len_2", "paddle_len_2"], 218],
 			[["paddle_len_down_2", "paddle_len_min"], 32], [["paddle_len_down_1", "paddle_len_down_2"], 32],
 			[["paddle_len_2", "paddle_len_down_2"], 54], [["paddle_len_1", "paddle_len_down_1"], 82]]:
 		var m3 = _fresh()
@@ -787,7 +793,10 @@ func _t_menu_pools() -> void:
 			_ok(seen.keys().all(func(id) -> bool: return ItemDefs.is_buff(id) == golden), "pool type matches golden=%s" % golden)
 			if not golden:
 				_eq(seen.has("thief"), replay, "thief only on replay (replay=%s)" % replay)
-			_eq(seen.size(), 12 if golden or not replay else 13, "pool size golden=%s replay=%s" % [golden, replay])
+			# 2026-10-28:金球池刪「擋板最大化」= 11 種;黑球池 12 種(重複關卡加小偷 13 種)
+			var want := 11 if golden else (13 if replay else 12)
+			_eq(seen.size(), want, "pool size golden=%s replay=%s" % [golden, replay])
+			_ok(not seen.has("paddle_len_max"), "no paddle_len_max in pool golden=%s replay=%s" % [golden, replay])
 
 
 func _mouse(pos: Vector2, pressed: bool) -> void:

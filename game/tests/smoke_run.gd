@@ -1,4 +1,4 @@
-## headless 冒煙測試:實際跑主場景,逐一觸發 27 種道具(含 3 選 1、到期處理、槍),檢查執行期沒有錯誤。
+## headless 冒煙測試:實際跑主場景,逐一觸發 26 種道具(含 3 選 1、到期處理、槍),檢查執行期沒有錯誤。
 ## 執行:Godot --headless --fixed-fps 60 --path game --script res://tests/smoke_run.gd
 ## 判讀:輸出不應出現 SCRIPT ERROR / ERROR;最後印出 SMOKE DONE。
 extends SceneTree
@@ -17,6 +17,10 @@ func _initialize() -> void:
 	_cfg = load("res://data/game_config.tres") as GameConfig
 	_cfg.debug_start_balls = 40   # 同時壓一點球數
 	_cfg.replay_level = true      # 讓小偷進入候選
+	# 實際秒數 5~30 秒;壓成 5 秒,讓每個道具 7 秒內都跑到到期處理(含長度共用計時、吸附、槍)
+	for p in _cfg.get_property_list():
+		if (p["name"] as String).begins_with("dur_"):
+			_cfg.set(p["name"], 5.0)
 	_next()
 
 

@@ -91,7 +91,8 @@ func _setup() -> void:
 		b.pos = p
 		_m.balls.append(b)
 	# 擋板:新規格基準長度 85(奇數;16 + 32 × 1 + 裁切 21 + 16)+ 槍。不吃長度道具
-	_m.effects.gun = true
+	# 2026-10-28:槍改為限時效果;給足時間,截圖期間不會到期
+	_m.effects.add_timed("gun", 999.0)
 	_m.paddle_x = 180.0
 	_m.target_x = 180.0
 	_m._fire_gun()
@@ -325,7 +326,7 @@ func _process(_delta: float) -> bool:
 		_verify(shot, true)
 		_m.effects.timed.erase("invincible")
 		_m.reduced_motion = false
-		_m.effects.gun = false   # 下一張截圖檢查一般擋板(非槍端)
+		_m.effects.timed.erase("gun")   # 下一張截圖檢查一般擋板(非槍端)
 	if _frame == 24:
 		var len: int = _m._paddle_len()
 		var left: int = _m._paddle_left(len)

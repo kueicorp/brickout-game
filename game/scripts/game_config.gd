@@ -34,8 +34,8 @@ extends Resource
 @export var brick_accel_other := 0.005
 ## 球每碰到一次擋板(反彈或被吸附黏住)也加這個比例,累加到同一個打磚加速;黑洞吸走不算。
 @export var brick_accel_paddle := 0.005
-## 打磚加速本局累計上限(擋板加速共用)(0.5 = 倍率最高 1.5)。
-@export var brick_accel_max := 0.5
+## 打磚加速本局累計上限(擋板加速共用)(1.0 = 倍率最高 2.0)。
+@export var brick_accel_max := 1.0
 
 @export_group("擋板")
 ## 擋板最高移動速度(px/s)。

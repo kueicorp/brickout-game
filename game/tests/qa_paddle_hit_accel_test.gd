@@ -150,7 +150,7 @@ func _hit_from_below(m, cell: Vector2i) -> void:
 
 func _t_config() -> void:
 	_eq(cfg.brick_accel_paddle, 0.005, "brick_accel_paddle = 0.005")
-	_eq(cfg.brick_accel_max, 0.5, "shared cap 0.5")
+	_eq(cfg.brick_accel_max, 1.0, "shared cap 1.0")
 	_eq(cfg.paddle_speed, 450.0, "paddle_speed = 450")
 	var m = _fresh()
 	_eq(m.brick_accel, 0.0, "new game accel 0")
@@ -347,48 +347,48 @@ func _t_gun() -> void:
 
 
 func _t_shared_cap() -> void:
-	# 49 次不可破壞磚(0.49)+ 擋板 3 次 → 0.495、0.5、0.5
+	# 上限 1.0:99 次不可破壞磚(0.99)+ 擋板 3 次 → 0.995、1.0、1.0
 	var m = _fresh()
 	_brick(m, 3, 8, 1, true)
-	for i in 49:
+	for i in 99:
 		_hit_from_below(m, Vector2i(3, 8))
-	_near(m.brick_accel, 0.49, "49 unbreakable = 0.49")
-	var exps := [0.495, 0.5, 0.5]
+	_near(m.brick_accel, 0.99, "99 unbreakable = 0.99")
+	var exps := [0.995, 1.0, 1.0]
 	for k in 3:
 		var b = _ball(m, Vector2(180, 700), Vector2.DOWN)
 		_fall(m, b)
 		m.balls.erase(b)
 		_near(m.brick_accel, exps[k], "paddle hit %d after bricks" % (k + 1))
-	_ok(m.brick_accel <= 0.5, "never above 0.5")
+	_ok(m.brick_accel <= 1.0, "never above 1.0")
 	# 上限時再打磚也不超過
 	_hit_from_below(m, Vector2i(3, 8))
-	_eq(m.brick_accel, 0.5, "brick hit at cap stays 0.5")
+	_eq(m.brick_accel, 1.0, "brick hit at cap stays 1.0")
 	m.free()
-	# 擋板 99 次 + 打磚 1 次(1%) → 0.5;再擋板 → 0.5
+	# 擋板 199 次 + 打磚 1 次(1%) → 1.0;再擋板 → 1.0
 	var m2 = _fresh()
 	_brick(m2, 3, 8, 1, true)
-	for i in 99:
+	for i in 199:
 		var b = _ball(m2, Vector2(180, 740), Vector2.DOWN)
 		_fall(m2, b)
 		m2.balls.erase(b)
-	_near(m2.brick_accel, 0.495, "99 paddle hits = 0.495", 1e-6)
+	_near(m2.brick_accel, 0.995, "199 paddle hits = 0.995", 1e-6)
 	_hit_from_below(m2, Vector2i(3, 8))
-	_eq(m2.brick_accel, 0.5, "+1% brick capped at 0.5")
+	_eq(m2.brick_accel, 1.0, "+1% brick capped at 1.0")
 	var b2 = _ball(m2, Vector2(180, 740), Vector2.DOWN)
 	_fall(m2, b2)
-	_eq(m2.brick_accel, 0.5, "paddle hit at cap stays 0.5")
-	# 上限時球速 240 × 1.5 = 360
+	_eq(m2.brick_accel, 1.0, "paddle hit at cap stays 1.0")
+	# 上限時球速 240 × 2.0 = 480
 	var p0: Vector2 = b2.pos
 	m2._update_balls(FPS)
-	_near((b2.pos - p0).length(), 360.0 * FPS, "speed at cap 360 px/s", 0.001)
+	_near((b2.pos - p0).length(), 480.0 * FPS, "speed at cap 480 px/s", 0.001)
 	m2.free()
-	# 只靠擋板 200 次:停在 0.5
+	# 只靠擋板 400 次(到上限要 200 次):停在 1.0
 	var m3 = _fresh()
-	for i in 200:
+	for i in 400:
 		var b = _ball(m3, Vector2(180, 740), Vector2.DOWN)
 		_fall(m3, b)
 		m3.balls.erase(b)
-	_ok(m3.brick_accel <= 0.5 and m3.brick_accel > 0.5 - 1e-9, "200 paddle hits capped at 0.5 (%.9f)" % m3.brick_accel)
+	_ok(m3.brick_accel <= 1.0 and m3.brick_accel > 1.0 - 1e-9, "400 paddle hits capped at 1.0 (%.9f)" % m3.brick_accel)
 	m3.free()
 
 
@@ -433,18 +433,18 @@ func _t_multi_same_frame() -> void:
 		m3._step(FPS)
 	_near(m3.brick_accel, HIT * 3, "3 stuck balls following paddle: still 0.015")
 	m3.free()
-	# 接近上限時同一幀 3 顆:0.49 → 0.5(不超過)
+	# 接近上限時同一幀 3 顆:0.99 → 1.0(不超過)
 	var m4 = _fresh()
-	m4.brick_accel = 0.49
+	m4.brick_accel = 0.99
 	for x in xs:
 		_ball(m4, Vector2(x, 744.0), Vector2.DOWN)
 	m4._update_balls(FPS)
-	_eq(m4.brick_accel, 0.5, "0.49 + 3 same frame capped at 0.5")
+	_eq(m4.brick_accel, 1.0, "0.99 + 3 same frame capped at 1.0")
 	m4.free()
 
 
 ## 逐幀來回打球:球 ↔ 頂牆(沒有磚),擋板每幀對準球(偏 +6 px 讓球斜飛會碰側牆)。
-## 每次擋板碰撞後 accel = min(n × 0.005, 0.5);沒換方向的幀位移 = 速度 × dt。
+## 每次擋板碰撞後 accel = min(n × 0.005, 1.0);沒換方向的幀位移 = 速度 × dt。
 func _rally(m, b, hits_wanted: int, tier: int) -> Dictionary:
 	m.effects.ball_tier = tier
 	var mult := 1.0 + 0.15 * tier
@@ -466,7 +466,7 @@ func _rally(m, b, hits_wanted: int, tier: int) -> Dictionary:
 			break
 		if dir0.y > 0.0 and b.dir.y < 0.0 and b.pos.y > 600.0:
 			n += 1
-			if not is_equal_approx(m.brick_accel, minf(n * HIT, 0.5)):
+			if not is_equal_approx(m.brick_accel, minf(n * HIT, 1.0)):
 				bad_accel += 1
 				if bad_accel <= 3:
 					print("  rally hit %d accel %.6f" % [n, m.brick_accel])
@@ -494,22 +494,22 @@ func _t_rally_base() -> void:
 
 
 func _t_rally_to_cap() -> void:
-	# 2.4 倍:速度階 +4(1.6)× 加速上限(1.5);打 110 次擋板,中途到上限
+	# 3.2 倍:速度階 +4(1.6)× 加速上限(2.0);打 210 次擋板,第 200 次到上限
 	var m = _fresh()
 	var b = _ball(m, Vector2(180, 600), Vector2.DOWN)
-	var r := _rally(m, b, 110, 4)
-	_ok(not r.lost, "ball never lost at up to 2.4x (%d frames)" % r.frames)
-	_eq(r.n, 110, "110 paddle hits")
-	_eq(r.bad_accel, 0, "accel after each hit = min(n × 0.005, 0.5)")
+	var r := _rally(m, b, 210, 4)
+	_ok(not r.lost, "ball never lost at up to 3.2x (%d frames)" % r.frames)
+	_eq(r.n, 210, "210 paddle hits")
+	_eq(r.bad_accel, 0, "accel after each hit = min(n × 0.005, 1.0)")
 	_eq(r.bad_speed, 0, "every free frame moves 384 × (1 + accel) × dt")
-	_eq(m.brick_accel, 0.5, "capped at 0.5")
-	_near(m._ball_speed(), 576.0, "ball speed 576 px/s (2.4x)")
+	_eq(m.brick_accel, 1.0, "capped at 1.0")
+	_near(m._ball_speed(), 768.0, "ball speed 768 px/s (3.2x)")
 	m.free()
 
 
-## 2.4 倍附近(起始 accel 0 / 0.495 / 0.5,速度階 +4)往下撞擋板:各角度各位置都接住,不穿過。
+## 3.2 倍附近(起始 accel 0 / 0.995 / 1.0,速度階 +4)往下撞擋板:各角度各位置都接住,不穿過。
 func _t_high_speed_paddle() -> void:
-	for acc in [0.0, 0.495, 0.5]:
+	for acc in [0.0, 0.995, 1.0]:
 		for dt in [FPS, MainScript.MAX_DT]:
 			for item in ["", "paddle_len_min"]:
 				var missed := 0
@@ -546,7 +546,7 @@ func _t_high_speed_paddle() -> void:
 								break
 						if not ok:
 							missed += 1
-						if not is_equal_approx(m.brick_accel, minf(acc + HIT, 0.5)):
+						if not is_equal_approx(m.brick_accel, minf(acc + HIT, 1.0)):
 							bad_acc += 1
 						m.free()
 				var tag := "acc %.3f dt %.3f %s" % [acc, dt, item if item != "" else "len85"]

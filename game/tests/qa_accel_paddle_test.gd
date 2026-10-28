@@ -28,6 +28,7 @@ func _process(_delta: float) -> bool:
 		_run("accel_multi_ball", _t_accel_multi_ball)
 		_run("accel_high_speed_bricks", _t_high_speed_bricks)
 		_run("accel_high_speed_paddle", _t_high_speed_paddle)
+		_run("accel_high_speed_multi_ball", _t_high_speed_multi_ball)
 		_run("paddle_lengths", _t_paddle_lengths)
 		_run("paddle_odd_center", _t_paddle_odd_center)
 		_section = "accel_restart"
@@ -158,7 +159,7 @@ func _catch(m, rect_pos: Vector2) -> bool:
 # ---------- 打磚加速 ----------
 
 func _t_accel_amounts() -> void:
-	_eq([cfg.brick_accel_unbreakable, cfg.brick_accel_other, cfg.brick_accel_max], [0.01, 0.005, 0.5], "config 1% / 0.5% / 0.5")
+	_eq([cfg.brick_accel_unbreakable, cfg.brick_accel_other, cfg.brick_accel_max], [0.01, 0.005, 1.0], "config 1% / 0.5% / 1.0")
 	var cases := [
 		# [說明, 啟用的道具, 不可破壞, 預期加速]
 		["unbreakable bounce", [], true, 0.01],
@@ -216,44 +217,45 @@ func _t_accel_cap() -> void:
 	var m = _fresh()
 	_brick(m, 1, 3, 1, true)
 	_brick(m, 2, 3, 69)
-	for i in 49:
+	# 上限 1.0(+100%):99 次不可破壞 = 0.99,再 2 次其他磚剛好 1.0
+	for i in 99:
 		_hit_from_below(m, Vector2i(1, 3))
-	_near(m.brick_accel, 0.49, "49 unbreakable hits = 0.49")
+	_near(m.brick_accel, 0.99, "99 unbreakable hits = 0.99")
 	_hit_from_below(m, Vector2i(2, 3))
 	_hit_from_below(m, Vector2i(2, 3))
-	_near(m.brick_accel, 0.5, "0.49 + 0.005 + 0.005 = 0.5")
+	_near(m.brick_accel, 1.0, "0.99 + 0.005 + 0.005 = 1.0")
 	_hit_from_below(m, Vector2i(1, 3))
-	_near(m.brick_accel, 0.5, "cap: +1% at 0.5 stays 0.5")
+	_near(m.brick_accel, 1.0, "cap: +1% at 1.0 stays 1.0")
 	for i in 200:
 		_hit_from_below(m, Vector2i(1, 3))
-	_ok(m.brick_accel <= 0.5 + 1e-9, "cap: never above 0.5 after 200 more hits (%.6f)" % m.brick_accel)
-	_near(1.0 + m.brick_accel, 1.5, "multiplier capped at 1.5")
-	_near(_measured_speed(m), 360.0, "measured movement 240 x 1.5 = 360 px/s", 0.01)
+	_ok(m.brick_accel <= 1.0 + 1e-9, "cap: never above 1.0 after 200 more hits (%.6f)" % m.brick_accel)
+	_near(1.0 + m.brick_accel, 2.0, "multiplier capped at 2.0")
+	_near(_measured_speed(m), 480.0, "measured movement 240 x 2.0 = 480 px/s", 0.01)
 	m.free()
-	# 只打其他磚到上限:100 次 × 0.5%(浮點累加後仍夾在 0.5)
+	# 只打其他磚到上限:200 次 × 0.5%(打 240 次,浮點累加後仍夾在 1.0)
 	var m2 = _fresh()
 	_brick(m2, 2, 3, 69)
-	for i in 120:
+	for i in 240:
 		_hit_from_below(m2, Vector2i(2, 3))
 		m2.grid[3][2].layers = 69   # 補回層數,讓同一塊磚一直被打
-	_ok(m2.brick_accel <= 0.5 + 1e-9 and m2.brick_accel > 0.5 - 1e-9, "120 other hits capped at 0.5 (%.9f)" % m2.brick_accel)
+	_ok(m2.brick_accel <= 1.0 + 1e-9 and m2.brick_accel > 1.0 - 1e-9, "240 other hits capped at 1.0 (%.9f)" % m2.brick_accel)
 	m2.free()
 
 
 func _t_accel_tiers() -> void:
 	var m = _fresh()
-	m.brick_accel = 0.5
+	m.brick_accel = 1.0
 	for i in 10:
 		m._apply_item("fast")
 	_eq(m.effects.ball_tier, 4, "fast capped at +4")
-	_near(m._ball_speed(), 240.0 * 1.6 * 1.5, "+4 tier x 1.5 = 576")
-	_near(_measured_speed(m), 576.0, "measured +4 x 1.5 = 576 px/s (2.4x)", 0.01)
+	_near(m._ball_speed(), 240.0 * 1.6 * 2.0, "+4 tier x 2.0 = 768")
+	_near(_measured_speed(m), 768.0, "measured +4 x 2.0 = 768 px/s (3.2x)", 0.01)
 	for i in 20:
 		m._apply_item("slow")
 	_eq(m.effects.ball_tier, -3, "slow capped at -3")
-	_near(m._ball_speed(), 240.0 * 0.55 * 1.5, "-3 tier x 1.5 = 198")
-	_near(_measured_speed(m), 198.0, "measured -3 x 1.5 = 198 px/s", 0.01)
-	_near(m.brick_accel, 0.5, "accel untouched by tier changes")
+	_near(m._ball_speed(), 240.0 * 0.55 * 2.0, "-3 tier x 2.0 = 264")
+	_near(_measured_speed(m), 264.0, "measured -3 x 2.0 = 264 px/s", 0.01)
+	_near(m.brick_accel, 1.0, "accel untouched by tier changes")
 	m.free()
 
 
@@ -385,9 +387,9 @@ func _t_accel_multi_ball() -> void:
 		var b = m.balls[k]
 		_near((b.pos - prev[k]).length(), v1 * FPS, "next frame ball %d speed 1.01x" % k)
 		_ok(b.dir.is_equal_approx(pdir[k]), "next frame ball %d direction unchanged" % k)
-	# 20 顆球同時:速度階 +4、加速 0.5 → 全部 576 px/s
+	# 20 顆球同時:速度階 +4、加速 1.0 → 全部 768 px/s
 	m.balls.clear()
-	m.brick_accel = 0.5
+	m.brick_accel = 1.0
 	m.effects.ball_tier = 4
 	for i in 20:
 		_ball(m, Vector2(40 + 14 * i, 520), Vector2.UP.rotated(deg_to_rad(-40 + 4 * i)))
@@ -397,19 +399,19 @@ func _t_accel_multi_ball() -> void:
 	m._update_balls(FPS)
 	var all_ok := true
 	for k in m.balls.size():
-		all_ok = all_ok and absf((m.balls[k].pos - p0[k]).length() - 576.0 * FPS) < 0.001
-	_ok(all_ok, "20 balls all move at 576 px/s")
+		all_ok = all_ok and absf((m.balls[k].pos - p0[k]).length() - 768.0 * FPS) < 0.001
+	_ok(all_ok, "20 balls all move at 768 px/s")
 	m.free()
 
 
-## 2.4 倍速(576 px/s)實際逐幀跑:整排不可破壞磚,任何角度都不能穿過去。
+## 3.2 倍速(768 px/s)實際逐幀跑:整排不可破壞磚,任何角度都不能穿過去。
 func _t_high_speed_bricks() -> void:
 	for dt in [FPS, MainScript.MAX_DT]:
 		var m = _fresh()
 		m.grid[0][7] = null
 		m.breakable_left = 0
 		m.effects.ball_tier = 4
-		m.brick_accel = 0.5
+		m.brick_accel = 1.0
 		for c in 8:
 			_brick(m, c, 10, 1, true)   # y 268~288
 		_brick(m, 0, 16, 69)           # 遠處可破壞磚,避免過關
@@ -437,12 +439,12 @@ func _t_high_speed_bricks() -> void:
 		_eq(not_bounced, 0, "dt %.3f: every ball bounces off the row" % dt)
 		# 推出後球上緣應在磚下緣(容許不到 1 個子步的穿入)
 		_ok(worst >= row_bottom - 3.0, "dt %.3f: max penetration < 3 px (ball top min %.3f)" % [dt, worst])
-		_eq(m.brick_accel, 0.5, "dt %.3f: accel stays at cap" % dt)
+		_eq(m.brick_accel, 1.0, "dt %.3f: accel stays at cap" % dt)
 		m.free()
 	# 單塊磚、垂直對準:最高速時仍反彈,不會從磚另一側出來
 	var m2 = _fresh()
 	m2.effects.ball_tier = 4
-	m2.brick_accel = 0.5
+	m2.brick_accel = 1.0
 	_brick(m2, 3, 8, 69)   # x 140~180、y 228~248
 	var b2 = _ball(m2, Vector2(160, 400), Vector2.UP)
 	var min_y := 9999.0
@@ -451,12 +453,12 @@ func _t_high_speed_bricks() -> void:
 		min_y = minf(min_y, b2.pos.y)
 		if b2.dir.y > 0.0:
 			break
-	_ok(b2.dir.y > 0.0 and min_y > 248.0, "single brick at 2.4x: bounced, center never inside (min y %.3f)" % min_y)
+	_ok(b2.dir.y > 0.0 and min_y > 248.0, "single brick at 3.2x: bounced, center never inside (min y %.3f)" % min_y)
 	_eq(_layers(m2, 3, 8), 68, "single brick took exactly 1 hit")
 	m2.free()
 
 
-## 2.4 倍速往下撞擋板(各長度、各角度、各位置),每顆都要被接住反彈,不能穿過擋板。
+## 3.2 倍速往下撞擋板(各長度、各角度、各位置),每顆都要被接住反彈,不能穿過擋板。
 func _t_high_speed_paddle() -> void:
 	for item in ["", "paddle_len_min", "paddle_len_down_2", "paddle_len_1", "paddle_len_max"]:
 		for dt in [FPS, MainScript.MAX_DT]:
@@ -466,7 +468,7 @@ func _t_high_speed_paddle() -> void:
 				m.effects.add_timed(item, 99999.0)
 			m.time_left = 99999.0
 			m.effects.ball_tier = 4
-			m.brick_accel = 0.5
+			m.brick_accel = 1.0
 			var len: int = m._paddle_len()
 			m.paddle_x = 180.0
 			m.target_x = 180.0
@@ -502,8 +504,103 @@ func _t_high_speed_paddle() -> void:
 					if m.state != 0:
 						break
 			_ok(n > 0, "len %d dt %.3f: %d drops tested" % [len, dt, n])
-			_eq(missed, 0, "len %d dt %.3f: all balls caught at 2.4x" % [len, dt])
+			_eq(missed, 0, "len %d dt %.3f: all balls caught at 3.2x" % [len, dt])
 			_ok(deepest <= 0.001, "len %d dt %.3f: ball never sinks below py - 8 (max %.3f)" % [len, dt, deepest])
+			m.free()
+
+
+## 上限 1.0 新增:3.2 倍速多顆球「同時」飛行。
+## 磚列(不可破壞 / 可破壞 69 層)與擋板(32 / 85 / 320)各自檢查每一顆球都反彈、沒有穿過。
+func _t_high_speed_multi_ball() -> void:
+	var dirs := []
+	for deg in range(-70, 71, 10):
+		dirs.append(deg)
+	for unb in [true, false]:
+		for dt in [FPS, MainScript.MAX_DT]:
+			var m = _fresh()
+			m.grid[0][7] = null
+			m.breakable_left = 0
+			m.time_left = 99999.0
+			m.effects.ball_tier = 4
+			m.brick_accel = 1.0
+			for c in 8:
+				_brick(m, c, 10, 69, unb)   # y 268~288
+			_brick(m, 0, 16, 69)
+			var row_bottom := 288.0
+			var bs := []
+			for i in dirs.size():
+				var x0 := 30.0 + 300.0 * i / (dirs.size() - 1)
+				bs.append(_ball(m, Vector2(x0, 420.0), Vector2.UP.rotated(deg_to_rad(dirs[i]))))
+			var bounced := []
+			bounced.resize(bs.size())
+			bounced.fill(false)
+			var crossed := 0
+			for f in 300:
+				m._update_balls(dt)
+				for k in bs.size():
+					var b = bs[k]
+					if bounced[k]:
+						continue
+					if b.pos.y < row_bottom:
+						crossed += 1
+						bounced[k] = true   # 記一次就好
+						print("INFO crossed: unb %s dt %.3f ball %d deg %d" % [unb, dt, k, dirs[k]])
+					elif b.dir.y > 0.0:
+						bounced[k] = true
+				if not bounced.has(false):
+					break
+			var tag := "%s dt %.3f %d balls" % ["unbreakable" if unb else "breakable", dt, bs.size()]
+			_eq(crossed, 0, "%s: no ball center passes the brick row" % tag)
+			_eq(bounced.count(false), 0, "%s: every ball bounced off the row" % tag)
+			_eq(m.brick_accel, 1.0, "%s: accel stays at cap" % tag)
+			m.free()
+	# 擋板:所有球同一幀抵達擋板(距離相同),各長度
+	for item in ["paddle_len_min", "", "paddle_len_max"]:
+		for dt in [FPS, MainScript.MAX_DT]:
+			var m = _fresh()
+			if item != "":
+				m.effects.add_timed(item, 99999.0)
+			m.time_left = 99999.0
+			m.effects.ball_tier = 4
+			m.brick_accel = 1.0
+			var len: int = m._paddle_len()
+			m._update_paddle(0.0)
+			var left: int = m._paddle_left(len)
+			var py: int = m._paddle_y()
+			var bs := []
+			# 13 個落點 × 13 種角度,挑起點在場內的組合;每個落點最多 1 顆,所有球同時抵達
+			for i in 13:
+				var land := left + 1 + (len - 2) * i / 12.0
+				for j in 13:
+					var deg: int = [0, 10, -10, 20, -20, 30, -30, 40, -40, 50, -50, 60, -60][(i + j) % 13]
+					var dir := Vector2.DOWN.rotated(deg_to_rad(deg))
+					var start := Vector2(land, py - 8.0) - dir * 150.0
+					if start.x >= 28.0 and start.x <= 332.0:
+						bs.append(_ball(m, start, dir))
+						break
+			var up := []
+			up.resize(bs.size())
+			up.fill(false)
+			var deepest := 0.0
+			for f in 60:
+				m._step(dt)
+				if m.state != 0:
+					break
+				for k in bs.size():
+					if up[k]:
+						continue
+					var b = bs[k]
+					deepest = maxf(deepest, b.pos.y - (py - 8.0))
+					if b.dir.y < 0.0:
+						up[k] = true
+				if not up.has(false):
+					break
+			var tag := "len %d dt %.3f %d balls" % [len, dt, bs.size()]
+			_ok(bs.size() == 13, "%s: 13 simultaneous balls placed" % tag)
+			_eq(m.state, 0, "%s: still playing" % tag)
+			_eq(up.count(false), 0, "%s: every ball bounced off the paddle" % tag)
+			_ok(deepest <= 0.001, "%s: no ball sinks below py - 8 (max %.3f)" % [tag, deepest])
+			_eq(m.brick_accel, 1.0, "%s: accel stays at cap" % tag)
 			m.free()
 
 

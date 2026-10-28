@@ -28,6 +28,7 @@ func _init() -> void:
 	_test_brick_textures()
 	_test_brick_accel()
 	_test_paddle_center()
+	_test_high_speed_no_tunnel()
 	# _init 時 root 還不在樹裡,加進去的節點不會跑 _ready;等一幀再測要用到樹的選單
 	await process_frame
 	_test_choice_menu_layout()
@@ -565,7 +566,7 @@ func _unbreakable(m: Node2D, cell: Vector2i) -> void:
 	m.grid[cell.y][cell.x] = br
 
 
-## 打磚加速:不可破壞 +1%、其他 +0.5%、上限 1.5;與速度階相乘;只算球碰磚。
+## 打磚加速:不可破壞 +1%、其他 +0.5%、上限 2.0;與速度階相乘;只算球碰磚。
 func _test_brick_accel() -> void:
 	var m := _bare_main()
 	_empty_grid(m)
@@ -584,17 +585,17 @@ func _test_brick_accel() -> void:
 	m._damage(Vector2i(2, 0), 1)
 	_eq([m.grid[0][1].layers, m.grid[0][2].layers], [67, 68], "bullet and _damage did hurt bricks")
 	_eq(is_equal_approx(m.brick_accel, 0.015), true, "bullet / splash damage do not accelerate")
-	# 上限 +50%:再打 60 次不可破壞磚仍停在 1.5
-	for i in 60:
+	# 上限 +100%:再打 100 次不可破壞磚仍停在 2.0
+	for i in 100:
 		m._ball_hit_brick(Vector2i(0, 0))
-	_eq(is_equal_approx(1.0 + m.brick_accel, 1.5), true, "accel capped at 1.5")
-	# 與 +4 階直接相乘:1.6 × 1.5 = 2.4 → 576 px/s,不設總上限
+	_eq(is_equal_approx(1.0 + m.brick_accel, 2.0), true, "accel capped at 2.0")
+	# 與 +4 階直接相乘:1.6 × 2.0 = 3.2 → 768 px/s,不設總上限
 	m.effects.ball_tier = 4
-	_eq(is_equal_approx(m._ball_speed(), 240.0 * 2.4), true, "+4 tier x 1.5 accel = 2.4x")
+	_eq(is_equal_approx(m._ball_speed(), 240.0 * 3.2), true, "+4 tier x 2.0 accel = 3.2x (768)")
 	# 減速只降 1 階,不清除累積加速
 	m._apply_item("slow")
-	_eq([m.effects.ball_tier, is_equal_approx(m.brick_accel, 0.5)], [3, true], "slow drops 1 tier, keeps accel")
-	_eq(is_equal_approx(m._ball_speed(), 240.0 * 1.45 * 1.5), true, "slow: 1.45 x 1.5")
+	_eq([m.effects.ball_tier, is_equal_approx(m.brick_accel, 1.0)], [3, true], "slow drops 1 tier, keeps accel")
+	_eq(is_equal_approx(m._ball_speed(), 240.0 * 1.45 * 2.0), true, "slow: 1.45 x 2.0")
 	# 加速立刻套用到所有球、方向不變:兩顆球同一幀,第二顆用新速度移動
 	m.effects.ball_tier = 0
 	m.brick_accel = 0.0
@@ -631,7 +632,7 @@ func _test_brick_accel() -> void:
 	fresh.free()
 	# 設定檔預設值
 	var tres := load("res://data/game_config.tres") as GameConfig
-	_eq([tres.brick_accel_unbreakable, tres.brick_accel_other, tres.brick_accel_max], [0.01, 0.005, 0.5], "config accel defaults")
+	_eq([tres.brick_accel_unbreakable, tres.brick_accel_other, tres.brick_accel_max], [0.01, 0.005, 1.0], "config accel defaults")
 	_eq(tres.brick_accel_paddle, 0.005, "config paddle accel default")
 	_test_paddle_accel()
 
@@ -674,16 +675,16 @@ func _test_paddle_accel() -> void:
 	m._update_balls(0.01)
 	_eq([m.balls.is_empty(), m.brick_accel], [true, 0.0], "blackhole: ball vanishes, no accel")
 	m.effects.timed.erase("blackhole")
-	# 與打磚加速共用上限 0.5
+	# 與打磚加速共用上限 1.0
 	_unbreakable(m, Vector2i(0, 0))
 	m.brick_accel = 0.0
-	for i in 49:
+	for i in 99:
 		m._ball_hit_brick(Vector2i(0, 0))
 	for i in 3:
 		b.pos = Vector2(180, py - 4)
 		b.dir = Vector2(0, 1)
 		m._ball_paddle(b, left, length, py)
-	_eq(is_equal_approx(m.brick_accel, 0.5), true, "paddle + brick share cap 0.5 (%.4f)" % m.brick_accel)
+	_eq(is_equal_approx(m.brick_accel, 1.0), true, "paddle + brick share cap 1.0 (%.4f)" % m.brick_accel)
 	# 多球同一幀各自撞擋板:各加一次
 	m.brick_accel = 0.0
 	var arr := []
@@ -727,3 +728,68 @@ func _test_paddle_center() -> void:
 		m._update_balls(0.01)
 		_eq(m.balls[0].pos.x, center, "len %d: start ball centered" % length)
 		m.free()
+
+
+## 最高速 3.2 倍(+4 階 × 加速上限 2.0 = 768 px/s)逐幀跑 _update_balls:
+## 球不會穿過一整排磚(20 高),也不會穿過擋板(16 高,長度 85 與 32)。
+## 每幀結束檢查圓心沒越過磚下緣 / 擋板上緣,直到球反彈為止。
+func _test_high_speed_no_tunnel() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var angles := [-70.0, -45.0, -20.0, 0.0, 20.0, 45.0, 70.0]
+	for dt in [1.0 / 60.0, 0.05]:
+		# 整排不可破壞磚放在第 10 排(y 268~288),球從下方往上打
+		var m := _bare_main()
+		_empty_grid(m)
+		for c in main_script.COLS:
+			_unbreakable(m, Vector2i(c, 10))
+		m.effects.ball_tier = 4
+		m.brick_accel = m.cfg.brick_accel_max
+		_eq(is_equal_approx(m._ball_speed(), 768.0), true, "top speed 768 px/s")
+		var brick_bottom := 288.0
+		for a in angles:
+			var dir := Vector2.UP.rotated(deg_to_rad(a))
+			var b = main_script.Ball.new()
+			b.pos = Vector2(180, brick_bottom + main_script.BALL_R) - dir * 150.0
+			b.dir = dir
+			m.balls.assign([b])
+			var ok := true
+			var bounced := false
+			for f in 120:
+				m._update_balls(dt)
+				if b.pos.y <= brick_bottom:
+					ok = false
+					break
+				if b.dir.y > 0.0:
+					bounced = true
+					break
+			_eq([ok, bounced], [true, true], "dt %.3f angle %d: ball bounces off brick row at 3.2x" % [dt, a])
+		m.free()
+		# 擋板:球從上方往下,瞄準擋板中央與兩端內側
+		for length in [85, 32]:
+			var p := _bare_main()
+			_empty_grid(p)
+			p.cfg.paddle_base_length = length
+			p.effects.ball_tier = 4
+			p.brick_accel = p.cfg.brick_accel_max
+			var left: int = p._paddle_left(length)
+			var py: int = p._paddle_y()
+			for tx in [left + 1.0, left + length / 2.0, left + length - 1.0]:
+				for a in angles:
+					var dir := Vector2.DOWN.rotated(deg_to_rad(a))
+					var b = main_script.Ball.new()
+					# 起點只退 60 px,斜 70 度時也不會先撞側牆而改變落點
+					b.pos = Vector2(tx, py - main_script.BALL_R) - dir * 60.0
+					b.dir = dir
+					p.balls.assign([b])
+					var ok := true
+					var bounced := false
+					for f in 120:
+						p._update_balls(dt)
+						if p.balls.is_empty() or b.pos.y >= py:
+							ok = false
+							break
+						if b.dir.y < 0.0:
+							bounced = true
+							break
+					_eq([ok, bounced], [true, true], "dt %.3f len %d x %.1f angle %d: ball bounces off paddle at 3.2x" % [dt, length, tx, a])
+			p.free()

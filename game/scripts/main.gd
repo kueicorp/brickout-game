@@ -37,7 +37,7 @@ const MAX_H := 800
 # ---- 時間
 const FRAME := 0.06       # D12 小磚每幀 60 ms
 const MAX_DT := 0.05      # 卡頓時一幀最多模擬 50 ms,避免球一次飛太遠
-const STEP_PX := 2.0      # 球每個子步最多移動的距離,高速時不會穿磚
+const STEP_PX := 2.0    # 球每個子步最多移動的距離,高速時不會穿磚
 
 ## D25 主題 1 裝飾(關卡區座標,左上角);依遠景 → 近景排序
 const MEADOW_DECOR := {

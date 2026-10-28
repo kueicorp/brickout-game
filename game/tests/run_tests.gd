@@ -26,6 +26,7 @@ func _init() -> void:
 	_test_scaled_geometry()
 	_test_brick_grid()
 	_test_brick_textures()
+	_test_bomb_mark_frames()
 	_test_brick_accel()
 	_test_paddle_center()
 	_test_high_speed_no_tunnel()
@@ -34,6 +35,7 @@ func _init() -> void:
 	_test_hud_icons()
 	_test_hud_len_cell()
 	_test_hud_order()
+	_test_hud_d36()
 	_test_hud_slots()
 	_test_paddle_in_wall_on_len_change()
 	# _init 時 root 還不在樹裡,加進去的節點不會跑 _ready;等一幀再測要用到樹的選單
@@ -615,19 +617,34 @@ func _test_brick_grid() -> void:
 func _test_brick_textures() -> void:
 	var m := _bare_main()
 	var names: Array[String] = ["d31_brick_hit", "d31_brick_dust_f4", "d31_brick_unbreakable", "d31_brick_unbreakable_hit",
-		"d31_invincible_frame", "d31_bomb_mark_f1", "d31_bomb_mark_f2"]
+		"d31_invincible_frame", "d37_bomb_mark_f1", "d37_bomb_mark_f2", "d37_bomb_mark_f3", "d37_bomb_mark_f4"]
 	for color in Rules.COLOR_NAMES:
 		for suffix in ["", "_f1", "_f2", "_f3"]:
 			names.append("d31_brick_%s%s" % [color, suffix])
 	for d in range(1, 10):
 		names.append("d31_digit_%d" % d)
-	_eq(names.size(), 44, "44 brick textures")
+	_eq(names.size(), 46, "46 brick textures")
 	var bad := []
 	for n in names:
 		var tex: Texture2D = m._t(n)
 		if tex == null or tex.get_size() != Vector2(40, 20):
 			bad.append(n)
-	_eq(bad, [], "all D31 textures load as 40x20")
+	_eq(bad, [], "all D31/D37 textures load as 40x20")
+	m.free()
+
+
+## D37 炸彈標記:F1 0~160、F2 160~260、F3 260~360、F4 360~500 ms;減少動態固定 F1。
+func _test_bomb_mark_frames() -> void:
+	var m := _bare_main()
+	var got := []
+	for ms in [0, 159, 160, 259, 260, 359, 360, 499]:
+		got.append(m._bomb_mark(ms / 1000.0))
+	_eq(got, ["d37_bomb_mark_f1", "d37_bomb_mark_f1", "d37_bomb_mark_f2", "d37_bomb_mark_f2",
+		"d37_bomb_mark_f3", "d37_bomb_mark_f3", "d37_bomb_mark_f4", "d37_bomb_mark_f4"], "D37 bomb mark frame by time")
+	_eq(m.BOMB_MARK_ENDS[-1], 0.5, "D37 bomb mark cycle 500 ms")
+	m.reduced_motion = true
+	_eq([m._bomb_mark(0.2), m._bomb_mark(0.3), m._bomb_mark(0.4)], ["d37_bomb_mark_f1", "d37_bomb_mark_f1", "d37_bomb_mark_f1"],
+		"D37 bomb mark reduced motion fixed F1")
 	m.free()
 
 
@@ -1107,6 +1124,64 @@ func _test_hud_order() -> void:
 	_order(v)
 	_eq(v._halo_on(), false, "halo off: bomb gone")
 	v.free()
+
+
+## D36:8 種新 HUD 格(圖示、線段條、到期補位)、同幀固定順序、不觸發光暈。
+func _test_hud_d36() -> void:
+	var timed := ["sticky", "gun", "heal", "heal_area", "blackhole", "invincible", "invisible"]
+	var t := _bare_main()
+	var bad := []
+	for id in timed + ["paddle_speed_up", "paddle_speed_down"]:
+		var tex: Texture2D = t._t("d34_hud_icon_" + id)
+		if tex == null or tex.get_size() != Vector2(32, 32) or tex.resource_path != "res://art/hud32/d34_hud_icon_%s.png" % id:
+			bad.append(id)
+	_eq(bad, [], "9 D36 HUD icons load from art/hud32 as 32x32")
+	t.free()
+	# 各限時種類:剛獲得滿條、總時間取 dur_<id>、到期移除;只有新種類時不亮光暈
+	for id in timed:
+		var m := _bare_main()
+		m._apply_item(id)
+		_eq([_order(m), m._hud_cells()[0], m._halo_on()], [[id], ["d34_hud_icon_" + id, {"fill": 20, "color": Pal.W}], false],
+			"%s: icon, full bar, no halo" % id)
+		var dur: float = m.cfg.get("dur_" + id)
+		m.effects.tick(dur / 2.0)
+		_eq(m._hud_cells()[0][1]["fill"], 10, "%s: half of dur_%s" % [id, id])
+		m.effects.tick(dur)
+		_eq(_order(m), [], "%s: expired, removed" % id)
+		m.free()
+	# 黑洞 5 秒:最後 1 秒照常閃爍(剩 0.95 → G)
+	var h := _bare_main()
+	h._apply_item("blackhole")
+	h.effects.tick(4.05)
+	_eq(h._hud_cells()[0][1], {"fill": 4, "color": Pal.G}, "blackhole last second blinks")
+	h.free()
+	# 擋板移動速度:分階線段,+ 4 段、− 3 段;一次跨過 0 位置不動只換圖;歸 0 移除後面補位
+	var p := _bare_main()
+	p._apply_item("paddle_speed")
+	p._apply_item("paddle_speed")
+	_eq([_order(p), p._hud_cells()[0], p._halo_on()],
+		[["paddle_speed"], ["d34_hud_icon_paddle_speed_up", {"segments": 4, "filled": 2}], false], "paddle speed +2: 4 segments, no halo")
+	p._apply_item("sticky")
+	p.effects.paddle_tier = -1
+	_eq([_order(p), p._hud_cells()[0]], [["paddle_speed", "sticky"], ["d34_hud_icon_paddle_speed_down", {"segments": 3, "filled": 1}]],
+		"paddle speed jump over 0: same slot, - icon, 3 segments")
+	p._apply_item("paddle_speed")
+	_eq(_order(p), ["sticky"], "paddle speed net 0: removed, sticky moves up")
+	# 新種類 + 擋板長度仍不亮;加入原本的球狀態才亮
+	p._apply_item("paddle_len_1")
+	_order(p)
+	_eq(p._halo_on(), false, "length + new kinds: no halo")
+	p._apply_item("pierce")
+	_order(p)
+	_eq(p._halo_on(), true, "pierce: halo on")
+	p.free()
+	# 同一幀同時新出現:依 HUD_KINDS 固定順序
+	var f := _bare_main()
+	for id in ["invisible", "invincible", "blackhole", "heal_area", "heal", "gun", "sticky", "paddle_speed_down", "paddle_len_1", "bomb"]:
+		f._apply_item(id)
+	_eq(_order(f), ["bomb", Effects.PADDLE_LEN, "paddle_speed", "sticky", "gun", "heal", "heal_area", "blackhole", "invincible", "invisible"],
+		"D36 same-frame gains in fixed order")
+	f.free()
 
 
 ## D35 方案 C 格位:每欄格數 = floor((H − 473) / 52),欄由左到右、欄內由上到下;跨欄補位。

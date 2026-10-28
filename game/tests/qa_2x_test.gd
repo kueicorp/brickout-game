@@ -108,7 +108,7 @@ func _size(name: String) -> Vector2i:
 
 # ---------- 原圖尺寸(畫的時候 × PX) ----------
 
-## 40×20 規格(D31):art/bricks40 的 44 張都是 40×20,一張 = 一格(1 倍,不乘 PX)。
+## 40×20 規格(D31 + D37):art/bricks40 的 48 張都是 40×20,一張 = 一格(1 倍,不乘 PX)。
 const BRICK_COLORS := ["red", "orange", "yellow", "green", "blue", "indigo", "purple"]
 
 
@@ -122,6 +122,9 @@ func _bricks40_names() -> Array:
 		out.append("d31_digit_%d" % d)
 	out.append_array(["d31_brick_hit", "d31_brick_dust_f4", "d31_brick_unbreakable", "d31_brick_unbreakable_hit",
 		"d31_invincible_frame", "d31_bomb_mark_f1", "d31_bomb_mark_f2"])
+	# D37 炸彈標記 4 幀(取代 D31 的 2 幀;d31_bomb_mark_* 檔案保留不刪)
+	for f in [1, 2, 3, 4]:
+		out.append("d37_bomb_mark_f%d" % f)
 	return out
 
 
@@ -148,19 +151,52 @@ func _opaque_bbox(img: Image) -> Rect2i:
 	return bb
 
 
+## D37 炸彈標記 4 幀:每幀都在第 25~36 欄、第 3~13 列內(4 幀合起來剛好這個範圍);
+## 4 幀彼此不同;不與 D31 無敵外框的不透明像素重疊(疊上去不互相吃掉)。
+func _t_d37_mark_art() -> void:
+	var inv := _img40("d31_invincible_frame")
+	var frames := []
+	var union := Rect2i()
+	for f in [1, 2, 3, 4]:
+		var img := _img40("d37_bomb_mark_f%d" % f)
+		frames.append(img)
+		var bb := _opaque_bbox(img)
+		union = bb if f == 1 else union.merge(bb)
+		_ok(bb.position.x >= 25 and bb.end.x <= 37 and bb.position.y >= 3 and bb.end.y <= 14,
+			"D37 F%d inside cols 25-36 rows 3-13 (bbox %s)" % [f, bb])
+		var overlap := 0
+		var partial := 0
+		for y in 20:
+			for x in 40:
+				var a := img.get_pixel(x, y).a
+				if a > 0.0 and inv.get_pixel(x, y).a > 0.0:
+					overlap += 1
+				if a > 0.0 and a < 1.0:
+					partial += 1
+		_eq(overlap, 0, "D37 F%d does not overlap invincible frame pixels" % f)
+		_eq(partial, 0, "D37 F%d has no semi-transparent pixels" % f)
+	_eq(union, Rect2i(25, 3, 12, 11), "D37 F1-F4 union = cols 25-36 rows 3-13")
+	for i in 4:
+		for j in range(i + 1, 4):
+			_ok(frames[i].get_data() != frames[j].get_data(), "D37 F%d != F%d" % [i + 1, j + 1])
+
+
 func _t_art_sizes() -> void:
 	_eq(MainScript.PX, 2, "PX = 2 (ball / paddle only)")
 	_eq([MainScript.BRICK_W, MainScript.BRICK_H], [40, 20], "brick cell 40x20 = art size x1")
 	var names := _bricks40_names()
-	_eq(names.size(), 44, "D31 list has 44 images")
+	_eq(names.size(), 48, "D31 + D37 list has 48 images")
 	var bad := []
 	for n in names:
 		var img := _img40(n)
 		if img == null or img.get_size() != Vector2i(40, 20):
 			bad.append([n, img.get_size() if img != null else "missing"])
-	_eq(bad, [], "all 44 art/bricks40 images exist and are 40x20")
+	_eq(bad, [], "all 48 art/bricks40 images exist and are 40x20")
 	var files := Array(DirAccess.get_files_at("res://art/bricks40")).filter(func(f) -> bool: return f.ends_with(".png"))
-	_eq(files.size(), 44, "art/bricks40 has exactly 44 png")
+	_eq(files.size(), 48, "art/bricks40 has exactly 48 png")
+	var listed := names.map(func(n) -> String: return n + ".png")
+	_eq(files.filter(func(f) -> bool: return not listed.has(f)), [], "no unlisted png in art/bricks40")
+	_t_d37_mark_art()
 	# D31 疊加層的位置(欄、列從 0 起):數字 7×9 在第 16~22 欄、第 5~13 列;
 	# 炸彈 F1 12×10 第 26~37 欄、第 6~15 列;F2 12×12 第 26~37 欄、第 4~15 列
 	for d in range(1, 10):

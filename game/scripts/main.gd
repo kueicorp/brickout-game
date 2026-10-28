@@ -35,13 +35,17 @@ const HUD_STEP := 52
 ## D35 方案 C:每欄格數 = 向下取整((H − 473) ÷ 52),格底端離擋板上緣(H − 45)至少留 12 px;
 ## 800 高 = 6、707 高 = 4、640 高 = 3
 const HUD_COL_RESERVE := 473
-## D35 狀態種類;陣列順序就是同一幀同時出現(R10)與開局建立時的固定順序
-const HUD_KINDS: Array[String] = ["reinforce", "fever", "speed", "pierce", "flame", "bomb", Effects.PADDLE_LEN]
+## D35、D36 狀態種類;陣列順序就是同一幀同時出現(R10)與開局建立時的固定順序
+const HUD_KINDS: Array[String] = ["reinforce", "fever", "speed", "pierce", "flame", "bomb", Effects.PADDLE_LEN,
+	"paddle_speed", "sticky", "gun", "heal", "heal_area", "blackhole", "invincible", "invisible"]
+## 會觸發球光暈的種類(D36 Q3):只有 D35 原本的球狀態,擋板長度與 D36 新種類都不觸發
+const HALO_KINDS: Array[String] = ["reinforce", "fever", "speed", "pierce", "flame", "bomb"]
 const MIN_H := 640
 const MAX_H := 800
 
 # ---- 時間
 const FRAME := 0.06       # D12 小磚每幀 60 ms
+const BOMB_MARK_ENDS: Array[float] = [0.16, 0.26, 0.36, 0.5]  # D37 炸彈標記 F1~F4 各幀的結束時間(秒),最後一個 = 一輪長度
 const MAX_DT := 0.05      # 卡頓時一幀最多模擬 50 ms,避免球一次飛太遠
 const STEP_PX := 2.0    # 球每個子步最多移動的距離,高速時不會穿磚
 
@@ -779,8 +783,8 @@ func _show_end_screen(text: String) -> void:
 
 func _t(name: String) -> Texture2D:
 	if not _tex.has(name):
-		# D31 磚圖放在 art/bricks40、D32 掉落道具在 art/items40、D34 HUD 圖示在 art/hud32,其餘在 art/generated
-		var dir := "bricks40" if name.begins_with("d31_") else "items40" if name.begins_with("d32_") \
+		# D31 磚圖與 D37 炸彈標記放在 art/bricks40、D32 掉落道具在 art/items40、D34 HUD 圖示在 art/hud32,其餘在 art/generated
+		var dir := "bricks40" if name.begins_with("d31_") or name.begins_with("d37_") else "items40" if name.begins_with("d32_") \
 			else "hud32" if name.begins_with("d34_") else "generated"
 		_tex[name] = load("res://art/%s/%s.png" % [dir, name])
 	return _tex[name]
@@ -789,6 +793,15 @@ func _t(name: String) -> Texture2D:
 ## 全域動畫時鐘的相位;所有球光暈、炸彈標記、道具呼吸共用,不受遊戲暫停影響。
 func _phase(period: float) -> float:
 	return fmod(Time.get_ticks_msec() / 1000.0, period)
+
+
+## 炸彈標記(D37)在一輪內第 t 秒(0 ≤ t < 0.5)的圖名,依 BOMB_MARK_ENDS 切換 F1~F4;減少動態時固定 F1。
+func _bomb_mark(t: float) -> String:
+	var f := 1
+	if not reduced_motion:
+		while f < BOMB_MARK_ENDS.size() and t >= BOMB_MARK_ENDS[f - 1]:
+			f += 1
+	return "d37_bomb_mark_f%d" % f
 
 
 func _paint_backdrop(ci: CanvasItem) -> void:
@@ -844,8 +857,8 @@ func _paint_time(ci: CanvasItem) -> void:
 
 func _paint_bricks(ci: CanvasItem) -> void:
 	var invincible := effects.is_active("invincible")
-	# 炸彈標記 F1 300 ms、F2 200 ms,所有標記同相位;減少動態時固定 F1
-	var mark := _t("d31_bomb_mark_f1" if reduced_motion or _phase(0.5) < 0.3 else "d31_bomb_mark_f2")
+	# 炸彈標記(D37)所有標記共用同一時鐘;減少動態時固定 F1
+	var mark := _t(_bomb_mark(_phase(BOMB_MARK_ENDS[-1])))
 	for r in MAX_ROWS:
 		for c in COLS:
 			var br: Brick = grid[r][c]
@@ -959,6 +972,15 @@ func _hud_cell(kind: String) -> Array:
 				return ["d34_hud_icon_" + kind, _timebar(kind)]
 		Effects.PADDLE_LEN:
 			return _hud_len_cell()
+		"paddle_speed":
+			# D36 第三節:比照球速,一次跨過 0 仍是同一格、只換圖
+			if effects.paddle_tier < 0:
+				return ["d34_hud_icon_paddle_speed_down", {"segments": -cfg.paddle_tier_min, "filled": -effects.paddle_tier}]
+			if effects.paddle_tier > 0:
+				return ["d34_hud_icon_paddle_speed_up", {"segments": cfg.paddle_tier_max, "filled": effects.paddle_tier}]
+		"sticky", "gun", "heal", "heal_area", "blackhole", "invincible", "invisible":
+			if effects.is_active(kind):
+				return ["d34_hud_icon_" + kind, _timebar(kind)]
 	return []
 
 
@@ -1039,7 +1061,7 @@ func _pickup_frame(t: float) -> int:
 
 
 func _paint_halos(ci: CanvasItem) -> void:
-	# 清單中有任何一格不是擋板長度才顯示光暈(D35);所有光暈畫在所有球本體之下,全部同相位呼吸
+	# 清單中有球的狀態才顯示光暈(D35、D36 Q3);所有光暈畫在所有球本體之下,全部同相位呼吸
 	if not _halo_on():
 		return
 	var tex := _t("d15_ball_opt_c_halo_f1" if reduced_motion or _phase(0.8) < 0.4 else "d15_ball_opt_c_halo_f2")
@@ -1048,9 +1070,9 @@ func _paint_halos(ci: CanvasItem) -> void:
 		_draw_px(ci, tex, (b.pos - Vector2(7, 7) * PX).floor())
 
 
-## 球光暈是否顯示:獲得順序清單中有任何一格不是擋板長度(D35)。
+## 球光暈是否顯示:獲得順序清單中有任何一格是球的狀態(D35,D36 Q3 補例外)。
 func _halo_on() -> bool:
-	return hud_order.any(func(k: String) -> bool: return k != Effects.PADDLE_LEN)
+	return hud_order.any(func(k: String) -> bool: return k in HALO_KINDS)
 
 
 func _paint_balls(ci: CanvasItem) -> void:

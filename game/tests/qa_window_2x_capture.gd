@@ -14,7 +14,7 @@ var _frame := 0
 var _out := ""
 var _fail := 0
 var _pass := 0
-var _mark_seen := {}   # 動態炸彈標記看到的幀:"f1"/"f2" → 次數
+var _mark_seen := {}   # 動態炸彈標記(D37)看到的幀:"f1"~"f4"(或 none/multi/desync)→ 次數
 
 
 func _initialize() -> void:
@@ -80,6 +80,12 @@ func _setup() -> void:
 	# 最後一排(第 16 排)
 	_add(0, 16, 14)
 	_add(7, 16, 69)
+	# D37:七色都疊標記(層數都帶數字,標記期間應改用同色第 0 輪、不畫數字);用來看同相位與七色顯示
+	for i in 7:
+		_add(i, 6, i + 1 + 7 * (i % 3 + 1), false, true)
+	# D37:被擊中幀(閃白 + 扣層前數字 4)上疊標記
+	_add(4, 7, 30, false, true, 29)
+	_add(5, 7, 1, false, true, 0)      # 紅 1 層被標記、被擊中(無數字)
 	# 破壞動畫:第 0 幀被擊中(閃白 + 數字)、F1~F3 依顏色、F4 灰塵
 	for b in BREAKS:
 		_m.anims.append({"kind": "break", "pos": _m._cell_rect(b[0]).position, "t": b[1], "dur": 999.0, "hit_row": b[2], "color": b[3]})
@@ -218,7 +224,7 @@ func _verify(shot: Image, invincible: bool) -> void:
 	for cs in _cases:
 		var cell: Vector2i = cs[0]
 		var dest := Vector2i(_m._cell_rect(cell).position)
-		_check_stack("cell %s L%d%s" % [cell, cs[1], tag], shot, _expected_stack(cs[1], cs[2], cs[3], cs[4], invincible, "d31_bomb_mark_f1"), dest)
+		_check_stack("cell %s L%d%s" % [cell, cs[1], tag], shot, _expected_stack(cs[1], cs[2], cs[3], cs[4], invincible, "d37_bomb_mark_f1"), dest)
 	# 破壞動畫:第 0 幀閃白 + 扣層前數字;F1~F3 依顏色、不疊數字;F4 灰塵(破壞中的格子不畫無敵外框)
 	var colors := ["red", "orange", "yellow", "green", "blue", "indigo", "purple"]
 	for b in BREAKS:
@@ -301,13 +307,80 @@ func _check_paddle_outside(shot: Image, bg: Image, len: int, left: int, py: int)
 var _normal_shot: Image
 
 
-## 動態炸彈標記(reduced_motion 關):截到的那一幀必須整格吻合 F1 或 F2 其中之一。
+## 動態炸彈標記(reduced_motion 關,D37):每個被標記的格子都必須整格吻合 F1~F4 其中恰好一幀,
+## 而且同一張截圖裡所有標記格是同一幀(同相位)。結果記在 _mark_seen:"f1"~"f4" / "none" / "multi" / "desync"。
+var _mark_seq := []
+var _mark_saved := {}
+
+
+func _mark_frame_of(shot: Image, cs: Array) -> String:
+	var dest := Vector2i(_m._cell_rect(cs[0]).position)
+	var hits := []
+	for f in [1, 2, 3, 4]:
+		var r := _cmp_stack(shot, _expected_stack(cs[1], cs[2], cs[3], cs[4], false, "d37_bomb_mark_f%d" % f), dest)
+		if r[0] == 0:
+			hits.append("f%d" % f)
+	return "none" if hits.is_empty() else (hits[0] if hits.size() == 1 else "multi")
+
+
 func _verify_mark_anim(shot: Image) -> void:
-	var dest := Vector2i(_m._cell_rect(Vector2i(4, 0)).position)
-	var r1 := _cmp_stack(shot, ["d31_brick_orange", "d31_bomb_mark_f1"], dest)
-	var r2 := _cmp_stack(shot, ["d31_brick_orange", "d31_bomb_mark_f2"], dest)
-	var k := "f1" if r1[0] == 0 else ("f2" if r2[0] == 0 else "none")
+	var seen := {}
+	for cs in _cases:
+		if cs[3] and not cs[2]:
+			seen[_mark_frame_of(shot, cs)] = true
+	var k: String = seen.keys()[0] if seen.size() == 1 else "desync"
 	_mark_seen[k] = _mark_seen.get(k, 0) + 1
+	_mark_seq.append(k)
+	if k.begins_with("f") and not _mark_saved.has(k):
+		_mark_saved[k] = true
+		shot.save_png(_out.path_join("qa_d37_mark_anim_%s.png" % k))
+
+
+## 循環順序:相鄰兩次截圖只能是同一幀或往後(F4 → F1 算往後),不能倒退。
+func _check_mark_order() -> void:
+	var back := 0
+	var first := ""
+	for i in range(1, _mark_seq.size()):
+		var a: String = _mark_seq[i - 1]
+		var b: String = _mark_seq[i]
+		if not (a.begins_with("f") and b.begins_with("f")):
+			continue
+		var d := (int(b.substr(1)) - int(a.substr(1)) + 4) % 4
+		if d == 3:
+			back += 1
+			if first == "":
+				first = "%s -> %s at capture %d" % [a, b, i]
+	_report("D37 mark order F1->F2->F3->F4 cyclic (no step back)", back, _mark_seq.size() - 1, first)
+
+
+## 炸彈到期爆炸後,原本標記的格子上不能再出現任何一幀標記(只比標記本身的不透明像素,必須有不一樣的)。
+func _check_no_mark(label: String, shot: Image, cells: Array) -> void:
+	var bad := 0
+	var first := ""
+	for cell in cells:
+		var dest := Vector2i(_m._cell_rect(cell).position)
+		for f in [1, 2, 3, 4]:
+			var r := _cmp_stack(shot, ["d37_bomb_mark_f%d" % f], dest)
+			if r[0] == 0:
+				bad += 1
+				if first == "":
+					first = "cell %s still shows F%d" % [cell, f]
+	_report(label, bad, cells.size() * 4, first)
+
+
+func _marked_cells() -> Array:
+	var out := []
+	for cs in _cases:
+		if cs[3] and not cs[2]:
+			out.append(cs[0])
+	return out
+
+
+## 讓炸彈到期(_on_expired("bomb"));_damage 只在 PLAYING 生效,所以只在這一刻切回 PLAYING。
+func _expire_bomb() -> void:
+	_m.state = MainScript.State.PLAYING
+	_m._on_expired("bomb")
+	_m.state = 1
 
 
 func _process(_delta: float) -> bool:
@@ -338,20 +411,58 @@ func _process(_delta: float) -> bool:
 	if _frame == 30:
 		var bg := root.get_texture().get_image()
 		_check_paddle_outside(_normal_shot, bg, _m._paddle_len(), _m._paddle_left(_m._paddle_len()), _m._paddle_y())
-	if _frame >= 36 and _frame < 96:
+	if _frame >= 36 and _frame < ANIM_END:
+		_verify_mark_anim(root.get_texture().get_image())
+	if _frame == ANIM_END:
+		var n := ANIM_END - 36
+		print("INFO animated bomb mark frames seen over %d captures: %s (expect F1 32%%, F2 20%%, F3 20%%, F4 28%%)" % [n, _mark_seen])
+		var all4: bool = _mark_seen.has("f1") and _mark_seen.has("f2") and _mark_seen.has("f3") and _mark_seen.has("f4")
+		var other := n - int(_mark_seen.get("f1", 0)) - int(_mark_seen.get("f2", 0)) - int(_mark_seen.get("f3", 0)) - int(_mark_seen.get("f4", 0))
+		_report("animated D37 mark: F1-F4 all seen, every marked cell exact, same phase", 0 if all4 and other == 0 else 1, n,
+			"" if all4 and other == 0 else str(_mark_seen))
+		# 取樣比例:F1 160 / F2 100 / F3 100 / F4 140 ms(一輪 500)→ 32 / 20 / 20 / 28 %,容許 ±8 個百分點
+		var want := {"f1": 32.0, "f2": 20.0, "f3": 20.0, "f4": 28.0}
+		for k in want:
+			var pct := 100.0 * float(_mark_seen.get(k, 0)) / n
+			var ok := absf(pct - want[k]) <= 8.0
+			_report("D37 %s share %.1f%% (want %.0f%% +-8)" % [k, pct, want[k]], 0 if ok else 1, n, "" if ok else "%.1f%%" % pct)
+		_check_mark_order()
+		# 到期爆炸(一):無敵中 → 磚不破,但標記要清掉
+		_m.effects.add_timed("invincible", 999.0)
+		_expire_bomb()
+	if _frame == ANIM_END + 6:
 		var shot := root.get_texture().get_image()
-		_verify_mark_anim(shot)
-		if _frame == 50 or _frame == 60:
-			shot.save_png(_out.path_join("qa_bricks40_mark_anim_%d.png" % _frame))
-	if _frame == 96:
-		print("INFO animated bomb mark frames seen over 60 captures: %s (expect F1 ~60%%, F2 ~40%%)" % [_mark_seen])
-		if _mark_seen.has("f1") and _mark_seen.has("f2") and not _mark_seen.has("none"):
-			_pass += 1
-			print("OK   animated bomb mark: both F1 and F2 drawn exactly, no other frame")
-		else:
-			_fail += 1
-			print("FAIL animated bomb mark: %s" % [_mark_seen])
+		shot.save_png(_out.path_join("qa_d37_after_explode_invincible.png"))
+		var cells := _marked_cells()
+		var still := 0
+		for cs in _cases:
+			if cs[3] and not cs[2]:
+				var br = _m.grid[cs[0].y][cs[0].x]
+				if br == null or br.marked:
+					still += 1
+				_check_stack("after explode (invincible) cell %s unmarked" % cs[0], shot, _expected_stack(cs[1], cs[2], false, cs[4], true, ""),
+					Vector2i(_m._cell_rect(cs[0]).position))
+		_report("after explode (invincible): marked bricks survive, flag cleared", still, cells.size(), "")
+		_check_no_mark("after explode (invincible): no D37 mark drawn", shot, cells)
+		# 到期爆炸(二):無敵關,重新標記後爆炸 → 被標記的磚破壞、標記消失
+		_m.effects.timed.erase("invincible")
+		for cell in cells:
+			_m.grid[cell.y][cell.x].marked = true
+		_expire_bomb()
+	if _frame == ANIM_END + 12:
+		var shot := root.get_texture().get_image()
+		shot.save_png(_out.path_join("qa_d37_after_explode.png"))
+		var cells := _marked_cells()
+		var left := 0
+		for cell in cells:
+			if _m.grid[cell.y][cell.x] != null:
+				left += 1
+		_report("after explode: marked bricks destroyed", left, cells.size(), "")
+		_check_no_mark("after explode: no D37 mark drawn", shot, cells)
 		print("QA 2X CAPTURE RESULT: %d passed, %d failed" % [_pass, _fail])
 		quit(1 if _fail > 0 else 0)
 		return true
 	return false
+
+
+const ANIM_END := 156   # 動態標記取樣:第 36~155 幀,共 120 張(約 2 秒、4 輪)

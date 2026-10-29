@@ -10,6 +10,8 @@ extends Resource
 @export var game_time := 300.0
 ## 多層磚層數上限。
 @export var max_layers := 69
+## 關卡編號(魔王血量 = 關卡編號 × boss_hp_per_level);本原型只有單關,先用設定模擬。
+@export var level_number := 10
 
 @export_group("球")
 ## 球的基準速度(px/s)。
@@ -89,9 +91,49 @@ extends Resource
 ## 模擬「重複遊玩的關卡」:true 時小偷才會出現在掉落與黑球選項中。
 @export var replay_level := false
 
+@export_group("功能型磚")
+## 雷射光束對沿途每塊可破壞磚扣的層數;閃電每道扣的層數(README)。
+@export var laser_damage := 1
+@export var lightning_damage := 2
+## 功能型磚所有動畫的每幀秒數(D38:雷射、落雷、爆炸、挑色環、選中閃光、傳送、被擊中、破壞都是 60 ms)。
+@export var func_frame := 0.06
+## 閃電多道時每道起始的間隔秒數(D17 建議值)。
+@export var lightning_stagger := 0.08
+## 爆炸連鎖:被引爆的爆炸磚在前一顆觸發後多久引爆(假設:0.12 = 前一顆爆炸 F3 開頭、火球最大時)。
+@export var explosion_chain_delay := 0.12
+## 剩餘次數數字(d31_digit_N)相對磚左上角的偏移(D38 Q4)。
+@export var func_digit_offset := Vector2(10, 0)
+## 垂直光束中段、端點(20×20)相對所在磚欄左緣的偏移(D38)。
+@export var laser_v_offset := Vector2(10, 0)
+## 落雷落點圖、爆炸圖、彩虹挑色環相對目標磚/功能型磚左上角的偏移(D38)。
+@export var lightning_hit_offset := Vector2(0, -10)
+@export var explosion_fx_offset := Vector2(-40, -20)
+@export var rainbow_ring_offset := Vector2(-10, -10)
+
+@export_group("特殊磚與魔王")
+## 寶箱破壞必掉 1 個道具,其中增益的機率(其餘減益;取代一般 30% 掉落判定)。
+@export var chest_buff_ratio := 0.7
+## 金幣磚必掉 1 枚金幣:面額與對應機率(D41,依序累加,合計應為 1)。
+@export var coin_values: Array[int] = [10, 50, 100]
+@export var coin_weights: Array[float] = [0.6, 0.3, 0.1]
+## 魔王每隻血量 = level_number × 這個值(README:關卡的 5 倍)。
+@export var boss_hp_per_level := 5
+## 魔王被球擊中時掉落(單次擲骰):減益機率、增益機率;魔王不吃一般 30% 掉落判定。
+@export var boss_debuff_chance := 0.2
+@export var boss_buff_chance := 0.05
+## 炸彈效果結束時,被標記的魔王扣的層數(README)。
+@export var bomb_boss_damage := 10
+## 一次跨多個門檻同時掉多格時,各格破壞動畫錯開的秒數(D42 Q8)。
+@export var boss_drop_stagger := 0.1
+## 魔王全滅後,剩下的磚依序播灰塵幀消失的間隔秒數(假設;規格只寫「依序」)。
+@export var boss_clear_stagger := 0.02
+
 @export_group("計分")
 @export var score_per_layer := 100
+## 一般磚破壞分;寶箱、金幣、圓形磚破壞也只給這個(不另給每層分)。魔王每層用 score_per_layer。
 @export var score_per_brick := 200
+## 每隻魔王死亡的加分(README)。
+@export var score_boss_kill := 1000
 @export var score_buff := 200
 @export var score_debuff := 50
 @export var score_per_second := 2

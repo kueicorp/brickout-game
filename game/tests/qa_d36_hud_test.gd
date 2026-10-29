@@ -7,6 +7,8 @@ extends SceneTree
 const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
 const FPS := 1.0 / 60.0
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 ## D36 第二節:7 種限時(id = HUD 種類 = 道具 id)與規格秒數
 const TIMED := {"sticky": 30.0, "gun": 10.0, "heal": 10.0, "heal_area": 10.0, "blackhole": 5.0,
 	"invincible": 10.0, "invisible": 10.0}
@@ -36,6 +38,7 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = LEVEL
 	cfg.drop_chance = 0.0
 	cfg.debug_enchant = ""
 	cfg.debug_force_item = ""

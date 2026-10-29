@@ -5,6 +5,8 @@ extends SceneTree
 
 const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 
 var cfg: GameConfig
 var _passed := 0
@@ -22,6 +24,7 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = LEVEL
 	_run_all()
 	return false
 
@@ -893,9 +896,10 @@ func _t_level_parse() -> void:
 		big.append("1 1 1 1 1 1 1 1 1 1")
 	var p6 := Rules.parse_level({"rows": big}, R, C, 69)
 	_eq([p6["cells"].size(), p6["cells"][16].size(), p6["errors"].size()], [17, 8, 18], "22x10 level -> 17x8 with 1 row error + 17 col errors")
-	var test_level = load(cfg.level_path).data
+	# 固定讀 level_test.json(17 排),不檢查設定檔預設指向哪一關
+	var test_level = load("res://data/levels/level_test.json").data
 	var p3 := Rules.parse_level(test_level, R, C, 69)
-	_eq([p3["cells"].size(), p3["errors"].size()], [17, 0], "test level 17 rows, no errors")
+	_eq([p3["cells"].size(), p3["errors"].size()], [17, 0], "level_test.json 17 rows, no errors")
 	# 遊戲實際載入超規格關卡:不中斷、格子仍是 17 × 8
 	var tmp := "user://qa_oversize_level.json"
 	var f := FileAccess.open(tmp, FileAccess.WRITE)

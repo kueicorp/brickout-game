@@ -5,6 +5,8 @@ extends SceneTree
 
 const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 
 var cfg: GameConfig
 var _passed := 0
@@ -18,6 +20,7 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = LEVEL
 	_run("art_sizes", _t_art_sizes)
 	_run("grid_cells", _t_grid_cells)
 	_run("walls", _t_walls)
@@ -108,7 +111,7 @@ func _size(name: String) -> Vector2i:
 
 # ---------- 原圖尺寸(畫的時候 × PX) ----------
 
-## 40×20 規格(D31 + D37):art/bricks40 的 48 張都是 40×20,一張 = 一格(1 倍,不乘 PX)。
+## 40×20 規格(D31 + D37 + D38):art/bricks40 的 73 張都是 40×20,一張 = 一格(1 倍,不乘 PX)。
 const BRICK_COLORS := ["red", "orange", "yellow", "green", "blue", "indigo", "purple"]
 
 
@@ -121,10 +124,18 @@ func _bricks40_names() -> Array:
 	for d in range(1, 10):
 		out.append("d31_digit_%d" % d)
 	out.append_array(["d31_brick_hit", "d31_brick_dust_f4", "d31_brick_unbreakable", "d31_brick_unbreakable_hit",
-		"d31_invincible_frame", "d31_bomb_mark_f1", "d31_bomb_mark_f2"])
-	# D37 炸彈標記 4 幀(取代 D31 的 2 幀;d31_bomb_mark_* 檔案保留不刪)
+		"d31_invincible_frame"])
+	# D37 炸彈標記 4 幀(取代 D31 的 2 幀;d31_bomb_mark_f1/f2 已淘汰並刪除)
 	for f in [1, 2, 3, 4]:
 		out.append("d37_bomb_mark_f%d" % f)
+	# D38 功能型磚 27 張(brick-size.md 正式匯出清單):磚體 8、被擊中 7、破壞 F1~F3 共 12
+	for k in ["laser_h", "laser_v", "laser_x", "lightning", "reaper", "explosion", "rainbow", "teleport"]:
+		out.append("d38_brick_" + k)
+		if k != "teleport":
+			out.append("d38_brick_%s_hit" % k)
+	for m in ["laser", "lightning", "reaper", "rainbow"]:
+		for f in [1, 2, 3]:
+			out.append("d38_brick_%s_f%d" % [m, f])
 	return out
 
 
@@ -185,25 +196,23 @@ func _t_art_sizes() -> void:
 	_eq(MainScript.PX, 2, "PX = 2 (ball / paddle only)")
 	_eq([MainScript.BRICK_W, MainScript.BRICK_H], [40, 20], "brick cell 40x20 = art size x1")
 	var names := _bricks40_names()
-	_eq(names.size(), 48, "D31 + D37 list has 48 images")
+	_eq(names.size(), 73, "D31 + D37 + D38 list has 73 images")
 	var bad := []
 	for n in names:
 		var img := _img40(n)
 		if img == null or img.get_size() != Vector2i(40, 20):
 			bad.append([n, img.get_size() if img != null else "missing"])
-	_eq(bad, [], "all 48 art/bricks40 images exist and are 40x20")
+	_eq(bad, [], "all 73 art/bricks40 images exist and are 40x20")
 	var files := Array(DirAccess.get_files_at("res://art/bricks40")).filter(func(f) -> bool: return f.ends_with(".png"))
-	_eq(files.size(), 48, "art/bricks40 has exactly 48 png")
+	_eq(files.size(), 73, "art/bricks40 has exactly 73 png")
 	var listed := names.map(func(n) -> String: return n + ".png")
 	_eq(files.filter(func(f) -> bool: return not listed.has(f)), [], "no unlisted png in art/bricks40")
 	_t_d37_mark_art()
-	# D31 疊加層的位置(欄、列從 0 起):數字 7×9 在第 16~22 欄、第 5~13 列;
-	# 炸彈 F1 12×10 第 26~37 欄、第 6~15 列;F2 12×12 第 26~37 欄、第 4~15 列
+	# D31 疊加層的位置(欄、列從 0 起):數字 7×9 在第 16~22 欄、第 5~13 列
+	# (D31 炸彈標記 2 幀已由 D37 取代並刪除,位置改由 _t_d37_mark_art 檢查)
 	for d in range(1, 10):
 		var bb := _opaque_bbox(_img40("d31_digit_%d" % d))
 		_ok(bb.position.x >= 16 and bb.end.x <= 23 and bb.position.y >= 5 and bb.end.y <= 14, "digit %d inside cols 16-22 rows 5-13 (bbox %s)" % [d, bb])
-	_eq(_opaque_bbox(_img40("d31_bomb_mark_f1")), Rect2i(26, 6, 12, 10), "bomb F1 bbox cols 26-37 rows 6-15")
-	_eq(_opaque_bbox(_img40("d31_bomb_mark_f2")), Rect2i(27, 4, 11, 12), "bomb F2 bbox cols 27-37 rows 4-15")
 	# 無敵外框:第 3~36 欄、第 3~16 列全透明,外框整張 40×20
 	var inv := _img40("d31_invincible_frame")
 	var inner_opaque := 0

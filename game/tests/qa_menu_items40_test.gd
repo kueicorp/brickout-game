@@ -165,6 +165,9 @@ func _t_option_icons() -> void:
 
 ## 走 main._open_menu 的實際抽選:選項圖示 = 抽到的 id
 func _t_option_icons_main() -> void:
+	# 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+	var cfg := load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = "res://data/levels/level_func_test.json"
 	for seed in [1, 2, 3, 4, 5]:
 		for golden in [true, false]:
 			var mm = MainScene.instantiate()

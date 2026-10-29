@@ -9,6 +9,9 @@ const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
 const BALL := Vector2(180, 300)
 const TOL := 3.0 / 255.0
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
+var _cfg: GameConfig   # 持有共用設定,主場景 load 到的是同一份
 
 var _m
 var _frame := 0
@@ -152,6 +155,8 @@ func _check(name: String, order: Array, label: String) -> void:
 func _process(_delta: float) -> bool:
 	_frame += 1
 	if _frame == 4:
+		_cfg = load("res://data/game_config.tres") as GameConfig
+		_cfg.level_path = LEVEL
 		_m = MainScene.instantiate()
 		root.add_child(_m)
 	if _frame == 6:

@@ -359,6 +359,9 @@ func _realtime_close() -> void:
 
 ## 5. 真實畫面截圖(主場景開啟選單),並量測實機字型
 func _real_screens() -> void:
+	# 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+	var cfg := load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = "res://data/levels/level_func_test.json"
 	var mm = MainScene.instantiate()
 	root.add_child(mm)
 	await _wait(3)

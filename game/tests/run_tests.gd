@@ -38,6 +38,27 @@ func _init() -> void:
 	_test_hud_d36()
 	_test_hud_slots()
 	_test_paddle_in_wall_on_len_change()
+	_test_func_parse()
+	_test_func_load()
+	_test_func_common()
+	_test_func_laser()
+	_test_func_shots()
+	_test_func_lightning()
+	_test_func_reaper()
+	_test_func_explosion()
+	_test_func_rainbow()
+	_test_func_teleport()
+	_test_func_invincible()
+	_test_func_win()
+	_test_func_textures()
+	_test_special_parse()
+	_test_boss_rules()
+	_test_boss_parts()
+	_test_special_rules()
+	_test_special_bricks()
+	_test_boss_game()
+	_test_boss_effects()
+	_test_special_textures()
 	# _init 時 root 還不在樹裡,加進去的節點不會跑 _ready;等一幀再測要用到樹的選單
 	await process_frame
 	_test_choice_menu_layout()
@@ -950,11 +971,11 @@ func _test_sticky_gun_expiry() -> void:
 func _test_hud_icons() -> void:
 	var m := _bare_main()
 	var bad := []
-	for id in ["reinforce", "slow", "fast", "pierce", "flame", "bomb", "fever", "paddle_len_up1", "paddle_len_down1"]:
+	for id in ["reinforce", "slow", "fast", "pierce", "flame", "bomb", "paddle_len_up1", "paddle_len_down1"]:
 		var tex: Texture2D = m._t("d34_hud_icon_" + id)
 		if tex == null or tex.get_size() != Vector2(32, 32) or tex.resource_path != "res://art/hud32/d34_hud_icon_%s.png" % id:
 			bad.append(id)
-	_eq(bad, [], "9 D34 HUD icons load from art/hud32 as 32x32")
+	_eq(bad, [], "8 D34 HUD icons load from art/hud32 as 32x32")
 	m.effects.reinforce = 2
 	m.effects.ball_tier = -1
 	m._apply_item("pierce")
@@ -1232,4 +1253,1005 @@ func _test_paddle_in_wall_on_len_change() -> void:
 	m._update_paddle(10.0)
 	m._apply_item("paddle_len_2")
 	_eq(m._paddle_left(m._paddle_len()), 20, "grow at left wall: inside wall at once")
+	m.free()
+
+
+# ===================== 功能型磚(D38) =====================
+
+## 放一塊功能型磚;傳送磚不計入勝利條件。
+func _func(m: Node2D, cell: Vector2i, kind: String, uses := 1) -> Object:
+	var br = load("res://scripts/main.gd").Brick.new()
+	br.kind = kind
+	br.uses = uses
+	m.grid[cell.y][cell.x] = br
+	if kind != "teleport":
+		m.breakable_left += 1
+	return br
+
+
+## 推進動畫與延遲效果(每步 10 ms),不移動球與擋板。
+func _run(m: Node2D, secs: float) -> void:
+	for i in roundi(secs / 0.01):
+		m._update_anims(0.01)
+		m._update_events(0.01)
+
+
+## 有功能型磚、空場地、不會意外過關(breakable_left 多墊 99)的主程式。
+func _func_main() -> Node2D:
+	var m := _bare_main()
+	m.rng.seed = 7
+	_empty_grid(m)
+	m.breakable_left = 99
+	return m
+
+
+func _anim_count(m: Node2D, kind: String) -> int:
+	return m.anims.filter(func(a: Dictionary) -> bool: return a["kind"] == kind).size()
+
+
+func _test_func_parse() -> void:
+	var F := Rules.FUNC
+	var p := Rules.parse_level({"rows": ["LH LV LX Z R E W T", "LH5 Z9 R1 E5 LH0 LH10 Q T"]}, 17, 8, 69)
+	_eq(p["cells"][0], [F, F, F, F, F, F, F, F] as Array[int], "8 function codes parse")
+	_eq(p["cells"][1], [F, F, F, 0, 0, 0, 0, F] as Array[int], "E5 / LH0 / LH10 / Q rejected")
+	_eq(p["errors"].size(), 4, "4 invalid function cells reported")
+	var kinds := []
+	for c in 8:
+		kinds.append(p["funcs"][Vector2i(c, 0)]["kind"])
+	_eq(kinds, ["laser_h", "laser_v", "laser_x", "lightning", "reaper", "explosion", "rainbow", "teleport"], "code -> kind")
+	_eq([p["funcs"][Vector2i(0, 0)]["uses"], p["funcs"][Vector2i(0, 1)]["uses"], p["funcs"][Vector2i(1, 1)]["uses"],
+		p["funcs"][Vector2i(2, 1)]["uses"]], [0, 5, 9, 1], "no count = 0 (random at load); LH5 / Z9 / R1 explicit")
+	# 傳送磚奇數塊:丟棄最後一塊(讀取順序)並記錯誤
+	var odd := Rules.parse_level({"rows": ["T . T . . . . .", ". . . . T . . ."]}, 17, 8, 69)
+	_eq([odd["cells"][0][0], odd["cells"][0][2], odd["cells"][1][4], odd["errors"].size(), odd["funcs"].has(Vector2i(4, 1))],
+		[F, F, 0, 1, false], "odd teleports: last one dropped with error")
+	var even := Rules.parse_level({"rows": ["T . T . T . . T"]}, 17, 8, 69)
+	_eq([even["errors"].size(), even["funcs"].size()], [0, 4], "even teleports kept")
+	# 功能型磚測試關卡:沒有錯誤、6 種(8 代號)都有、不可破壞磚 2~3 塊
+	var lv := Rules.parse_level(load("res://data/levels/level_func_test.json").data, 17, 8, 69)
+	var seen := {}
+	for k in lv["funcs"]:
+		seen[lv["funcs"][k]["kind"]] = true
+	var u := 0
+	for line in lv["cells"]:
+		u += line.count(Rules.UNBREAKABLE)
+	_eq([lv["errors"].size(), seen.size(), u >= 2 and u <= 3], [0, 8, true], "level_func_test: no errors, all 8 kinds, 2~3 U")
+	# 原本的測試關卡不受影響
+	_eq(Rules.parse_level(load("res://data/levels/level_test.json").data, 17, 8, 69)["funcs"].size(), 0, "level_test has no function bricks")
+
+
+func _test_func_load() -> void:
+	var m := _bare_main()
+	m.rng.seed = 3
+	m.cfg.level_path = "res://data/levels/level_func_test.json"
+	m._load_level()
+	_eq([m.grid[0][3].kind, m.grid[0][3].uses], ["laser_h", 3], "LH3 loads with 3 uses")
+	_eq([m.grid[4][1].kind, m.grid[4][1].uses, m.grid[4][6].uses], ["explosion", 1, 1], "explosion / rainbow: 1 use")
+	var r10: int = m.grid[10][3].uses
+	_eq(r10 >= 1 and r10 <= 9, true, "LH without count: random 1~9 (%d)" % r10)
+	var ok := true
+	for i in 200:
+		var v: int = m.rng.randi_range(1, Rules.FUNC_USES_MAX)
+		ok = ok and v >= 1 and v <= 9
+	_eq(ok, true, "random uses always 1~9")
+	# 50 塊多層磚 + 9 塊功能型磚(不含 2 塊傳送、2 塊不可破壞)
+	_eq(m.breakable_left, 59, "win counter: layered + function bricks, teleport excluded")
+	m.free()
+
+
+## 共通:不吃強化/火焰/炸彈標記;穿透遇到照常反彈並觸發;打磚加速 +0.5%;火焰波及不影響功能型磚。
+func _test_func_common() -> void:
+	var m := _func_main()
+	var reaper = _func(m, Vector2i(4, 8), "reaper", 5)
+	_brick(m, Vector2i(3, 8), 5)
+	_brick(m, Vector2i(5, 8), 5)
+	m.effects.reinforce = 7
+	m.effects.add_timed("flame", 20.0)
+	m._ball_hit_brick(Vector2i(4, 8))
+	_eq([reaper.uses, m.grid[8][3].layers, m.grid[8][5].layers], [4, 5, 5], "reinforce + flame: function brick uses -1 only, no splash")
+	_eq(is_equal_approx(m.brick_accel, 0.005), true, "function brick hit = other brick accel +0.5%")
+	# 打旁邊的多層磚(火焰 2 + 強化 7 → 破壞),3×3 波及到死神磚也不扣次數
+	m._ball_hit_brick(Vector2i(3, 8))
+	_eq([m.grid[8][3], reaper.uses], [null, 4], "flame splash does not touch function brick")
+	m.effects.timed.clear()
+	m.effects.reinforce = 0
+	# 炸彈期間:功能型磚不被標記,照常觸發
+	m.effects.add_timed("bomb", 10.0)
+	m._ball_hit_brick(Vector2i(4, 8))
+	_eq([reaper.marked, reaper.uses], [false, 3], "bomb: function brick not marked, still triggers")
+	m.effects.timed.clear()
+	# 回血不加功能型磚
+	m._heal(Vector2i(4, 8), 3)
+	_eq(reaper.uses, 3, "heal does not touch function brick")
+	m.free()
+	# 穿透:功能型磚照常反彈並觸發(雷射 (4,10) 的 y 268~288)
+	var p := _func_main()
+	var laser = _func(p, Vector2i(4, 10), "laser_h", 5)
+	var b = load("res://scripts/main.gd").Ball.new()
+	b.pos = Vector2(200, 295.9)
+	b.dir = Vector2.UP
+	p._ball_bricks(b, true)
+	_eq([b.dir.y > 0.0, laser.uses], [true, 4], "pierce: bounces off function brick and triggers")
+	p.free()
+
+
+func _test_func_laser() -> void:
+	# 水平:第 3 排 y 128;左側到牆、右側被不可破壞磚 (5,3) 擋下;F2 開頭才扣層
+	var m := _func_main()
+	_brick(m, Vector2i(0, 3), 5)
+	_brick(m, Vector2i(1, 3), 5)
+	var laser = _func(m, Vector2i(2, 3), "laser_h", 3)
+	_brick(m, Vector2i(4, 3), 2)
+	_unbreakable(m, Vector2i(5, 3))
+	_brick(m, Vector2i(6, 3), 5)
+	_brick(m, Vector2i(2, 2), 5)
+	m._ball_hit_brick(Vector2i(2, 3))
+	_eq([laser.uses, laser.hit_row, laser.hit_t > 0.0], [2, 3, true], "laser: uses -1, hit frame shows old count")
+	_eq(m.grid[3][0].layers, 5, "beam damage waits for F2")
+	_run(m, 0.07)
+	_eq([m.grid[3][0].layers, m.grid[3][1].layers, m.grid[3][4].layers, m.grid[3][6].layers, m.grid[2][2].layers],
+		[4, 4, 1, 5, 5], "beam: -1 on path, stops at unbreakable, other rows untouched")
+	_eq(m.score, 300, "beam damage 100 per layer")
+	var a: Dictionary = m.anims.filter(func(x: Dictionary) -> bool: return x["kind"] == "laser")[0]
+	var segs: Array = a["segs"]
+	_eq([segs.size(), segs[0]["pos"], segs[3]["pos"]], [8, Vector2(80, 128), Vector2(20, 128)], "left: 4 mids to wall x 20")
+	_eq([segs[-1]["name"], segs[-1]["pos"], segs[-1]["flip"], segs[-2]["pos"]],
+		["d38_fx_laser_block_", Vector2(200, 128), false, Vector2(180, 128)], "right: 3 mids + block end next to unbreakable")
+	_eq([m._beam_width({"t": 0.0}), m._beam_width({"t": 0.07}), m._beam_width({"t": 0.13}), m._beam_width({"t": 0.19})],
+		["thin", "full", "full", "thin"], "beam frames thin, full, full, thin")
+	m.free()
+	# 緊貼擋下:沒有中段,端點蓋在起點靠擋下磚的那一半;往左的端點鏡射
+	var t := _func_main()
+	_unbreakable(t, Vector2i(5, 3))
+	_func(t, Vector2i(6, 3), "laser_h", 2)
+	t._ball_hit_brick(Vector2i(6, 3))
+	var s2: Array = t.anims.filter(func(x: Dictionary) -> bool: return x["kind"] == "laser")[0]["segs"]
+	_eq([s2.size(), s2[0]["name"], s2[0]["pos"], s2[0]["flip"], s2[1]["pos"], s2[2]["pos"]],
+		[3, "d38_fx_laser_block_", Vector2(260, 128), true, Vector2(300, 128), Vector2(320, 128)], "adjacent blocker: block only, mirrored")
+	t.free()
+	# 垂直:第 0 排往上多 1 段(y 48,畫時裁到 52);往下一路到關卡區底部
+	var v := _func_main()
+	_func(v, Vector2i(3, 0), "laser_v", 2)
+	_brick(v, Vector2i(3, 4), 3)
+	v._ball_hit_brick(Vector2i(3, 0))
+	var sv: Array = v.anims.filter(func(x: Dictionary) -> bool: return x["kind"] == "laser")[0]["segs"]
+	_eq([sv[0]["pos"], sv[0]["vert"], sv[1]["pos"], sv[-1]["pos"]], [Vector2(150, 48), true, Vector2(150, 88), Vector2(150, 788)],
+		"vertical: x + 10, up to field top, down to field bottom")
+	_run(v, 0.07)
+	_eq(v.grid[4][3].layers, 2, "vertical beam damages column")
+	v.free()
+	# 剩 1 次:先發射,光束播完(240 ms)才破壞;用完後再碰不觸發
+	var l := _func_main()
+	var last = _func(l, Vector2i(0, 10), "laser_x", 1)
+	l._ball_hit_brick(Vector2i(0, 10))
+	_eq([_anim_count(l, "laser"), last.uses, l.grid[10][0] != null], [1, 0, true], "last use: fires, brick stays while beaming")
+	l._ball_hit_brick(Vector2i(0, 10))
+	_eq(_anim_count(l, "laser"), 1, "spent laser does not fire again")
+	var left0: int = l.breakable_left
+	_run(l, 0.25)
+	_eq([l.grid[10][0], l.score, l.breakable_left, _anim_count(l, "func_break")], [null, 200, left0 - 1, 1],
+		"destroyed after beam: +200, counted for win")
+	l.free()
+	# 連鎖:A 的光束打到 B → B 發射打回 A,每次都扣次數,直到兩塊用完
+	var c := _func_main()
+	var la = _func(c, Vector2i(0, 12), "laser_h", 2)
+	_brick(c, Vector2i(1, 12), 9)
+	var lb = _func(c, Vector2i(3, 12), "laser_h", 2)
+	c._ball_hit_brick(Vector2i(0, 12))
+	_run(c, 0.07)
+	_eq([la.uses, lb.uses, _anim_count(c, "laser")], [1, 1, 2], "chain: beam hits laser B, B fires and loses 1")
+	_run(c, 1.0)
+	_eq([c.grid[12][0], c.grid[12][3], c.grid[12][1].layers], [null, null, 5], "chain ends after 4 shots; brick between hit 4 times")
+	c.free()
+	# 光束打到死神只扣次數(不吃球)、打到傳送磚被擋下沒效果
+	var r := _func_main()
+	_func(r, Vector2i(0, 14), "laser_h", 3)
+	var rp = _func(r, Vector2i(2, 14), "reaper", 3)
+	_brick(r, Vector2i(3, 14), 5)
+	var tp = _func(r, Vector2i(6, 14), "teleport")
+	_func(r, Vector2i(7, 14), "laser_h", 3)
+	r.balls.append(load("res://scripts/main.gd").Ball.new())
+	r._ball_hit_brick(Vector2i(0, 14))
+	r._ball_hit_brick(Vector2i(7, 14))
+	_run(r, 0.07)
+	_eq([rp.uses, r.balls.size(), r.grid[14][3].layers, tp.hit_t, r.grid[14][6] == tp], [2, 1, 5, 0.0, true],
+		"beam: reaper -1 only, blocks beam; teleport blocks with no effect")
+	r.free()
+
+
+## 擋板槍子彈:打到功能型磚觸發並扣 1 次、子彈停下;傳送磚擋下沒效果;死神只扣次數。
+func _test_func_shots() -> void:
+	var m := _func_main()
+	var laser = _func(m, Vector2i(1, 5), "laser_h", 3)
+	var tp = _func(m, Vector2i(3, 5), "teleport")
+	var rp = _func(m, Vector2i(5, 5), "reaper", 2)
+	m.balls.append(load("res://scripts/main.gd").Ball.new())
+	# 第 5 排下緣 y 188;子彈 x 59 → 第 1 欄、139 → 第 3 欄、219 → 第 5 欄
+	m.bullets = [Vector2(59, 200), Vector2(139, 200), Vector2(219, 200)]
+	m._update_bullets(0.05)
+	_eq([m.bullets.size(), laser.uses, _anim_count(m, "laser"), rp.uses, m.balls.size()], [0, 2, 1, 1, 1],
+		"bullet: laser fires and -1, reaper -1 without eating balls, bullets stop")
+	_eq([_anim_count(m, "bullet_hit"), _anim_count(m, "bullet_block"), m.grid[5][3] == tp], [2, 1, true], "bullet blocked by teleport")
+	m.free()
+
+
+func _test_func_lightning() -> void:
+	var m := _func_main()
+	for i in 20:
+		_brick(m, Vector2i(i % 8, i / 8), 5)
+	_unbreakable(m, Vector2i(0, 5))
+	var rp = _func(m, Vector2i(1, 5), "reaper", 3)
+	var z = _func(m, Vector2i(2, 5), "lightning", 9)
+	m._ball_hit_brick(Vector2i(2, 5))
+	_eq(z.uses, 8, "lightning: uses -1")
+	var starts: Array = m.events.map(func(e: Dictionary) -> float: return snappedf(e["t"], 0.001))
+	_eq(starts, [0.0, 0.08, 0.16, 0.24, 0.32, 0.4, 0.48, 0.56, 0.64], "9 bolts (= uses before hit), 80 ms apart")
+	_run(m, 1.0)
+	var hit := 0
+	var other := 0
+	for i in 20:
+		var l: int = m.grid[i / 8][i % 8].layers
+		hit += 1 if l == 3 else 0
+		other += 1 if l == 5 else 0
+	_eq([hit, other, rp.uses, m.grid[5][0].unbreakable], [9, 11, 3, true], "9 distinct bricks -2, no unbreakable / function targets")
+	_eq(m.score, 9 * 200, "lightning 2 layers x 100 each")
+	m.free()
+	# 可打的磚不夠:打到現有數量為止;剩 1 次:發射後立刻破壞
+	var s := _func_main()
+	for c in 3:
+		_brick(s, Vector2i(c, 0), 5)
+	_func(s, Vector2i(5, 5), "lightning", 1)
+	s._ball_hit_brick(Vector2i(5, 5))
+	_eq([s.events.size(), s.grid[5][5], _anim_count(s, "func_break")], [1, null, 1], "last use: 1 bolt, brick destroyed at once")
+	s.free()
+	var f := _func_main()
+	for c in 3:
+		_brick(f, Vector2i(c, 0), 5)
+	_func(f, Vector2i(5, 5), "lightning", 9)
+	f._ball_hit_brick(Vector2i(5, 5))
+	_eq(f.events.size(), 3, "only 3 targets: 3 bolts")
+	_run(f, 1.0)
+	_eq([f.grid[0][0].layers, f.grid[0][1].layers, f.grid[0][2].layers], [3, 3, 3], "only 3 targets: each -2")
+	f.free()
+
+
+func _test_func_reaper() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _func_main()
+	var rp = _func(m, Vector2i(3, 8), "reaper", 2)   # y 228~248
+	var b = main_script.Ball.new()
+	b.pos = Vector2(140, 256.5)
+	b.dir = Vector2.UP
+	m.balls.assign([b])
+	m._update_balls(0.01)
+	_eq([m.balls.size(), b.gone, rp.uses, rp.hit_t > 0.0, _anim_count(m, "vanish")], [0, true, 1, true, 1],
+		"reaper: ball vanishes, brick hit frame, uses -1")
+	# 球全部消失:照一般規則判輸
+	m.time_left = 100.0
+	m._step(0.01)
+	_eq(m.state, main_script.State.ENDED, "all balls gone -> game over")
+	m.free()
+	var d := _func_main()
+	_func(d, Vector2i(3, 8), "reaper", 1)
+	d._ball_hit_brick(Vector2i(3, 8), main_script.Ball.new())
+	_eq([d.grid[8][3], d.score, _anim_count(d, "func_break")], [null, 200, 1], "reaper last use: destroyed, +200")
+	d.free()
+
+
+func _test_func_explosion() -> void:
+	var m := _func_main()
+	m.cfg.debug_force_item = "slow"
+	var e1 = _func(m, Vector2i(3, 8), "explosion")
+	var e2 = _func(m, Vector2i(4, 8), "explosion")
+	var e3 = _func(m, Vector2i(6, 8), "explosion")
+	_brick(m, Vector2i(2, 7), 69)
+	_brick(m, Vector2i(2, 9), 1)
+	_brick(m, Vector2i(5, 9), 30)
+	_unbreakable(m, Vector2i(3, 7))
+	var laser = _func(m, Vector2i(4, 7), "laser_h", 4)
+	var tp = _func(m, Vector2i(3, 9), "teleport")
+	m._ball_hit_brick(Vector2i(3, 8))
+	_eq([e1.uses, e1.hit_t > 0.0, _anim_count(m, "explosion")], [0, true, 1], "explosion: 1 use, hit frame, fx")
+	_eq(m.anims.filter(func(a: Dictionary) -> bool: return a["kind"] == "explosion")[0]["pos"], Vector2(100, 208),
+		"explosion fx at brick - (40, 20)")
+	_run(m, 0.11)
+	_eq([m.grid[7][2] != null, m.grid[8][3] != null], [true, true], "before F3: bricks still there")
+	_run(m, 0.02)
+	_eq([m.grid[7][2], m.grid[9][2], m.grid[8][3], e2.uses], [null, null, null, 0],
+		"F3: 3x3 layered destroyed regardless of layers; neighbour explosion chained")
+	_run(m, 0.5)
+	_eq([m.grid[9][5], m.grid[8][4], m.grid[8][6] == e3, e3.uses, _anim_count(m, "explosion")], [null, null, true, 1, 0],
+		"chain clears its own 3x3; far explosion untouched")
+	_eq([m.grid[7][3].unbreakable, laser.uses, m.grid[9][3] == tp], [true, 4, true], "unbreakable / function / teleport unaffected")
+	_eq([_anim_count(m, "break"), _anim_count(m, "func_break")], [0, 0], "no break frames for exploded bricks")
+	_eq(m.score, 6900 + 200 + 100 + 200 + 3000 + 200 + 200 * 2, "score: layers x100 + 200 per brick + 200 per explosion")
+	_eq(m.items.size(), 3, "layered bricks roll drops, function bricks do not")
+	m.free()
+
+
+func _test_func_rainbow() -> void:
+	var m := _func_main()
+	for c in 3:
+		_brick(m, Vector2i(c, 0), 1)       # 紅
+	_brick(m, Vector2i(3, 0), 8)           # 紅(有數字 1)
+	_brick(m, Vector2i(4, 0), 2)           # 橙
+	_brick(m, Vector2i(5, 0), 9)           # 橙(數字 1)
+	_unbreakable(m, Vector2i(6, 0))
+	var laser = _func(m, Vector2i(7, 0), "laser_h", 4)
+	_func(m, Vector2i(3, 5), "rainbow")
+	m._ball_hit_brick(Vector2i(3, 5))
+	var a: Dictionary = m.anims.filter(func(x: Dictionary) -> bool: return x["kind"] == "rainbow")[0]
+	var red: bool = a["color"] == 0
+	_eq([a["color"] in [0, 1], a["pos"], a["targets"].size(), snappedf(a["dur"], 0.001)], [true, Vector2(130, 158), 4 if red else 2, 0.18],
+		"rainbow: picks an existing color, ring at - (10, 10), 3 frames")
+	_run(m, 0.17)
+	_eq(m.grid[0][0] != null and m.grid[0][4] != null, true, "targets still there during pick")
+	_run(m, 0.02)
+	var gone := []
+	for c in 6:
+		gone.append(m.grid[0][c] == null)
+	_eq(gone, [true, true, true, true, false, false] if red else [false, false, false, false, true, true],
+		"all bricks of the picked color destroyed (with or without digit), others kept")
+	_eq([m.grid[5][3], m.grid[0][6].unbreakable, laser.uses], [null, true, 4], "rainbow destroyed itself; U / function untouched")
+	var brk: Array = m.anims.filter(func(x: Dictionary) -> bool: return x["kind"] == "break")
+	_eq([brk.size() > 0, brk.all(func(x: Dictionary) -> bool: return not x["hit"] and is_equal_approx(x["dur"], 0.24))], [true, true],
+		"rainbow targets: break F1~F4 only, no hit frame")
+	# 整段 420 ms:450 ms 時已沒有彩虹相關動畫
+	_run(m, 0.26)
+	_eq([_anim_count(m, "rainbow"), _anim_count(m, "break"), _anim_count(m, "func_break")], [0, 0, 0],
+		"rainbow flow done by 450 ms")
+	m.free()
+	# 沒有多層磚:直接破壞,不播挑色環
+	var e := _func_main()
+	_unbreakable(e, Vector2i(0, 0))
+	_func(e, Vector2i(3, 5), "rainbow")
+	e._ball_hit_brick(Vector2i(3, 5))
+	_eq([e.grid[5][3], _anim_count(e, "rainbow"), _anim_count(e, "func_break"), e.score], [null, 0, 1, 200],
+		"no layered bricks: rainbow breaks at once, no ring")
+	e.free()
+
+
+func _test_func_teleport() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _func_main()
+	var t1 = _func(m, Vector2i(1, 8), "teleport")   # y 228~248
+	_func(m, Vector2i(6, 8), "teleport")
+	var b = main_script.Ball.new()
+	b.pos = Vector2(80, 255.9)
+	b.dir = Vector2.UP
+	m.balls.assign([b])
+	m._ball_bricks(b, false)
+	_eq([snappedf(b.warp, 0.001), b.pos, b.ghost, t1.hit_t], [0.48, Vector2(280, 238), Vector2i(6, 8), 0.0], "teleport: ball warps to exit center, no flash")
+	_eq(absf(b.dir.y) >= sin(deg_to_rad(15.0)) - 0.0001, true, "exit angle >= 15 deg from horizontal")
+	_eq([_anim_count(m, "tele_in"), _anim_count(m, "vanish")], [1, 1], "entrance: suck-in + ball vanish")
+	_run(m, 0.25)
+	_eq([_anim_count(m, "tele_out"), _anim_count(m, "appear")], [1, 1], "exit: reversed anims after 240 ms")
+	m.balls.assign([b])
+	m.time_left = 100.0
+	m._update_balls(0.47)
+	_eq([b.pos, m.balls.size()], [Vector2(280, 238), 1], "warping ball does not move, still counts as in play")
+	m._update_balls(0.02)
+	var warped := false
+	for i in 20:
+		m._update_balls(0.01)
+		warped = warped or b.warp > 0.0
+	_eq([warped, b.ghost, (b.pos - Vector2(280, 238)).length() > 20.0], [false, Vector2i(-1, -1), true],
+		"leaves exit without re-teleporting; ghost cleared")
+	m.free()
+	# 3 塊傳送磚:出口一定是其他塊
+	var s := _func_main()
+	_func(s, Vector2i(1, 8), "teleport")
+	_func(s, Vector2i(6, 8), "teleport")
+	_func(s, Vector2i(3, 12), "teleport")
+	var ok := true
+	var both := {}
+	for i in 40:
+		var nb = main_script.Ball.new()
+		s._teleport(Vector2i(1, 8), nb)
+		ok = ok and nb.ghost != Vector2i(1, 8)
+		both[nb.ghost] = true
+	_eq([ok, both.size()], [true, 2], "exit is a random other teleport")
+	s.free()
+	# 傳送途中球被合併 / 大黑洞移除:出口不播出現動畫
+	for id in ["merge", "blackhole_big"]:
+		var g := _func_main()
+		_func(g, Vector2i(1, 8), "teleport")
+		_func(g, Vector2i(6, 8), "teleport")
+		var keep = main_script.Ball.new()
+		keep.pos = Vector2(300, 600)
+		keep.dir = Vector2.DOWN
+		var w = main_script.Ball.new()
+		w.pos = Vector2(80, 255.9)
+		w.dir = Vector2.UP
+		g.balls.assign([keep, w])
+		g._ball_bricks(w, false)
+		g._apply_item(id)
+		_run(g, 0.25)
+		_eq([g.balls.has(w), _anim_count(g, "appear")], [false, 0], "%s removes warping ball: no appear at exit" % id)
+		g.free()
+	# 出口角度:360° 內排除與水平夾角 < 15°,上下兩邊都有
+	var good := true
+	for i in 21:
+		for down in [true, false]:
+			var d := Rules.exit_dir(i / 20.0, down, 15.0)
+			good = good and is_equal_approx(d.length(), 1.0) and absf(d.y) >= sin(deg_to_rad(15.0)) - 0.0001 and (d.y > 0.0) == down
+	_eq(good, true, "exit_dir always >= 15 deg from horizontal")
+	_eq([Rules.exit_dir(0.0, true, 15.0).x > 0.9, Rules.exit_dir(1.0, false, 15.0).x < -0.9], [true, true], "exit_dir covers left and right")
+
+
+## 無敵期間:所有功能型磚(含傳送)不發動、不扣次數,球照常反彈;子彈擋下。
+func _test_func_invincible() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _func_main()
+	m.effects.add_timed("invincible", 10.0)
+	var laser = _func(m, Vector2i(4, 10), "laser_h", 3)   # y 268~288
+	var tp = _func(m, Vector2i(1, 8), "teleport")
+	_func(m, Vector2i(6, 8), "teleport")
+	var rp = _func(m, Vector2i(3, 3), "reaper", 2)
+	var ex = _func(m, Vector2i(6, 3), "explosion")
+	var b = main_script.Ball.new()
+	b.pos = Vector2(200, 295.9)
+	b.dir = Vector2.UP
+	m.balls.assign([b])
+	m._ball_bricks(b, false)
+	_eq([b.dir.y > 0.0, laser.uses, laser.hit_t > 0.0, _anim_count(m, "laser"), m.events.size()], [true, 3, true, 0, 0],
+		"invincible: laser not fired, ball bounces, hit flash only")
+	var t = main_script.Ball.new()
+	t.pos = Vector2(80, 255.9)
+	t.dir = Vector2.UP
+	m._ball_bricks(t, false)
+	_eq([t.warp, t.dir.y > 0.0, tp.hit_t], [0.0, true, 0.0], "invincible: teleport not used, ball bounces, no flash")
+	m._ball_hit_brick(Vector2i(3, 3), b)
+	m._ball_hit_brick(Vector2i(6, 3))
+	_eq([rp.uses, m.balls.size(), ex.uses, m.score], [2, 1, 1, 0], "invincible: reaper / explosion do nothing")
+	m.bullets = [Vector2(179, 300)]
+	m._update_bullets(0.05)
+	_eq([laser.uses, _anim_count(m, "bullet_block")], [3, 1], "invincible: bullet blocked")
+	m.free()
+
+
+## 勝利:多層磚與功能型磚都清空才過關,傳送磚除外。
+func _test_func_win() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _bare_main()
+	_empty_grid(m)
+	_brick(m, Vector2i(0, 0), 1)
+	_func(m, Vector2i(1, 0), "teleport")
+	_func(m, Vector2i(2, 0), "teleport")
+	m._damage(Vector2i(0, 0), 1)
+	_eq(m.state, main_script.State.ENDED, "only teleports left: level cleared")
+	m.free()
+	var f := _bare_main()
+	_empty_grid(f)
+	_brick(f, Vector2i(0, 0), 1)
+	_func(f, Vector2i(1, 5), "laser_v", 1)
+	f._damage(Vector2i(0, 0), 1)
+	_eq(f.state, main_script.State.PLAYING, "function brick left: not cleared")
+	f._ball_hit_brick(Vector2i(1, 5))
+	_run(f, 0.3)
+	_eq(f.state, main_script.State.ENDED, "last function brick destroyed: cleared")
+	f.free()
+
+
+## D38 圖都載入得到、尺寸正確,_t 會到 art/bricks40、art/fx40 找。
+func _test_func_textures() -> void:
+	var m := _bare_main()
+	var want := {}
+	for k in Rules.FUNC_CODES.values():
+		want["d38_brick_" + k] = Vector2(40, 20)
+		if k != "teleport":
+			want["d38_brick_%s_hit" % k] = Vector2(40, 20)
+	for mat in ["laser", "lightning", "reaper", "rainbow"]:
+		for i in [1, 2, 3]:
+			want["d38_brick_%s_f%d" % [mat, i]] = Vector2(40, 20)
+	for w in ["thin", "full"]:
+		for o in ["h", "v", "x"]:
+			want["d38_fx_laser_origin_%s_%s" % [o, w]] = Vector2(40, 20)
+		for s in ["mid", "block", "v_mid", "v_block_up", "v_block_down"]:
+			want["d38_fx_laser_%s_%s" % [s, w]] = Vector2(20, 20)
+	for i in [1, 2, 3]:
+		want["d38_fx_lightning_b_top_f%d" % i] = Vector2(40, 6)
+		want["d38_fx_lightning_b_mid_f%d" % i] = Vector2(40, 20)
+		want["d38_fx_lightning_b_hit_f%d" % i] = Vector2(40, 30)
+		for c in Rules.COLOR_NAMES:
+			want["d38_fx_rainbow_pick_%s_f%d" % [c, i]] = Vector2(60, 40)
+	for i in [1, 2, 3, 4]:
+		want["d38_fx_explosion_f%d" % i] = Vector2(120, 60)
+		want["d38_fx_teleport_in_f%d" % i] = Vector2(40, 20)
+	for i in [1, 2]:
+		want["d38_fx_rainbow_target_f%d" % i] = Vector2(40, 20)
+	var bad := []
+	for n in want:
+		var tex: Texture2D = m._t(n)
+		if tex == null or tex.get_size() != want[n]:
+			bad.append(n)
+	_eq([want.size(), bad], [83, []], "83 D38 textures load with expected size")
+	_eq([m._t("d38_brick_teleport").resource_path, m._t("d38_fx_explosion_f1").resource_path],
+		["res://art/bricks40/d38_brick_teleport.png", "res://art/fx40/d38_fx_explosion_f1.png"], "d38 paths")
+	m.free()
+
+
+# ===================== 特殊磚與魔王(D39~D44) =====================
+
+## 關卡代號:H 寶箱、G 金幣、O 圓形、B1/B2 魔王格;其他寫法記錯誤。
+func _test_special_parse() -> void:
+	var S := Rules.SPECIAL
+	var B := Rules.BOSS
+	var p := Rules.parse_level({"rows": ["H G O B1 B1 B2 . .", "B1 . . . . B2 B3 H2"]}, 17, 8, 69)
+	_eq(p["cells"][0], [S, S, S, B, B, B, 0, 0] as Array[int], "H G O B1 B2 parse")
+	_eq(p["cells"][1], [B, 0, 0, 0, 0, B, 0, 0] as Array[int], "B3 / H2 rejected")
+	_eq(p["errors"].size(), 2, "2 invalid special cells reported")
+	_eq(p["specials"], {Vector2i(0, 0): "chest", Vector2i(1, 0): "coin", Vector2i(2, 0): "circle"}, "special kinds")
+	_eq(p["bosses"], {"B1": [Vector2i(3, 0), Vector2i(4, 0), Vector2i(0, 1)], "B2": [Vector2i(5, 0), Vector2i(5, 1)]},
+		"boss cells grouped by code (need not be connected)")
+	_eq(p["funcs"].size(), 0, "specials are not function bricks")
+	# 測試關卡:B1 4×1、B2 T 形,寶箱/金幣/圓形各 3,不可破壞磚仍只有 2 塊
+	var lv := Rules.parse_level(load("res://data/levels/level_test.json").data, 17, 8, 69)
+	var kinds := {}
+	for k in lv["specials"]:
+		kinds[lv["specials"][k]] = kinds.get(lv["specials"][k], 0) + 1
+	var u := 0
+	for line in lv["cells"]:
+		u += line.count(Rules.UNBREAKABLE)
+	_eq([lv["errors"].size(), kinds, u], [0, {"chest": 3, "coin": 3, "circle": 3}, 2], "level_test specials, 2 U")
+	_eq(lv["bosses"], {"B1": [Vector2i(0, 9), Vector2i(1, 9), Vector2i(2, 9), Vector2i(3, 9)],
+		"B2": [Vector2i(2, 13), Vector2i(3, 13), Vector2i(4, 13), Vector2i(3, 14)]}, "level_test B1 4x1, B2 T")
+	# 載入:血量 = 關卡編號 × 5,魔王格不算進 breakable_left
+	var m := _bare_main()
+	m.cfg.level_path = "res://data/levels/level_test.json"
+	m.cfg.level_number = 7
+	m._load_level()
+	var bricks := 0
+	for row in m.grid:
+		for br in row:
+			if br != null and not br.unbreakable and br.boss == null:
+				bricks += 1
+	_eq([m.bosses.size(), m.bosses[0].layers, m.bosses[1].max_layers, m.bosses[0].thresholds],
+		[2, 35, 35, [35, 27, 18, 9, 0] as Array[int]], "2 bosses, hp = level 7 x 5, thresholds")
+	_eq([m.grid[9][0].boss == m.bosses[0], m.grid[14][3].boss == m.bosses[1], m.grid[9][5].special, m.breakable_left == bricks],
+		[true, true, "chest", true], "grid cells linked to boss; breakable_left excludes boss")
+	m.free()
+
+
+## 門檻(往上進位)、剩幾格(含跨多門檻)、裂痕、血條寬度、魔王掉落擲骰、分數換金幣。
+func _test_boss_rules() -> void:
+	_eq(Rules.boss_thresholds(50, 4), [50, 38, 25, 13, 0] as Array[int], "H50 N4: 37.5/25/12.5 round up")
+	_eq(Rules.boss_thresholds(10, 3), [10, 7, 4, 0] as Array[int], "H10 N3: 6.67/3.33 round up")
+	_eq(Rules.boss_thresholds(5, 4), [5, 4, 3, 2, 0] as Array[int], "H5 N4")
+	_eq(Rules.boss_thresholds(50, 1), [50, 0] as Array[int], "single cell: only 0")
+	var t := Rules.boss_thresholds(50, 4)
+	var left := []
+	for v in [50, 39, 38, 26, 25, 14, 13, 1, 0, -3]:
+		left.append(Rules.boss_cells_left(v, t))
+	_eq(left, [4, 4, 3, 3, 2, 2, 1, 1, 0, 0], "cells left by layers (<= threshold drops)")
+	_eq(4 - Rules.boss_cells_left(10, t), 3, "50 -> 10 in one hit crosses 3 thresholds")
+	var crack := []
+	for v in [50, 47, 46, 43, 42, 39]:
+		crack.append(Rules.boss_crack(v, 4, t))
+	_eq(crack, [0, 0, 1, 1, 2, 2], "crack by consumed share of current segment (12 layers)")
+	_eq([Rules.boss_crack(38, 3, t), Rules.boss_crack(45, 3, t), Rules.boss_crack(1, 1, t)], [0, 0, 2],
+		"crack resets after drop; heal above segment = none; last segment")
+	_eq([Rules.boss_bar_fill(50, 50, 146), Rules.boss_bar_fill(1, 50, 146), Rules.boss_bar_fill(0, 50, 146),
+		Rules.boss_bar_fill(25, 50, 306)], [146, 3, 0, 153], "bar fill rounds up")
+	var drops := []
+	for u in [0.0, 0.199, 0.2, 0.249, 0.25, 0.99]:
+		drops.append(Rules.boss_drop(u, 0.2, 0.05))
+	_eq(drops, ["debuff", "debuff", "buff", "buff", "", ""], "boss drop 20% debuff / 5% buff")
+	_eq([Rules.gold_from_score(0), Rules.gold_from_score(49), Rules.gold_from_score(50), Rules.gold_from_score(1234)],
+		[0, 0, 1, 12], "gold = score 1% rounded")
+
+
+## 依形狀算每種元件的總數(去掉 d42_boss_ 前綴)。
+func _part_counts(shape: Array) -> Dictionary:
+	var has := func(c: Vector2i) -> bool: return c in shape
+	var out := {}
+	for cell in shape:
+		for p in Rules.boss_parts(cell, has):
+			var n: String = p[1].trim_prefix("d42_boss_")
+			out[n] = out.get(n, 0) + 1
+	return out
+
+
+## 拼接遮罩:D42 6 種形狀與掉格後,外緣/外凸/內凹/節點的數量;單格的完整清單與位置。
+func _test_boss_parts() -> void:
+	var s1 := [Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0), Vector2i(3, 0)]
+	var has1 := func(c: Vector2i) -> bool: return c in s1
+	_eq(Rules.boss_parts(Vector2i(1, 0), has1), [[0, "d42_boss_fill", Vector2i(0, 0)], [1, "d42_boss_edge_t", Vector2i(0, 0)],
+		[1, "d42_boss_edge_b", Vector2i(0, 17)], [4, "d42_boss_joint_h", Vector2i(-2, 7)]], "4x1 middle cell parts")
+	_eq(Rules.boss_parts(Vector2i(3, 0), has1).map(func(p: Array) -> Array: return [p[1], p[2]]),
+		[["d42_boss_fill", Vector2i(0, 0)], ["d42_boss_edge_t", Vector2i(0, 0)], ["d42_boss_edge_b", Vector2i(0, 17)],
+		["d42_boss_edge_r", Vector2i(37, 0)], ["d42_boss_corner_tr", Vector2i(37, 0)], ["d42_boss_corner_br", Vector2i(37, 17)],
+		["d42_boss_joint_h", Vector2i(-2, 7)]], "4x1 right end parts and offsets")
+	var corners4 := {"corner_tl": 1, "corner_tr": 1, "corner_bl": 1, "corner_br": 1}
+	var want := {
+		"S1 4x1": [s1, {"fill": 4, "edge_t": 4, "edge_b": 4, "edge_l": 1, "edge_r": 1, "joint_h": 3}.merged(corners4)],
+		"S2 2x2": [[Vector2i(0, 0), Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1)],
+			{"fill": 4, "edge_t": 2, "edge_b": 2, "edge_l": 2, "edge_r": 2, "joint_h": 2}.merged(corners4)],
+		"S3 3x3": [_rect_cells(3, 3), {"fill": 9, "edge_t": 3, "edge_b": 3, "edge_l": 3, "edge_r": 3, "joint_h": 6}.merged(corners4)],
+		"L": [[Vector2i(0, 0), Vector2i(0, 1), Vector2i(0, 2), Vector2i(1, 2)],
+			{"fill": 4, "edge_t": 2, "edge_b": 2, "edge_l": 3, "edge_r": 3, "corner_tl": 1, "corner_tr": 2, "corner_bl": 1,
+			"corner_br": 1, "concave_ne": 1, "joint_h": 1}],
+		"T": [[Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0), Vector2i(1, 1)],
+			{"fill": 4, "edge_t": 3, "edge_b": 3, "edge_l": 2, "edge_r": 2, "corner_tl": 1, "corner_tr": 1, "corner_bl": 2,
+			"corner_br": 2, "concave_sw": 1, "concave_se": 1, "joint_h": 2}],
+		"bump": [[Vector2i(1, 0), Vector2i(0, 1), Vector2i(1, 1), Vector2i(2, 1)],
+			{"fill": 4, "edge_t": 3, "edge_b": 3, "edge_l": 2, "edge_r": 2, "corner_tl": 2, "corner_tr": 2, "corner_bl": 1,
+			"corner_br": 1, "concave_nw": 1, "concave_ne": 1, "joint_h": 2}],
+		# 掉格後:4×1 掉第 2 格斷成兩段 → 多一對左右外緣與 4 個外凸轉角、少 2 個節點
+		"S1 drop (1,0)": [[Vector2i(0, 0), Vector2i(2, 0), Vector2i(3, 0)],
+			{"fill": 3, "edge_t": 3, "edge_b": 3, "edge_l": 2, "edge_r": 2, "corner_tl": 2, "corner_tr": 2, "corner_bl": 2,
+			"corner_br": 2, "joint_h": 1}],
+		# 3×3 掉中央:四個內凹轉角都用到(D42 總覽)
+		"S3 drop center": [_rect_cells(3, 3).filter(func(c: Vector2i) -> bool: return c != Vector2i(1, 1)),
+			{"fill": 8, "edge_t": 4, "edge_b": 4, "edge_l": 4, "edge_r": 4, "concave_nw": 1, "concave_ne": 1, "concave_se": 1,
+			"concave_sw": 1, "joint_h": 4}.merged(corners4)],
+		# T 掉下方那格 = 3×1
+		"T drop (1,1)": [[Vector2i(0, 0), Vector2i(1, 0), Vector2i(2, 0)],
+			{"fill": 3, "edge_t": 3, "edge_b": 3, "edge_l": 1, "edge_r": 1, "joint_h": 2}.merged(corners4)],
+	}
+	for k in want:
+		_eq(_part_counts(want[k][0]), want[k][1], "boss parts %s" % k)
+
+
+func _rect_cells(w: int, h: int) -> Array:
+	var out := []
+	for y in h:
+		for x in w:
+			out.append(Vector2i(x, y))
+	return out
+
+
+## 金幣機率、圓形反彈角度範圍。
+func _test_special_rules() -> void:
+	var v := [10, 50, 100]
+	var w := [0.6, 0.3, 0.1]
+	var got := []
+	for u in [0.0, 0.59, 0.6, 0.89, 0.9, 0.999]:
+		got.append(Rules.coin_value(u, v, w))
+	_eq(got, [10, 10, 50, 50, 100, 100], "coin value by cumulative 60/30/10")
+	var rng := RandomNumberGenerator.new()
+	rng.seed = 5
+	var count := {10: 0, 50: 0, 100: 0}
+	for i in 10000:
+		count[Rules.coin_value(rng.randf(), v, w)] += 1
+	_eq([absf(count[10] / 10000.0 - 0.6) < 0.02, absf(count[50] / 10000.0 - 0.3) < 0.02, absf(count[100] / 10000.0 - 0.1) < 0.02],
+		[true, true, true], "coin 10000 samples ~60/30/10 (%s)" % count)
+	var cfg := load("res://data/game_config.tres") as GameConfig
+	_eq([cfg.coin_values, cfg.coin_weights, cfg.chest_buff_ratio, cfg.level_number, cfg.boss_hp_per_level],
+		[[10, 50, 100] as Array[int], [0.6, 0.3, 0.1] as Array[float], 0.7, 10, 5], "config special/boss defaults")
+	# 圓形反彈:各種法線都朝離開圓的那側、與水平夾角 ≥ 15°、單位向量;同一法線會出現不同角度
+	var s := sin(deg_to_rad(15.0))
+	var bad := []
+	var spread := {}
+	for i in 2000:
+		var n: Vector2 = Vector2.from_angle(rng.randf() * TAU) if i >= 4 else [Vector2.RIGHT, Vector2.LEFT, Vector2.UP, Vector2.DOWN][i]
+		var d := Rules.circle_bounce(n, rng, 15.0)
+		if d.dot(n) <= 0.0 or absf(d.y) < s - 0.000001 or not is_equal_approx(d.length(), 1.0):
+			bad.append([n, d])
+		if n == Vector2.DOWN or i < 200:
+			spread[snappedf(rad_to_deg(d.angle()), 10.0)] = true
+	_eq(bad, [], "circle bounce: away from circle, >= 15 deg from horizontal")
+	_eq(spread.size() > 5, true, "circle bounce is random (%d buckets)" % spread.size())
+
+
+func _special(m: Node2D, cell: Vector2i, kind: String) -> Object:
+	var br = load("res://scripts/main.gd").Brick.new()
+	br.special = kind
+	m.grid[cell.y][cell.x] = br
+	m.breakable_left += 1
+	return br
+
+
+## 寶箱 70/30 必掉、金幣磚掉金幣與接取、圓形碰撞與子彈、計分、彩虹不挑、閃電會挑、回血不加。
+func _test_special_bricks() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _func_main()
+	m.cfg.drop_chance = 0.0   # 寶箱不吃一般掉落判定
+	var buff := 0
+	var ok := true
+	for i in 2000:
+		_special(m, Vector2i(2, 2), "chest")
+		var before: int = m.items.size()
+		m._damage(Vector2i(2, 2), 1)
+		ok = ok and m.items.size() == before + 1 and m.grid[2][2] == null
+		buff += 1 if ItemDefs.is_buff(m.items[-1]["id"]) else 0
+	_eq(ok, true, "chest always drops exactly 1 item (drop_chance 0)")
+	_eq(absf(buff / 2000.0 - 0.7) < 0.03, true, "chest buff ratio ~70%% (%d / 2000)" % buff)
+	_eq(m.items[-1]["pos"] + Vector2(8, 8), Vector2(120, 118), "chest item centered on cell (2,2)")
+	m.items.clear()
+	# 計分:特殊磚破壞固定 +200
+	m.score = 0
+	_special(m, Vector2i(2, 2), "chest")
+	m._damage(Vector2i(2, 2), 9)
+	_eq(m.score, 200, "special brick break = 200")
+	# 金幣磚:必掉 1 枚金幣、從磚中心開始;一般道具照常(此處 drop_chance 0 = 不掉)
+	m.items.clear()
+	_special(m, Vector2i(3, 5), "coin")
+	m._damage(Vector2i(3, 5), 1)
+	_eq([m.coins.size(), m.coins[0]["pos"], m.coins[0]["value"] in [10, 50, 100], m.items.size()],
+		[1, Vector2(160, 178), true, 0], "coin brick drops 1 coin at center")
+	# 接到:金幣矩形碰到擋板;掉出畫面就消失
+	m.paddle_x = 180.0
+	m.coins = [{"value": 50, "pos": Vector2(180, m._paddle_y() - 7.5)}, {"value": 100, "pos": Vector2(30, m.view_h + 10.0)}]
+	m._update_coins(0.01)
+	_eq([m.coins_caught, m.coins.size(), _anim_count(m, "coin_pick")], [50, 0, 1], "coin caught by paddle; off-screen coin gone")
+	m.coins = [{"value": 10, "pos": Vector2(180, m._paddle_y() - 9.0)}]
+	m._update_coins(0.0)
+	_eq([m.coins_caught, m.coins.size()], [50, 1], "coin 16x16 not yet touching paddle")
+	# 判定矩形尺寸取自各面額貼圖:10/50/100 = 16/18/20,中心不變
+	_eq([m._coin_rect(10, Vector2(100, 100)), m._coin_rect(50, Vector2(100, 100)), m._coin_rect(100, Vector2(100, 100))],
+		[Rect2(92, 92, 16, 16), Rect2(91, 91, 18, 18), Rect2(90, 90, 20, 20)], "coin hit rect 16/18/20 centered")
+	# coin_values 填了沒圖的面額:記錯誤並略過,不生成金幣也不當掉
+	var old_values: Array[int] = m.cfg.coin_values
+	var old_weights: Array[float] = m.cfg.coin_weights
+	var no_art: Array[int] = [7]
+	var one: Array[float] = [1.0]
+	m.cfg.coin_values = no_art
+	m.cfg.coin_weights = one
+	m.coins.clear()
+	_special(m, Vector2i(3, 5), "coin")
+	m._damage(Vector2i(3, 5), 1)
+	_eq([m.coins.size(), m.grid[5][3]], [0, null], "coin value without art is skipped")
+	m.cfg.coin_values = old_values
+	m.cfg.coin_weights = old_weights
+	# 彩虹不挑特殊磚;閃電會挑
+	var ch = _special(m, Vector2i(0, 0), "chest")
+	_brick(m, Vector2i(1, 0), 1)
+	_func(m, Vector2i(5, 5), "rainbow")
+	m._rainbow(Vector2i(5, 5))
+	_run(m, 0.3)
+	_eq([m.grid[0][0] == ch, m.grid[0][1]], [true, null], "rainbow skips special bricks")
+	m._lightning(1)
+	_run(m, 0.3)
+	_eq(m.grid[0][0], null, "lightning targets special bricks")
+	# 回血不加特殊磚層數
+	var ci = _special(m, Vector2i(0, 1), "circle")
+	m._heal(Vector2i(0, 1), 3)
+	_eq([ci.layers, ci.hit_t > 0.0], [1, true], "heal does not add layers to special brick")
+	m.free()
+	# 圓形碰撞:格 (3,5) 矩形 x 140~180、y 168~188,圓心 (160,178)
+	var c := _func_main()
+	var circle = _special(c, Vector2i(3, 5), "circle")
+	var b = main_script.Ball.new()
+	b.pos = Vector2(145, 195)
+	b.dir = Vector2.UP
+	_eq([c._circle_rect(b.pos, c._cell_rect(Vector2i(3, 5))).z > 0.0, c._hit_shape(b.pos, Vector2i(3, 5), circle).z > 0.0],
+		[true, false], "cell corner: rect would hit, circle does not")
+	c._ball_bricks(b, false)
+	_eq([c.grid[5][3] == circle, b.dir], [true, Vector2.UP], "ball passes the empty corner of circle cell")
+	b.pos = Vector2(160, 195.9)
+	c._ball_bricks(b, false)
+	_eq([c.grid[5][3], b.dir.y > 0.0, absf(b.dir.y) >= sin(deg_to_rad(15.0)) - 0.000001], [null, true, true],
+		"ball below circle: destroyed, bounces away at >= 15 deg")
+	# 子彈:判定點在圓外(x 140~149 的欄)從旁邊穿過、打到上面的磚;在圓內用實際碰到的位置
+	_special(c, Vector2i(3, 5), "circle")
+	_brick(c, Vector2i(3, 2), 3)
+	_eq(c._bullet_trace(140, 420, 100), Vector3i(3, 2, 128), "bullet beside circle passes to brick above")
+	_eq(c._bullet_trace(158, 420, 100), Vector3i(3, 5, 188), "bullet under circle center hits circle bottom")
+	# 判定點 150、151 兩欄:151 那欄離圓心近、碰到的位置比較低,先碰到
+	_eq(c._bullet_trace(149, 420, 100).z, ceili(178 + sqrt(100.0 - pow(151.5 - 160.0, 2))), "bullet near circle edge hits lower arc")
+	c.free()
+
+
+## 放一隻魔王到格子上(不經過關卡檔)。
+func _boss(m: Node2D, cells: Array, hp: int) -> Object:
+	var main_script := load("res://scripts/main.gd")
+	var bs = main_script.Boss.new()
+	bs.id = "B%d" % (m.bosses.size() + 1)
+	bs.cells.assign(cells)
+	bs.size = cells.size()
+	bs.max_layers = hp
+	bs.layers = hp
+	bs.thresholds = Rules.boss_thresholds(hp, cells.size())
+	for c in cells:
+		var br = main_script.Brick.new()
+		br.boss = bs
+		m.grid[c.y][c.x] = br
+	m.bosses.append(bs)
+	return bs
+
+
+func _row_cells(row: int, c0: int, c1: int) -> Array:
+	var out := []
+	for c in range(c0, c1 + 1):
+		out.append(Vector2i(c, row))
+	return out
+
+
+## 魔王:隨機掉格、跨多門檻錯開、計分、死亡與勝利清場、強化/火焰、無敵不影響、球擊中掉落。
+func _test_boss_game() -> void:
+	var main_script := load("res://scripts/main.gd")
+	# 隨機掉格:門檻 38 時從剩下的格子隨機挑 1 格;不同種子會挑到每一格
+	var picked := {}
+	for seed in 40:
+		var m := _func_main()
+		m.rng.seed = seed
+		var bs = _boss(m, _row_cells(3, 0, 3), 50)
+		m._ball_hit_brick(Vector2i(1, 3))
+		if seed == 0:
+			_eq([bs.layers, m.score, bs.cells.size(), is_equal_approx(m.brick_accel, 0.005)], [49, 100, 4, true],
+				"ball hit: -1, 100 points, no drop yet, accel +0.5%")
+		m._boss_damage(bs, 11)
+		var gone := _row_cells(3, 0, 3).filter(func(c: Vector2i) -> bool: return m.grid[3][c.x] == null)
+		if gone.size() == 1 and gone[0] not in bs.cells and bs.cells.size() == 3:
+			picked[gone[0]] = true
+		m.free()
+	_eq(picked.size(), 4, "random drop picks among remaining cells (all 4 seen)")
+	# 一次跨 3 個門檻:第 1 格立刻掉,其餘每 100 ms 一格
+	var x := _func_main()
+	var bx = _boss(x, _row_cells(3, 0, 3), 50)
+	x._boss_damage(bx, 40)
+	var on_grid := func() -> int: return _row_cells(3, 0, 3).filter(func(c: Vector2i) -> bool: return x.grid[3][c.x] != null).size()
+	_eq([bx.cells.size(), on_grid.call(), x.events.size()], [1, 3, 2], "cross 3 thresholds: 3 drop, 1st now, 2 staggered")
+	_run(x, 0.11)
+	_eq(on_grid.call(), 2, "2nd cell drops after 100 ms")
+	_run(x, 0.1)
+	_eq([on_grid.call(), _anim_count(x, "boss_break") >= 1], [1, true], "3rd cell after 200 ms")
+	x.free()
+	# 強化 + 火焰:扣 2 + 2;周圍 3×3 波及一般磚,不重複扣自己
+	var f := _func_main()
+	var bf = _boss(f, _row_cells(3, 0, 3), 50)
+	_brick(f, Vector2i(1, 4), 5)
+	f.effects.reinforce = 2
+	f.effects.add_timed("flame", 20.0)
+	f._ball_hit_brick(Vector2i(1, 3))
+	_eq([bf.layers, f.grid[4][1].layers], [46, 4], "boss: flame 2 + reinforce 2, splash -1 to neighbor, not self")
+	f.effects.timed.clear()
+	f.effects.reinforce = 0
+	# 一般磚被火焰打到,旁邊的魔王只扣一次(即使碰到多格)
+	f.effects.add_timed("flame", 20.0)
+	f._ball_hit_brick(Vector2i(1, 4))
+	_eq([bf.layers, f.grid[4][1].layers], [45, 2], "flame on brick: adjacent boss -1 once")
+	f.effects.timed.clear()
+	# 無敵不影響魔王
+	f.effects.add_timed("invincible", 10.0)
+	f._ball_hit_brick(Vector2i(2, 3))
+	f.bullets = [Vector2(57, 160)]
+	f._update_bullets(0.05)
+	_eq([bf.layers, f.bullets.size()], [43, 0], "invincible: ball and bullet still damage boss; bullet stops")
+	f.effects.timed.clear()
+	# 回血:加層但不超過總層數、掉的格不長回來
+	f.effects.add_timed("heal", 10.0)
+	f._boss_damage(bf, 10)
+	var cells_now: int = bf.cells.size()
+	for i in 30:
+		f._ball_hit_brick(bf.cells[0])
+	_eq([bf.layers, bf.cells.size()], [50, cells_now], "heal: boss capped at max, dropped cells stay gone")
+	f.free()
+	# 球擊中掉落:20% 減益、5% 增益,從擊中點往下掉;不吃一般 30%
+	var d := _func_main()
+	var bd = _boss(d, _row_cells(3, 0, 3), 1000000)
+	var ball = main_script.Ball.new()
+	ball.pos = Vector2(80, 156)
+	var deb := 0
+	var buf := 0
+	for i in 4000:
+		var n: int = d.items.size()
+		d._ball_hit_brick(Vector2i(1, 3), ball)
+		if d.items.size() > n:
+			if ItemDefs.is_buff(d.items[-1]["id"]):
+				buf += 1
+			else:
+				deb += 1
+	_eq([absf(deb / 4000.0 - 0.2) < 0.02, absf(buf / 4000.0 - 0.05) < 0.012], [true, true],
+		"boss ball-hit drops ~20%% debuff (%d) / ~5%% buff (%d)" % [deb, buf])
+	_eq(d.items[-1]["pos"] + Vector2(8, 8), Vector2(80, 148), "boss drop starts at contact point")
+	d.items.clear()
+	d._boss_damage(bd, 1)
+	_eq(d.items.size(), 0, "non-ball damage does not roll boss drop")
+	d.free()
+	# 勝利:兩隻都死才過關;一般磚清空不算;剩下的可破壞磚依序變灰塵,不可破壞磚留著
+	var w := _bare_main()
+	_empty_grid(w)
+	var a = _boss(w, [Vector2i(0, 0)], 3)
+	var b2 = _boss(w, [Vector2i(2, 0), Vector2i(3, 0)], 3)
+	_brick(w, Vector2i(5, 5), 1)
+	_brick(w, Vector2i(6, 5), 4)
+	_unbreakable(w, Vector2i(7, 7))
+	w._damage(Vector2i(5, 5), 1)
+	_eq([w.state, w.breakable_left], [main_script.State.PLAYING, 1], "boss level: clearing bricks is not a win")
+	w.score = 0
+	w._boss_damage(a, 5)
+	_eq([w.score, a.layers, w.state, w.grid[0][0]], [1300, 0, main_script.State.PLAYING, null], "1st boss dies: 3x100 + 1000, still playing")
+	# 清場那一刻空中的金幣全數計入、道具直接移除(不加分)
+	w.coins = [{"value": 10, "pos": Vector2(100, 300)}, {"value": 100, "pos": Vector2(200, 400)}]
+	w.items = [{"id": "slow", "pos": Vector2(150, 350)}]
+	var caught0: int = w.coins_caught
+	w._boss_damage(b2, 3)
+	_eq([w.state, w.bar_fade, w.grid[5][6] != null], [main_script.State.CLEARING, 0.0, true], "all bosses dead: clearing")
+	_eq([w.coins_caught - caught0, w.coins.size(), w.items.size(), w.score], [110, 0, 0, 2600],
+		"clearing: airborne coins counted (+110), coins and items removed, no item score")
+	w._ball_hit_brick(Vector2i(6, 5))
+	_eq(w.grid[5][6].layers, 4, "no damage during clearing")
+	_run(w, 1.0)
+	# 第 2 隻 3 × 100 + 1000;裸主程式 time_left = 0,沒有時間加分;清場的磚不計分
+	_eq([w.state, w.grid[5][6], w.grid[7][7] != null, w.score], [main_script.State.ENDED, null, true, 2600],
+		"after clearing: ended, bricks dusted, U kept")
+	w.free()
+
+
+## 魔王與其他效果:炸彈標記 −10 與 3×3、雷射擋下 −1、閃電 −2、爆炸不影響、穿透反彈與結束時 −1、炸彈標記位置。
+func _test_boss_effects() -> void:
+	var main_script := load("res://scripts/main.gd")
+	var m := _func_main()
+	var bs = _boss(m, [Vector2i(1, 3), Vector2i(2, 3), Vector2i(3, 3), Vector2i(2, 4)], 50)   # T 形
+	_eq(m._boss_mark_cell(bs), Vector2i(3, 3), "bomb mark: top row, rightmost")
+	_brick(m, Vector2i(4, 2), 5)
+	_brick(m, Vector2i(0, 3), 5)
+	m.effects.add_timed("bomb", 10.0)
+	m._ball_hit_brick(Vector2i(1, 3))
+	_eq([bs.marked, bs.layers], [true, 50], "bomb: ball marks boss, no damage")
+	m.effects.add_timed("invincible", 10.0)
+	m._bomb_explode()
+	_eq([bs.layers, bs.marked, m.grid[2][4].layers, m.grid[3][0].layers], [40, false, 5, 5],
+		"bomb: boss -10 even when invincible; bricks protected")
+	m.effects.timed.clear()
+	bs.marked = true
+	m._bomb_explode()
+	_eq([bs.layers, m.grid[2][4].layers, m.grid[3][0].layers], [30, 3, 5], "bomb: 3x3 around mark cell (3,3) -2, boss not self-hit")
+	m.free()
+	# 雷射:魔王擋下光束並 −1;閃電:魔王算 1 個目標 −2;爆炸:不影響魔王
+	var l := _func_main()
+	var bl = _boss(l, _row_cells(3, 0, 3), 50)
+	_brick(l, Vector2i(7, 3), 5)
+	_func(l, Vector2i(5, 3), "laser_h", 2)
+	l._trigger(Vector2i(5, 3))
+	_run(l, 0.1)
+	_eq([bl.layers, l.grid[3][7].layers], [49, 4], "laser: boss blocks beam -1")
+	l._lightning(5)
+	_run(l, 0.5)
+	_eq([bl.layers, l.grid[3][7].layers], [47, 2], "lightning: boss is 1 target, -2")
+	_func(l, Vector2i(4, 4), "explosion")
+	l._trigger(Vector2i(4, 4))
+	_run(l, 0.3)
+	_eq([bl.layers, l.grid[3][3] != null], [47, true], "explosion: boss unaffected")
+	l.free()
+	# 穿透:碰到魔王照常反彈並扣層;穿透結束時球在魔王格內扣 1(碰到 2 格也只扣 1)
+	var p := _func_main()
+	var bp = _boss(p, _row_cells(3, 0, 3), 50)
+	var b = main_script.Ball.new()
+	b.pos = Vector2(80, 155.9)
+	b.dir = Vector2.UP
+	p.balls.assign([b])
+	p._ball_bricks(b, true)
+	_eq([b.dir.y > 0.0, bp.layers], [true, 49], "pierce: bounces off boss, -1")
+	b.pos = Vector2(100, 138)
+	p._pierce_end()
+	_eq([bp.layers, bp.cells.size()], [48, 4], "pierce end inside boss: -1 once, not destroyed")
+	p.free()
+
+
+## D39~D44 圖都載入得到、尺寸正確,_t 會到 art/special40 找;閃白版只把非 K 像素改白。
+func _test_special_textures() -> void:
+	var m := _bare_main()
+	var want := {"d39_invincible_circle": Vector2(20, 20), "d42_boss_fill": Vector2(40, 20), "d42_boss_joint_h": Vector2(4, 6),
+		"d42_boss_edge_t": Vector2(40, 3), "d42_boss_edge_b": Vector2(40, 3), "d42_boss_edge_l": Vector2(3, 20),
+		"d42_boss_edge_r": Vector2(3, 20), "d43_bar_cap_l": Vector2(3, 12), "d43_bar_cap_r": Vector2(3, 12),
+		"d43_bar_mid": Vector2(1, 12), "d43_bar_fill": Vector2(1, 8), "d43_digit_0": Vector2(7, 9),
+		"d44_boss_text_f1": Vector2(96, 32), "d44_boss_text_f2": Vector2(96, 32), "d44_warn_stripe": Vector2(16, 8)}
+	for s in ["", "_hit", "_f1", "_f2", "_f3"]:
+		want["d39_brick_circle" + s] = Vector2(20, 20)
+		want["d40_brick_chest" + s] = Vector2(40, 20)
+		want["d41_brick_coin" + s] = Vector2(40, 20)
+	var coin_px := {10: 16, 50: 18, 100: 20}
+	for v in coin_px:
+		for i in [1, 2, 3, 4]:
+			want["d41_coin_%d_f%d" % [v, i]] = Vector2(coin_px[v], coin_px[v])
+	for i in [1, 2, 3]:
+		want["d41_coin_pick_f%d" % i] = Vector2(20, 20)
+		want["d42_boss_f%d" % i] = Vector2(40, 20)
+	for i in [1, 2]:
+		want["d42_boss_crack_%d" % i] = Vector2(40, 20)
+	for k in ["corner_tl", "corner_tr", "corner_bl", "corner_br", "concave_nw", "concave_ne", "concave_se", "concave_sw"]:
+		want["d42_boss_" + k] = Vector2(3, 3)
+	var bad := []
+	for n in want:
+		var tex: Texture2D = m._t(n)
+		if tex == null or tex.get_size() != want[n] or not tex.resource_path.begins_with("res://art/special40/"):
+			bad.append(n)
+	_eq([want.size(), bad], [58, []], "58 D39~D44 textures in special40 with expected size")
+	var src: Image = m._t("d42_boss_edge_t").get_image()
+	var white: Image = m._t_white("d42_boss_edge_t").get_image()
+	_eq([white.get_pixel(5, 0).is_equal_approx(src.get_pixel(5, 0)), white.get_pixel(5, 1), white.get_pixel(5, 2)],
+		[true, Color.WHITE, Color.WHITE], "white flash keeps K row, other rows -> W")
 	m.free()

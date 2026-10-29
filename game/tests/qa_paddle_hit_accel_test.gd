@@ -8,6 +8,8 @@ const MainScript := preload("res://scripts/main.gd")
 const FPS := 1.0 / 60.0
 const PADDLE_V := 450.0
 const HIT := 0.005
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 
 var cfg: GameConfig
 var _passed := 0
@@ -21,6 +23,7 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = LEVEL
 	_run("config", _t_config)
 	_run("bounce_once", _t_bounce_once)
 	_run("sticky", _t_sticky)

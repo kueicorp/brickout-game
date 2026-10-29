@@ -8,7 +8,10 @@ extends SceneTree
 
 const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 
+var _cfg: GameConfig   # 持有共用設定,主場景 load 到的是同一份
 var _m
 var _frame := 0
 var _out := ""
@@ -20,6 +23,8 @@ var _mark_seen := {}   # 動態炸彈標記(D37)看到的幀:"f1"~"f4"(或 none/
 func _initialize() -> void:
 	var args := OS.get_cmdline_user_args()
 	_out = args[0] if args.size() > 0 else OS.get_user_data_dir()
+	_cfg = load("res://data/game_config.tres") as GameConfig
+	_cfg.level_path = LEVEL
 	_m = MainScene.instantiate()
 	root.add_child(_m)
 

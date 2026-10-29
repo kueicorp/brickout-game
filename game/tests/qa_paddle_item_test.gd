@@ -5,6 +5,8 @@ extends SceneTree
 
 const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 
 var cfg: GameConfig
 var _passed := 0
@@ -18,6 +20,7 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = LEVEL
 	_run("tap_no_move", _t_tap_no_move)
 	_run("drag_both_dirs", _t_drag_both_dirs)
 	_run("speed_tiers", _t_speed_tiers)

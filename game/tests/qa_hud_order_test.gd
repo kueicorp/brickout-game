@@ -6,6 +6,8 @@ extends SceneTree
 const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
 const FPS := 1.0 / 60.0
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 const LEN := Effects.PADDLE_LEN
 ## R10 固定順序(D35)
 const FIXED := ["reinforce", "fever", "speed", "pierce", "flame", "bomb", "paddle_len"]
@@ -25,6 +27,7 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = LEVEL
 	cfg.drop_chance = 0.0
 	cfg.debug_enchant = ""
 	cfg.debug_force_item = ""

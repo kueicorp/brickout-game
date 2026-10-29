@@ -24,11 +24,16 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	# 主場景讀 cfg.level_path;本測試要玩的是 level_test.json,不依賴設定檔目前指向哪個關卡(結束時還原)
+	var orig_path := cfg.level_path
+	cfg.level_path = LEVEL
 	_run("format", _t_format)
 	_run("layers_1_69", _t_layers)
 	_run("scene_load", _t_scene_load)
 	_run("play_angles", _t_play_angles)
 	_run("play_multiball", _t_play_multiball)
+	_run("play_victory", _t_play_victory)
+	cfg.level_path = orig_path
 	print("QA LEVEL RESULT: %d passed, %d failed" % [_passed, _failed])
 	quit(1 if _failed > 0 else 0)
 	return false
@@ -66,6 +71,8 @@ func _t_format() -> void:
 	var bad_width := []
 	var u_cells := []
 	var bad_tokens := []
+	var specials := {}
+	var bosses := {}
 	for r in rows.size():
 		var tokens: PackedStringArray = str(rows[r]).split(" ", false)
 		if tokens.size() != 8:
@@ -77,11 +84,20 @@ func _t_format() -> void:
 			var t := tokens[c]
 			if t == "U":
 				u_cells.append(Vector2i(c, r))
+			elif t in ["H", "G", "O"]:
+				# D39~D41 特殊磚:寶箱 H、金幣 G、圓形 O
+				specials[t] = specials.get(t, 0) + 1
+			elif t in ["B1", "B2"]:
+				# D42 魔王格
+				bosses.get_or_add(t, []).append(Vector2i(c, r))
 			elif t != "." and not (t.is_valid_int() and t.to_int() >= 1 and t.to_int() <= 69):
 				bad_tokens.append("%d,%d=%s" % [r, c, t])
 	_eq(bad_width, [], "every row has exactly 8 single-space tokens")
 	_eq(bad_tokens, [], "all tokens valid")
 	_eq(u_cells, [Vector2i(0, 8), Vector2i(7, 8)], "exactly 2 U at row 9 col 0 and col 7")
+	_eq(specials, {"H": 3, "G": 3, "O": 3}, "3 chest + 3 coin + 3 circle")
+	_eq(bosses.get("B1", []), [Vector2i(0, 9), Vector2i(1, 9), Vector2i(2, 9), Vector2i(3, 9)], "B1 = 4x1 at row 10")
+	_eq(bosses.get("B2", []), [Vector2i(2, 13), Vector2i(3, 13), Vector2i(4, 13), Vector2i(3, 14)], "B2 = T shape at rows 14~15")
 	var parsed := Rules.parse_level(JSON.parse_string(FileAccess.get_file_as_string(LEVEL)), 17, 8, cfg.max_layers)
 	_eq(parsed["errors"].size(), 0, "parse_level reports no errors")
 	_eq(cfg.max_layers, 69, "max_layers is 69")
@@ -147,11 +163,13 @@ func _t_scene_load() -> void:
 				continue
 			if br.unbreakable:
 				u += 1
-			else:
+			elif br.boss == null:
+				# 魔王格不算進 breakable_left(有魔王的關卡改看魔王全滅)
 				breakable += 1
 	_eq(m.grid.size(), 17, "grid 17 rows")
 	_eq(u, 2, "2 unbreakable bricks in scene")
-	_eq(m.breakable_left, breakable, "breakable_left matches grid")
+	_eq(m.breakable_left, breakable, "breakable_left matches grid (non-boss, non-U)")
+	_eq(m.bosses.size(), 2, "2 bosses loaded")
 	_ok(m.grid[8][0] != null and m.grid[8][0].unbreakable, "grid[8][0] is U")
 	_ok(m.grid[8][7] != null and m.grid[8][7].unbreakable, "grid[8][7] is U")
 	print("INFO scene: breakable=%d unbreakable=%d view_h=%d" % [breakable, u, m.view_h])
@@ -192,13 +210,24 @@ func _autoplay(m: Node2D, rng: RandomNumberGenerator, offs: Dictionary) -> void:
 	m.target_x = center
 
 
-func _simulate(angle_deg: float, balls: int, seed: int, drops: bool) -> Dictionary:
-	var old := [cfg.debug_start_balls, cfg.drop_chance, cfg.game_time]
+## boss_hp_per_level:−1 = 用設定檔的正式血量。
+## 有魔王的關卡在魔王全滅時就過關、剩下的磚自動清場(CLEARING = 2),所以「每塊都打得到」只在沒過關時要求。
+## (給魔王無限血量量可達性不可行:B1 正上方第 9 排 (1,8)(2,8) 被 U 與 B1 包住,魔王不死就只能從上方打穿 69 層區)
+func _simulate(angle_deg: float, balls: int, seed: int, drops: bool, boss_hp_per_level := -1) -> Dictionary:
+	var old := [cfg.debug_start_balls, cfg.drop_chance, cfg.game_time, cfg.boss_hp_per_level,
+		cfg.boss_debuff_chance, cfg.boss_buff_chance]
 	cfg.debug_start_balls = balls
 	if not drops:
+		# 不掉道具:一般 30% 與魔王被擊中的 20% / 5% 都關掉(魔王掉落不看 drop_chance,
+		# 不關的話會掉黑洞等減益,自動玩家接到後球被吸走)
 		cfg.drop_chance = 0.0
+		cfg.boss_debuff_chance = 0.0
+		cfg.boss_buff_chance = 0.0
 	cfg.game_time = SIM_TIME + 10.0
+	if boss_hp_per_level >= 0:
+		cfg.boss_hp_per_level = boss_hp_per_level
 	var m := _new_main()
+	# level_test 載入時不用亂數(沒有功能型磚),所以在 _ready 之後設種子,之後的遊玩仍可重現
 	m.rng.seed = seed
 	var rng := RandomNumberGenerator.new()
 	rng.seed = seed
@@ -224,6 +253,9 @@ func _simulate(angle_deg: float, balls: int, seed: int, drops: bool) -> Dictiona
 		var u_before := [m.grid[8][0].hit_t, m.grid[8][7].hit_t]
 		m._step(DT)
 		t += DT
+		if not drops:
+			# 寶箱必掉道具(不看 drop_chance);「不掉道具」模式下直接清掉,只看關卡本身
+			m.items.clear()
 		if m.grid[8][0].hit_t > 0.0 and u_before[0] <= 0.0:
 			u_hits += 1
 		if m.grid[8][7].hit_t > 0.0 and u_before[1] <= 0.0:
@@ -251,7 +283,9 @@ func _simulate(angle_deg: float, balls: int, seed: int, drops: bool) -> Dictiona
 		var cleared := true
 		for cell in lower:
 			var br = m.grid[cell.y][cell.x]
-			if (br == null or br.layers < lower[cell]) and not hit.has(cell):
+			# 魔王格的 layers 不使用:被球打到(閃白)或掉格就算打到
+			var touched: bool = br == null or (br.boss == null and br.layers < lower[cell]) or (br.boss != null and br.hit_t > 0.0)
+			if touched and not hit.has(cell):
 				hit[cell] = t
 			if br != null:
 				cleared = false
@@ -273,10 +307,15 @@ func _simulate(angle_deg: float, balls: int, seed: int, drops: bool) -> Dictiona
 		"max_gap": max_gap, "max_gap_at": max_gap_at, "lost": lost, "u_hits": u_hits,
 		"missed": missed, "lower": lower.size(), "end_t": t, "state": m.state, "score": m.score,
 		"balls_end": m.balls.size()}
+	res["coins_caught"] = m.coins_caught
+	res["boss_layers"] = m.bosses.map(func(b) -> int: return b.layers)
 	m.free()
 	cfg.debug_start_balls = old[0]
 	cfg.drop_chance = old[1]
 	cfg.game_time = old[2]
+	cfg.boss_hp_per_level = old[3]
+	cfg.boss_debuff_chance = old[4]
+	cfg.boss_buff_chance = old[5]
 	return res
 
 
@@ -284,6 +323,7 @@ func _report(tag: String, r: Dictionary) -> void:
 	print("INFO %s angle=%5.1f all_hit=%6.1fs lower_clear=%6.1fs max_no_progress=%5.2fs(@%.1f) lost=%d u_hits=%d end_t=%.1f state=%d score=%d balls=%d missed=%s slowest=%s" % [
 		tag, r["angle"], r["t_all_hit"], r["t_lower_clear"], r["max_gap"], r["max_gap_at"], r["lost"],
 		r["u_hits"], r["end_t"], r["state"], r["score"], r["balls_end"], r["missed"], r["slowest"]])
+	print("INFO %s angle=%5.1f boss_layers=%s coins_caught=%d" % [tag, r["angle"], r["boss_layers"], r["coins_caught"]])
 
 
 func _t_play_angles() -> void:
@@ -293,11 +333,15 @@ func _t_play_angles() -> void:
 			var r := _simulate(angles[i], 1, seed * 1000 + i, false)
 			_report("single seed=%d" % seed, r)
 			var lbl := "angle %.0f seed %d" % [angles[i], seed]
-			# 可達性:模擬時間內每塊都要被打到。300 秒(= 一局時間)只列 INFO:
-			# 自動玩家是隨機擊球、不會瞄準,超過 300 秒代表「亂打要很久」,不代表打不到
-			_eq(r["missed"], [], lbl + ": every lower brick hit within %ds" % int(SIM_TIME))
-			if r["t_all_hit"] < 0.0 or r["t_all_hit"] > HIT_ALL_LIMIT:
-				print("INFO %s: random autoplay needed > %ds to touch every lower brick" % [lbl, int(HIT_ALL_LIMIT)])
+			# 可達性(原本的要求):模擬時間內每塊都要被打到;魔王全滅過關時剩下的磚由清場移除,不再要求。
+			# 300 秒(= 一局時間)與「600 秒內沒過關」只列 INFO:自動玩家是隨機擊球、不會瞄準
+			if r["state"] != 2:
+				print("INFO %s: no victory within %ds, boss_layers=%s" % [lbl, int(SIM_TIME), r["boss_layers"]])
+				_eq(r["missed"], [], lbl + ": no victory -> every lower brick hit within %ds" % int(SIM_TIME))
+			elif not r["missed"].is_empty():
+				print("INFO %s: victory before touching %s (cleared by victory)" % [lbl, r["missed"]])
+			if r["end_t"] > HIT_ALL_LIMIT:
+				print("INFO %s: random autoplay needed %.0fs (> %ds) to finish" % [lbl, r["end_t"], int(HIT_ALL_LIMIT)])
 			_ok(r["max_gap"] < STUCK_LIMIT, lbl + ": no >%ds stretch without score/paddle" % int(STUCK_LIMIT))
 			_eq(r["lost"], 0, lbl + ": autoplay never loses the ball")
 
@@ -308,9 +352,18 @@ func _t_play_multiball() -> void:
 	for n in [10, 40]:
 		var r := _simulate(0.0, n, 77 + n, false)
 		_report("multi n=%d" % n, r)
-		_eq(r["missed"], [], "multiball %d: every lower brick hit" % n)
+		_ok(r["state"] == 2 or r["missed"].is_empty(), "multiball %d: victory, or every lower brick hit" % n)
 		_ok(r["max_gap"] < STUCK_LIMIT, "multiball %d: no >%ds stretch without score/paddle" % [n, int(STUCK_LIMIT)])
 	# 有掉道具:道具(黑洞、合併等)會改變球數,結果受亂數影響,只列 INFO 並檢查無執行錯誤
 	for n in [10, 40]:
 		var r := _simulate(0.0, n, 77 + n, true)
 		_report("multi n=%d drops" % n, r)
+
+
+## 正式魔王血量(level_number × boss_hp_per_level):自動玩能打死兩隻魔王進入清場(CLEARING = 2)。
+func _t_play_victory() -> void:
+	for seed in [5, 6]:
+		var r := _simulate(30.0, 1, seed, false)
+		_report("victory seed=%d" % seed, r)
+		_eq([r["state"], r["boss_layers"]], [2, [0, 0]], "seed %d: both bosses killed -> CLEARING within %ds" % [seed, int(SIM_TIME)])
+		_eq(r["lost"], 0, "seed %d: autoplay never loses the ball" % seed)

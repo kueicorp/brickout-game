@@ -6,6 +6,8 @@ extends SceneTree
 const MainScene := preload("res://scenes/main.tscn")
 const MainScript := preload("res://scripts/main.gd")
 const FPS := 1.0 / 60.0
+## 固定測試關卡(無魔王):不依賴 game_config.tres 目前的 level_path(魔王關進場有 1.6 秒 BOSS 警告)
+const LEVEL := "res://data/levels/level_func_test.json"
 
 ## 規格 A 的秒數(使用者確認)
 const DUR := {
@@ -28,6 +30,7 @@ func _process(_delta: float) -> bool:
 		return false
 	_started = true
 	cfg = load("res://data/game_config.tres") as GameConfig
+	cfg.level_path = LEVEL
 	cfg.drop_chance = 0.0
 	_run("a_config_values", _t_config_values)
 	_run("a_pickup_durations", _t_pickup_durations)
@@ -500,7 +503,8 @@ func _t_hud_column1() -> void:
 	_eq(m._hud_cells().size(), 3, "bomb (10 s) gone at 10 s")
 	# 版面常數
 	_eq([MainScript.HUD_X, MainScript.HUD_Y, MainScript.HUD_STEP, cfg.hud_alpha], [24, 424, 52, 0.5], "x 24, y 424, step 52, 50%")
-	for id in ["reinforce", "slow", "fast", "pierce", "flame", "bomb", "fever"]:
+	# fever 尚未實作,圖示已刪除,不檢查
+	for id in ["reinforce", "slow", "fast", "pierce", "flame", "bomb"]:
 		var tex: Texture2D = load("res://art/hud32/d34_hud_icon_%s.png" % id)
 		_eq(tex.get_size() if tex else Vector2.ZERO, Vector2(32, 32), "hud32 %s is 32x32" % id)
 	m.free()

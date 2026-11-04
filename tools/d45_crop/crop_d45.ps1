@@ -1,7 +1,7 @@
-﻿# 依 crop_table.csv 把 D45 首頁的整層 PNG 裁成小檔,輸出到 game/art/home/。
+﻿# 依 crop_table.csv 把 D45 首頁的整層 PNG 裁成小檔,輸出到各列指定的路徑(art/ui/home/、art/borders/home/)。
 # 像素原樣複製(32bpp ARGB,不縮放、不重新取樣、不改色),跑完重新讀取輸出檔逐像素比對來源。
 #
-# CSV 欄位:name, source(相對專案根目錄), x, y, w, h, mode
+# CSV 欄位:output(相對專案根目錄), source(相對專案根目錄), x, y, w, h, mode
 #   mode = fixed:直接裁 x,y,w,h
 #   mode = bbox :在 x,y,w,h 範圍內找不透明像素(alpha > 0)的最小外框再裁;
 #                 若外框碰到範圍邊緣,代表內容可能超出範圍,直接中止,避免默默截掉。
@@ -13,7 +13,6 @@ $ErrorActionPreference = 'Stop'
 Add-Type -AssemblyName System.Drawing
 
 $root = (Resolve-Path (Join-Path $PSScriptRoot '..\..')).Path
-$outDir = Join-Path $root 'game\art\home'
 $rows = Import-Csv (Join-Path $PSScriptRoot 'crop_table.csv')
 
 # 讀整張圖成 32bpp ARGB 位元組陣列(BGRA 順序),回傳 @{ W; H; Bytes; Stride }。
@@ -56,17 +55,17 @@ foreach ($r in $rows) {
     $x = [int]$r.x; $y = [int]$r.y; $w = [int]$r.w; $h = [int]$r.h
 
     if ($x -lt 0 -or $y -lt 0 -or $w -le 0 -or $h -le 0 -or $x + $w -gt $src.W -or $y + $h -gt $src.H) {
-        throw "$($r.name):矩形 $x,$y,$w,$h 超出來源 $($r.source)($($src.W)x$($src.H))"
+        throw "$($r.output):矩形 $x,$y,$w,$h 超出來源 $($r.source)($($src.W)x$($src.H))"
     }
     if ($r.mode -eq 'bbox') {
         $bb = Get-OpaqueBBox $src $x $y $w $h
-        if ($null -eq $bb) { throw "$($r.name):範圍內沒有不透明像素" }
+        if ($null -eq $bb) { throw "$($r.output):範圍內沒有不透明像素" }
         if ($bb[0] -eq $x -or $bb[1] -eq $y -or $bb[0] + $bb[2] -eq $x + $w -or $bb[1] + $bb[3] -eq $y + $h) {
-            throw "$($r.name):最小外框 $($bb -join ',') 碰到搜尋範圍邊緣,內容可能超出範圍,請放寬 CSV 的矩形"
+            throw "$($r.output):最小外框 $($bb -join ',') 碰到搜尋範圍邊緣,內容可能超出範圍,請放寬 CSV 的矩形"
         }
         $x, $y, $w, $h = $bb
     } elseif ($r.mode -ne 'fixed') {
-        throw "$($r.name):未知的 mode '$($r.mode)'"
+        throw "$($r.output):未知的 mode '$($r.mode)'"
     }
 
     # 逐列複製原始 BGRA 位元組到新點陣圖,避開 DrawImage 可能的混色或重新取樣。
@@ -79,7 +78,7 @@ foreach ($r in $rows) {
                 [System.Runtime.InteropServices.Marshal]::Copy($src.Bytes, ($y + $row) * $src.Stride + $x * 4, $dst, $w * 4)
             }
         } finally { $out.UnlockBits($lock) }
-        $outPath = Join-Path $outDir $r.name
+        $outPath = Join-Path $root $r.output
         $out.Save($outPath, [System.Drawing.Imaging.ImageFormat]::Png)
     } finally { $out.Dispose() }
 
@@ -95,7 +94,7 @@ foreach ($r in $rows) {
     }
     if ($diff -ne 0) { $failed++ }
     $results += [pscustomobject]@{
-        File   = $r.name
+        File   = $r.output
         Size   = "${w}x${h}"
         Source = [IO.Path]::GetFileName($r.source)
         Rect   = "$x,$y,$w,$h"

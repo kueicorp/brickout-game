@@ -130,6 +130,25 @@
 | 載入畫面 | 360×640 依 D09:底色 #192331、Logo 放大 1.25 倍、金磚填充 + 外框 |
 | 未決 | 216 不是 16 的倍數，100% 時最後一塊金磚只露一半;載入失敗畫面未設計 |
 
+## 共用資源圖示(2026-11-06)
+
+| 項目 | 內容 |
+|---|---|
+| 決定 | 金幣、金塊、愛心、銀塊全 APP 統一(含關卡內掉落金幣、撿起動畫、金幣磚塊);圖示不帶 +,首頁資源列的 + 由程式疊上(README 已寫) |
+| 檔案 | `art/ui/resource/`:coin、gold、silver、heart、heart_empty(各 25×25,無 +)、plus_badge 12×12(疊在 (13,13)) |
+| 尚未做 | 首頁資源列改用這套 + 程式疊 plus_badge(工程師 → QA);關卡內金幣統一(使用者 2026-11-06 說先不做;已停止設計師規劃，未產出檔案);尚未複製到 game/assets |
+
+## 活動頁(2026-11-06)
+
+| 項目 | 內容 |
+|---|---|
+| 設計稿 | `docs/design/event/event-screen.md`:列表 → 每日簽到 / 首次儲值;D05、D10、D11 使用者已確認(2026-11-06,尚未刪除,派工程師時整段放進指令);D01~D04、D06~D09、D12~D14 未逐項確認 |
+| 預覽 | `docs/design/event/event-screen-preview.svg`(引用真實圖檔);截圖 `art/mockups/event_screen_preview.png` / `_x2.png`(Edge headless 截圖:`msedge --headless=new --allow-file-access-from-files --screenshot=...`);舊色塊稿 `event-screen-layout.svg` |
+| 圖 | `art/ui/event/`:icon_checkin、icon_first_topup(48×48,列表用)、icon_random_item_36(36×36,首儲列與 28 天卡用;48×48 舊版保留未用)、icon_signed(24×24);首儲金塊、銀塊用 `art/ui/resource/gold_x2.png`、`silver_x2.png`(36×36,程式 2 倍) |
+| 尺寸表 | `docs/design/resource-icon-sizes.md`:資源列 25×25 不變;首儲列 36×36 |
+| 已定案文字 | 首儲頁與列表副標只寫「限購 1 次」(README 已寫) |
+| 待決定 | Q1~Q11 活動規則(日期對應、手動/自動領、跨月處理、首儲道具清單、付款失敗處理等);D01~D04、D06~D09、D12~D14 確認;每次出圖候選張數(設計師規則 1 張 vs 記憶 3 張)。使用者說會在實作 session 裡細修 |
+
 ## 首頁 UI
 
 | 項目 | 內容 |
@@ -180,6 +199,9 @@ D15 地圖：一次 10 關、每主題 2 組、左右滑動;蛇形 3+4+3;格子�
 | Pixflux | 不會在空白處長出新東西(主題 1 補雲、主題 2 延伸都失敗);strength 300 左右可「修順」已有內容 |
 | 精確文字、數量、構圖 | Pixen 常不聽;改用 Pro Flash,或以 Pixen 候選當 style_image |
 | 很扁的長條、16×16 無縫 | Pixen 畫不出來;長條改 Pro Flash 修改，無縫紋理改程式畫或改設計 |
+| 小圖要跟舊圖一致(如 24×24 勾) | Pixen 兩次都畫成黃綠細勾;改 Pro Flash + style_image 成功。**style_image 不可大於畫布**,先從舊圖裁出 ≤ 畫布的區塊(不縮放)再上傳;24×24 約 5 generations |
+| 去掉圖內角標(如資源 icon 的 +) | Pro Flash inpaint 最小 32×32、需 4 的倍數:把 25×25 原圖平移放進 32×32 透明畫布(不縮放)+ 遮罩,inpaint 後裁回;5 generations,遮罩外逐像素不變 |
+| 圖示畫滿畫布 | Pixen 提示詞加「large, filling the entire canvas edge to edge」有效(E02 37→46 px) |
 | 尺寸 | Pixen 每邊 16~768、面積 ≤512²、4 的倍數;Pixflux 每邊 ≤400;Pro Flash ≤256 |
 
 做法與注意:

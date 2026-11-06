@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1160" height="700" viewBox="0 0 1160 700">
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="2300" height="700" viewBox="0 0 2300 700">
   <style>
     @font-face { font-family: 'Cubic 11'; src: url('../../../art/fonts/Cubic_11.ttf') format('truetype'); }
     text { font-family: 'Cubic 11', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; }
@@ -7,7 +7,6 @@
   </style>
   <defs>
     <rect id="cS" width="44" height="52" fill="#2E7D4F"/>
-    <rect id="cM" width="44" height="52" fill="#4A3030"/>
     <rect id="cF" width="44" height="52" fill="#2A2F3A"/>
     <rect id="listBg" width="332" height="72" fill="#222B3A" stroke="#5D6D7E"/>
 
@@ -41,7 +40,7 @@
     </g>
   </defs>
 
-  <rect width="1160" height="700" fill="#ECEFF1"/>
+  <rect width="2300" height="700" fill="#ECEFF1"/>
   <text x="20" y="24" font-size="14" fill="#111">活動頁預覽(真實圖檔,360×640,不縮放)</text>
 
   <!-- ===== A 活動列表 ===== -->
@@ -51,6 +50,8 @@
     <g transform="translate(14,138)">
       <use href="#listBg"/>
       <image href="../../../art/ui/event/icon_checkin.png" x="12" y="12" width="48" height="48"/>
+      <!-- D05 紅點:12x12,項內 x 52、y 4;今天未簽 → 亮 -->
+      <circle cx="58" cy="10" r="5.5" fill="#E74C3C" stroke="#FFFFFF" stroke-width="1"/>
       <text x="72" y="32" font-size="16" fill="#fff">每日簽到</text>
       <text x="72" y="54" font-size="12" fill="#B0B8C4">每日 1500 金幣 + 2 愛心</text>
       <text x="312" y="43" font-size="18" text-anchor="middle" fill="#fff">&gt;</text>
@@ -71,84 +72,80 @@
     </g>
   </g>
 
-  <!-- ===== B 每日簽到(今天第 10 天、已簽 7 天、漏簽第 4、6 天) ===== -->
-  <g transform="translate(400,40)">
+  <!-- ===== B 每日簽到(已簽 7 次、今天未簽:第 1~7 格已簽,第 8 格金框) ===== -->
+  <g id="screenB" transform="translate(400,40)">
     <use href="#screenBase"/>
     <text x="60" y="108" font-size="18" fill="#fff">每日簽到</text>
     <!-- D07 -->
-    <text x="14" y="154" font-size="14" fill="#fff">本月已簽 7 / 28 天</text>
+    <text x="14" y="154" font-size="14" fill="#fff">本月已簽 7 / 28 次</text>
     <text x="14" y="172" font-size="12" fill="#fff">每日 1500 金幣 + 2 愛心</text>
     <rect x="250" y="136" width="96" height="44" fill="#2ECC71"/>
     <text x="298" y="163" font-size="14" text-anchor="middle" fill="#000">今日簽到</text>
-    <!-- D08 -->
-    <g font-size="11" fill="#fff" text-anchor="middle">
-      <text x="36" y="197">日</text><text x="84" y="197">一</text><text x="132" y="197">二</text><text x="180" y="197">三</text><text x="228" y="197">四</text><text x="276" y="197">五</text><text x="324" y="197">六</text>
-    </g>
-    <!-- D09 grid -->
+    <!-- D09 grid: x = 14 + col*48, y = 194 + row*56(D08 星期列已移除) -->
     <g font-size="12" fill="#fff">
-      <!-- row 0 -->
-      <g transform="translate(14,202)"><use href="#cS"/><text x="4" y="14">1</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
-      <g transform="translate(62,202)"><use href="#cS"/><text x="4" y="14">2</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
-      <g transform="translate(110,202)"><use href="#cS"/><text x="4" y="14">3</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
-      <g transform="translate(158,202)"><use href="#cM"/><text x="4" y="14" fill="#999">4</text><text x="22" y="40" font-size="16" text-anchor="middle" fill="#999">×</text></g>
-      <g transform="translate(206,202)"><use href="#cS"/><text x="4" y="14">5</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
-      <g transform="translate(254,202)"><use href="#cM"/><text x="4" y="14" fill="#999">6</text><text x="22" y="40" font-size="16" text-anchor="middle" fill="#999">×</text></g>
-      <g transform="translate(302,202)"><use href="#cS"/><text x="4" y="14">7</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
-      <!-- row 1 -->
-      <g transform="translate(14,258)"><use href="#cS"/><text x="4" y="14">8</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
-      <g transform="translate(62,258)"><use href="#cS"/><text x="4" y="14">9</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
-      <g transform="translate(110,258)"><use href="#cF"/><rect x="1" y="1" width="42" height="50" fill="none" stroke="#F4C430" stroke-width="2"/><text x="4" y="14">10</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(158,258)"><use href="#cF"/><text x="4" y="14" fill="#999">11</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(206,258)"><use href="#cF"/><text x="4" y="14" fill="#999">12</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(254,258)"><use href="#cF"/><text x="4" y="14" fill="#999">13</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(302,258)"><use href="#cF"/><text x="4" y="14" fill="#999">14</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <!-- row 0: 第 1~7 次,已簽 -->
+      <g transform="translate(14,194)"><use href="#cS"/><text x="4" y="14">1</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+      <g transform="translate(62,194)"><use href="#cS"/><text x="4" y="14">2</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+      <g transform="translate(110,194)"><use href="#cS"/><text x="4" y="14">3</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+      <g transform="translate(158,194)"><use href="#cS"/><text x="4" y="14">4</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+      <g transform="translate(206,194)"><use href="#cS"/><text x="4" y="14">5</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+      <g transform="translate(254,194)"><use href="#cS"/><text x="4" y="14">6</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+      <g transform="translate(302,194)"><use href="#cS"/><text x="4" y="14">7</text><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+      <!-- row 1: 第 8 次 = 下一格(金框),其餘未簽 -->
+      <g transform="translate(14,250)"><use href="#cF"/><rect x="1" y="1" width="42" height="50" fill="none" stroke="#F4C430" stroke-width="2"/><text x="4" y="14">8</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(62,250)"><use href="#cF"/><text x="4" y="14" fill="#999">9</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(110,250)"><use href="#cF"/><text x="4" y="14" fill="#999">10</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(158,250)"><use href="#cF"/><text x="4" y="14" fill="#999">11</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(206,250)"><use href="#cF"/><text x="4" y="14" fill="#999">12</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(254,250)"><use href="#cF"/><text x="4" y="14" fill="#999">13</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(302,250)"><use href="#cF"/><text x="4" y="14" fill="#999">14</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
       <!-- row 2 -->
-      <g transform="translate(14,314)"><use href="#cF"/><text x="4" y="14" fill="#999">15</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(62,314)"><use href="#cF"/><text x="4" y="14" fill="#999">16</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(110,314)"><use href="#cF"/><text x="4" y="14" fill="#999">17</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(158,314)"><use href="#cF"/><text x="4" y="14" fill="#999">18</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(206,314)"><use href="#cF"/><text x="4" y="14" fill="#999">19</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(254,314)"><use href="#cF"/><text x="4" y="14" fill="#999">20</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(302,314)"><use href="#cF"/><text x="4" y="14" fill="#999">21</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(14,306)"><use href="#cF"/><text x="4" y="14" fill="#999">15</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(62,306)"><use href="#cF"/><text x="4" y="14" fill="#999">16</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(110,306)"><use href="#cF"/><text x="4" y="14" fill="#999">17</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(158,306)"><use href="#cF"/><text x="4" y="14" fill="#999">18</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(206,306)"><use href="#cF"/><text x="4" y="14" fill="#999">19</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(254,306)"><use href="#cF"/><text x="4" y="14" fill="#999">20</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(302,306)"><use href="#cF"/><text x="4" y="14" fill="#999">21</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
       <!-- row 3 -->
-      <g transform="translate(14,370)"><use href="#cF"/><text x="4" y="14" fill="#999">22</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(62,370)"><use href="#cF"/><text x="4" y="14" fill="#999">23</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(110,370)"><use href="#cF"/><text x="4" y="14" fill="#999">24</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(158,370)"><use href="#cF"/><text x="4" y="14" fill="#999">25</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(206,370)"><use href="#cF"/><text x="4" y="14" fill="#999">26</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(254,370)"><use href="#cF"/><text x="4" y="14" fill="#999">27</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
-      <g transform="translate(302,370)"><use href="#cF"/><text x="4" y="14" fill="#999">28</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(14,362)"><use href="#cF"/><text x="4" y="14" fill="#999">22</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(62,362)"><use href="#cF"/><text x="4" y="14" fill="#999">23</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(110,362)"><use href="#cF"/><text x="4" y="14" fill="#999">24</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(158,362)"><use href="#cF"/><text x="4" y="14" fill="#999">25</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(206,362)"><use href="#cF"/><text x="4" y="14" fill="#999">26</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(254,362)"><use href="#cF"/><text x="4" y="14" fill="#999">27</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+      <g transform="translate(302,362)"><use href="#cF"/><text x="4" y="14" fill="#999">28</text><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
     </g>
     <!-- D10 cards: 80x137 at x 14/98/182/266, y 428; button y 90; gift 36x36 at (4,50) -->
     <g font-size="12" fill="#fff">
       <!-- 7 days: claimable, 2px gold -->
       <g transform="translate(14,428)">
         <rect x="1" y="1" width="78" height="135" fill="#222B3A" stroke="#F4C430" stroke-width="2"/>
-        <text x="40" y="13" text-anchor="middle">累積 7 天</text>
+        <text x="40" y="13" text-anchor="middle">累積 7 次</text>
         <image href="../../../art/ui/resource/coin.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">2000</text>
         <image href="../../../art/ui/resource/silver.png" x="4" y="55" width="25" height="25"/><text x="33" y="72" font-size="11">1</text>
         <rect x="4" y="90" width="72" height="44" fill="#2ECC71"/><text x="40" y="116" text-anchor="middle" fill="#000">領取</text>
       </g>
       <g transform="translate(98,428)">
         <rect x="0.5" y="0.5" width="79" height="136" fill="#222B3A" stroke="#5D6D7E"/>
-        <text x="40" y="13" text-anchor="middle">累積 14 天</text>
+        <text x="40" y="13" text-anchor="middle">累積 14 次</text>
         <image href="../../../art/ui/resource/coin.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">5000</text>
         <image href="../../../art/ui/resource/silver.png" x="4" y="55" width="25" height="25"/><text x="33" y="72" font-size="11">2</text>
-        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 7 天</text>
+        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 7 次</text>
       </g>
       <g transform="translate(182,428)">
         <rect x="0.5" y="0.5" width="79" height="136" fill="#222B3A" stroke="#5D6D7E"/>
-        <text x="40" y="13" text-anchor="middle">累積 21 天</text>
+        <text x="40" y="13" text-anchor="middle">累積 21 次</text>
         <image href="../../../art/ui/resource/coin.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">10000</text>
         <image href="../../../art/ui/resource/silver.png" x="4" y="55" width="25" height="25"/><text x="33" y="72" font-size="11">5</text>
-        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 14 天</text>
+        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 14 次</text>
       </g>
       <g transform="translate(266,428)">
         <rect x="0.5" y="0.5" width="79" height="136" fill="#222B3A" stroke="#5D6D7E"/>
-        <text x="40" y="13" text-anchor="middle">累積 28 天</text>
+        <text x="40" y="13" text-anchor="middle">累積 28 次</text>
         <image href="../../../art/ui/resource/silver.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">5</text>
         <image href="../../../art/ui/event/icon_random_item_36.png" x="4" y="50" width="36" height="36"/><text x="44" y="72" font-size="11">×1</text>
-        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 21 天</text>
+        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 21 次</text>
       </g>
     </g>
   </g>
@@ -172,5 +169,106 @@
     <text x="180" y="510" font-size="18" text-anchor="middle" fill="#000">TWD 300 購買</text>
   </g>
 
-  <text x="20" y="696" font-size="11" fill="#111">A 左上 (20,40)、B (400,40)、C (780,40);色塊為設計稿佔位色;圖片以相對路徑引用,請在 docs/design/event/ 原位置開啟。</text>
+  <!-- ===== D D15 月初補發提示框(疊在 A 活動列表上;示意:補發 4 階全部,框高 372) ===== -->
+  <g transform="translate(1160,40)">
+    <use href="#screenBase"/>
+    <text x="60" y="108" font-size="18" fill="#fff">活動</text>
+    <g transform="translate(14,138)">
+      <use href="#listBg"/>
+      <image href="../../../art/ui/event/icon_checkin.png" x="12" y="12" width="48" height="48"/>
+      <!-- D05 紅點:12x12,項內 x 52、y 4;今天未簽 → 亮 -->
+      <circle cx="58" cy="10" r="5.5" fill="#E74C3C" stroke="#FFFFFF" stroke-width="1"/>
+      <text x="72" y="32" font-size="16" fill="#fff">每日簽到</text>
+      <text x="72" y="54" font-size="12" fill="#B0B8C4">每日 1500 金幣 + 2 愛心</text>
+      <text x="312" y="43" font-size="18" text-anchor="middle" fill="#fff">&gt;</text>
+    </g>
+    <g transform="translate(14,218)">
+      <use href="#listBg"/>
+      <image href="../../../art/ui/event/icon_first_topup.png" x="12" y="12" width="48" height="48"/>
+      <text x="72" y="32" font-size="16" fill="#fff">首次儲值</text>
+      <text x="72" y="54" font-size="12" fill="#B0B8C4">限購 1 次</text>
+      <text x="312" y="43" font-size="18" text-anchor="middle" fill="#fff">&gt;</text>
+    </g>
+    <!-- 全螢幕遮罩 alpha 160 -->
+    <rect x="0" y="0" width="360" height="640" fill="#000" fill-opacity="0.627"/>
+    <!-- 提示框 296x372,x 32,y 134(垂直置中) -->
+    <g transform="translate(32,134)">
+      <rect x="0.5" y="0.5" width="295" height="371" fill="#222B3A" stroke="#5D6D7E"/>
+      <text x="148" y="37" font-size="18" text-anchor="middle" fill="#fff">上月未領取的累積獎勵已補發</text>
+      <!-- 區塊 1:累積 7 次,y 56 -->
+      <g transform="translate(0,56)">
+        <text x="16" y="14" font-size="14" fill="#B0B8C4">累積 7 次</text>
+        <image href="../../../art/ui/resource/coin.png" x="16" y="22" width="25" height="25"/><text x="45" y="40" font-size="14" fill="#fff">×2000</text>
+        <image href="../../../art/ui/resource/silver.png" x="110" y="22" width="25" height="25"/><text x="139" y="40" font-size="14" fill="#fff">×1</text>
+      </g>
+      <!-- 區塊 2:累積 14 次,y 112 -->
+      <g transform="translate(0,112)">
+        <text x="16" y="14" font-size="14" fill="#B0B8C4">累積 14 次</text>
+        <image href="../../../art/ui/resource/coin.png" x="16" y="22" width="25" height="25"/><text x="45" y="40" font-size="14" fill="#fff">×5000</text>
+        <image href="../../../art/ui/resource/silver.png" x="110" y="22" width="25" height="25"/><text x="139" y="40" font-size="14" fill="#fff">×2</text>
+      </g>
+      <!-- 區塊 3:累積 21 次,y 168 -->
+      <g transform="translate(0,168)">
+        <text x="16" y="14" font-size="14" fill="#B0B8C4">累積 21 次</text>
+        <image href="../../../art/ui/resource/coin.png" x="16" y="22" width="25" height="25"/><text x="45" y="40" font-size="14" fill="#fff">×10000</text>
+        <image href="../../../art/ui/resource/silver.png" x="110" y="22" width="25" height="25"/><text x="139" y="40" font-size="14" fill="#fff">×5</text>
+      </g>
+      <!-- 區塊 4:累積 28 次,y 224,高 76 -->
+      <g transform="translate(0,224)">
+        <text x="16" y="14" font-size="14" fill="#B0B8C4">累積 28 次</text>
+        <image href="../../../art/ui/resource/silver.png" x="16" y="22" width="25" height="25"/><text x="45" y="40" font-size="14" fill="#fff">×5</text>
+        <text x="16" y="66" font-size="14" fill="#fff">隨機道具:示意道具 ×1</text>
+      </g>
+      <!-- 按鈕 216x44,框內 x 40,y 312(距框底 16) -->
+      <rect x="40" y="312" width="216" height="44" fill="#2ECC71"/>
+      <text x="148" y="339" font-size="14" text-anchor="middle" fill="#000">好</text>
+    </g>
+    <text x="352" y="632" font-size="9" text-anchor="end" fill="#AAB">D15 示意(補發 4 階)</text>
+  </g>
+
+  <!-- ===== E D16 首頁底部按鈕區示意(活動 icon 右上角紅點;座標依 home-screen-confirmed / bottom-buttons-confirmed) ===== -->
+  <g transform="translate(1540,40)">
+    <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="0" width="360" height="640"/>
+    <text x="180" y="300" font-size="14" text-anchor="middle" fill="#fff" stroke="#000" stroke-width="3" paint-order="stroke">首頁(上半部省略)</text>
+    <text x="180" y="324" font-size="12" text-anchor="middle" fill="#fff" stroke="#000" stroke-width="3" paint-order="stroke">D16:任一活動有紅點時,「活動」icon 右上角顯示</text>
+    <!-- 底部 4 格:x 8/95/182/269,y 492,83x72;icon 64x64 在格內 x 9、y 0 -->
+    <image href="../../../art/ui/home/bottom-button/icon_event.png" x="17" y="492" width="64" height="64"/>
+    <image href="../../../art/ui/home/bottom-button/icon_shop.png" x="104" y="492" width="64" height="64"/>
+    <image href="../../../art/ui/home/bottom-button/icon_growth.png" x="191" y="492" width="64" height="64"/>
+    <image href="../../../art/ui/home/bottom-button/icon_settings.png" x="278" y="492" width="64" height="64"/>
+    <g font-size="15" fill="#fff" stroke="#000" stroke-width="2" paint-order="stroke" text-anchor="middle">
+      <text x="49.5" y="561">活動</text>
+      <text x="136.5" y="561">商城</text>
+      <text x="223.5" y="561">成長</text>
+      <text x="310.5" y="561">設定</text>
+    </g>
+    <!-- D16 紅點:12x12,畫面 x 69~81、y 492~504(icon 內 x 52、y 0);照實疊在金星上 -->
+    <circle cx="75" cy="498" r="5.5" fill="#E74C3C" stroke="#FFFFFF" stroke-width="1"/>
+    <!-- banner 320x50 at (20,574) -->
+    <rect x="20" y="574" width="320" height="50" fill="#95A5A6"/>
+    <text x="180" y="604" font-size="14" text-anchor="middle" fill="#000">廣告 320×50</text>
+  </g>
+
+  <!-- ===== F D17 獲得提示框(示意:簽到成功;底層引用畫面 B,use 的 x = 1920 − 400) ===== -->
+  <use href="#screenB" x="1520" y="0"/>
+  <g transform="translate(1920,40)">
+    <!-- 全螢幕遮罩 alpha 160 -->
+    <rect x="0" y="0" width="360" height="640" fill="#000" fill-opacity="0.627"/>
+    <!-- 提示框 296x168,x 32,y 236(垂直置中) -->
+    <g transform="translate(32,236)">
+      <rect x="0.5" y="0.5" width="295" height="167" fill="#222B3A" stroke="#5D6D7E"/>
+      <text x="148" y="37" font-size="18" text-anchor="middle" fill="#fff">已獲得</text>
+      <!-- 獎勵列區塊 y 56,高 40;icon 在區塊內 y 8 -->
+      <g transform="translate(0,56)">
+        <image href="../../../art/ui/resource/coin.png" x="16" y="8" width="25" height="25"/><text x="45" y="26" font-size="14" fill="#fff">×1500</text>
+        <image href="../../../art/ui/resource/heart.png" x="110" y="8" width="25" height="25"/><text x="139" y="26" font-size="14" fill="#fff">×2</text>
+      </g>
+      <!-- 按鈕 216x44,框內 x 40、y 108 -->
+      <rect x="40" y="108" width="216" height="44" fill="#2ECC71"/>
+      <text x="148" y="135" font-size="14" text-anchor="middle" fill="#000">好</text>
+    </g>
+    <text x="352" y="632" font-size="9" text-anchor="end" fill="#AAB">D17 示意(簽到成功;底層為畫面 B 示意,不反映簽到後狀態)</text>
+  </g>
+
+  <text x="20" y="696" font-size="11" fill="#111">A 左上 (20,40)、B (400,40)、C (780,40)、D (1160,40)、E (1540,40,首頁底部示意)、F (1920,40,D17 示意);色塊為設計稿佔位色;圖片以相對路徑引用,請在 docs/design/event/ 原位置開啟。</text>
 </svg>

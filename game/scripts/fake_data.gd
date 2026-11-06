@@ -12,3 +12,6 @@ const FIRST_UNCLEARED_LEVEL := 15
 
 ## 愛心「下一顆」倒數的起始秒數(12:34)。
 const HEART_NEXT_SECONDS := 12 * 60 + 34
+
+## 是否已購買「移除廣告」;true 時 AdManager 不載入也不顯示 banner。之後購買系統成功時改成 true。
+static var ads_removed := false

@@ -15,6 +15,8 @@ const HOP_HEIGHT := 8.0
 const BOB_INTERVAL := 0.5
 ## 放開前這麼久沒有移動,就當作手指已停住(速度 0),避免停住後放開還被判成快甩
 const VELOCITY_STALE_MS := 100
+## 黑底:#000000 alpha 160(首頁半透明黑底統一值)
+const BG_COLOR := Color(0, 0, 0, 160.0 / 255.0)
 
 var group := 1
 var first_uncleared := 1
@@ -43,7 +45,7 @@ func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_STOP
 
 	# 黑底與裁切遮罩用同一個像素階梯圓角(Q77);遮罩本身不畫,只用來裁切路、格子、棋子
-	_layers.append(_rounded_layer(Color(0, 0, 0, 120.0 / 255.0)))
+	_layers.append(_rounded_layer(BG_COLOR))
 	var clip := _rounded_layer(Color.WHITE)
 	_layers.append(clip)
 	clip.clip_children = CanvasItem.CLIP_CHILDREN_ONLY

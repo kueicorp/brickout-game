@@ -1,11 +1,12 @@
 # 交接文件
 
-更新日期:2026-11-06(10 個主題背景與牆壁全部換新、圖片整理之後)
+更新日期:2026-11-06(首頁 AdMob banner、D20 底部列黑底完成，使用者實機測試成功之後)
 
 ## 目前階段
 - Godot 專案在 `game/`(Godot 4.7.2,執行檔 `E:\Godot 4\Godot_v4.7.2-stable_win64.exe`、`_console.exe`)
 - 已完成並通過 QA:載入畫面、首頁(完整互動 + 假資料)、Android 圖示設定、長螢幕版面延伸
 - **2026-11-05~06 完成:10 個主題背景 + 牆壁全部換新**(Pixen 180×420 → 整數放大 2 倍，2 px 一格)
+- **2026-11-06 完成：首頁 AdMob banner(測試 ID)、D20 底部列黑底、首頁黑底統一 alpha 160**;QA 通過，使用者實體手機測試成功
 - 所有已定案內容以 `README.md` 為準;圖片原檔在 `art/`,用到的圖複製到 `game/assets/`(保留子路徑)
 
 ## 待接續(新 session 從這裡開始)
@@ -17,7 +18,27 @@
 | 3 | 主題 1~5 牆壁對比 | 這 5 個是在「牆壁要跟背景對比」規則之前做的;可能有問題：主題 2(深棕樹根 vs 深棕樹幹)、主題 5(黑岩 vs 黑岩壁)。**使用者尚未決定是否回頭檢查** |
 | 4 | 牆壁進遊戲 | 程式目前沒用到牆壁;做關卡畫面時再把 `art/borders/game/` 複製到 `game/assets/`,並寫進工程師指令(見「主題、背景、牆壁」) |
 | 5 | ~~設計稿整理~~ | **2026-11-06 已完成**:`tall-screen.md` 刪除 T05、T08、T09、Q10~Q12,新增「背景現況」,307 → 59 行 |
-| 6 | commit | 全部尚未 commit(使用者用 GitHub Desktop 操作) |
+| 6 | commit | 全部尚未 commit(使用者用 GitHub Desktop 操作;使用者說之後會 commit) |
+| 7 | 安全檢查 | AdMob 改動尚未做:第三方 SDK(Poing 外掛、Google ads-mobile-sdk)、INTERNET 權限、廣告 ID 收集、外掛自動下載;使用者自己另開 session |
+| 8 | AdMob 正式 ID | 使用者申請 App ID 與 banner unit ID 後交給 PM,派工程師替換 |
+
+## 首頁 AdMob banner(2026-11-06)
+
+| 項目 | 內容 |
+|---|---|
+| 狀態 | 已實作,QA 通過(已知問題 3 項在 `test_ad_manager_states` 標為 KNOWN);**2026-11-06 使用者實體手機測試成功**;尚未做安全檢查 |
+| 匯出 | headless:`--headless --path game --install-android-build-template --export-debug Android <路徑>`;Gradle daemon 會讓指令不結束，產出後用 `gradlew --stop`;debug APK 約 92 MB |
+| 外掛 | Poing Studios godot-admob-plugin v5.1.0(`game/addons/admob/`,Android 4.7.2 binaries);JEV 選定 |
+| 程式 | Autoload `AdManager`(`game/scripts/ad_manager.gd`)單一 banner,自訂 dp 座標對齊 D10;首頁進入 show、離開 hide;`FakeData.ads_removed` |
+| ID | 目前用 Google 測試 ID;上架前使用者申請 AdMob App ID 與 banner unit ID,換 `ad_manager.gd` 常數與專案設定 `admob/general/android/app_id`;正式 ID 測試時要登記測試裝置 |
+| gradle | 已開啟;`game/android/build/` 在 .gitignore;`game/android/.build_version` 會進版控,clone 後可能要重跑 `--install-android-build-template` |
+| iOS 檔 | 外掛開編輯器會自動下載 iOS binaries(約 3 MB),使用者已接受保留 |
+| 已知問題 | 手機 dp 寬 < 360(輔助功能放大顯示大小)時 banner 超出 D10;使用者決定先不處理。已查證可改 `GodotApp.java` 覆寫 density(有條件可行，未實作) |
+| 未做 | 其他 4 個畫面(活動、商城、成長、設定)、插頁、獎勵、UMP、購買系統;載入失敗不重試(shortcut);APK 92 MB 原因未查 |
+
+## 首頁黑底統一(2026-11-06)
+- 新增 D20 底部列共用半透明黑底(x 8、y 488、344×80,跟底部列一起貼下移動);首頁黑底一律 #000000 alpha 160(D15 由 120 改);QA 通過，使用者實體手機測試成功;實際畫面 `art/mockups/home/d20_impl_640.png`;設計稿 D20 已刪除(規格在 README 與 `home.gd`)
+- 品質備註(未處理,JEV 0.32 不交回):「黑 alpha 160」常數重複在 home.gd、level_map.gd、resource_bar.gd、theme_bar_button.gd 4 處
 
 其他待使用者決定(沿用):
 | 項目 | 內容 |
@@ -25,7 +46,7 @@
 | 愛心按鈕 | 手指移出再移回、500 ms 內放開仍會去商城;D14 未定義此情況;JEV 判斷問使用者(0.78),尚未回答 |
 | Android package name | 仍是 `com.example.$genname`,上架前要決定 |
 | 設計稿 D 項目 | branding D01~D10、首頁 D02/D04/D06/D15 已實作，待使用者確認畫面後請設計師刪除/整理 |
-| 安全檢查 | 首頁與載入畫面已通過 QA,已告知可做安全檢查(只有觸控輸入與 VIBRATE 權限);使用者尚未進行 |
+| 安全檢查 | 首頁與載入畫面已通過 QA,已告知可做安全檢查(觸控輸入、VIBRATE 權限，加上 2026-11-06 的 AdMob,見待接續 7);使用者尚未進行 |
 
 ## 本輪決策紀錄(2026-11-05~06)
 
@@ -53,7 +74,8 @@
 | 10 虛空深淵 | 55f70b44 | 淺灰米碎石紅裂縫 d77a5019 |
 
 ## 實機未驗證
-- S26+ 上的安全區實際值、immersive / edge_to_edge、觸控手感、震動、圖示;尚未匯出 APK
+- 2026-11-06 使用者已用 APK 實體手機測試成功(首頁 banner、D20);以下細項未逐項回報
+- S26+ 上的安全區實際值、immersive / edge_to_edge、觸控手感、震動、圖示
 - 新背景在遊戲內的效果(含 640 高螢幕裁掉頂部後的樣子)
 - 建議裝機時請工程師在畫面印出實際 viewport 尺寸，確認是 360×780
 
@@ -61,7 +83,7 @@
 ```
 & "E:\Godot 4\Godot_v4.7.2-stable_win64_console.exe" --headless --path game --script res://tests/<名稱>.gd
 ```
-- `test_layout`(126)、`test_home_logic`(110)、`test_home_interaction`(137)、`test_home_tall`(562)、`smoke_main_scene`;結束時的「ObjectDB leaked」是引擎背景載入造成，不是專案 bug
+- `test_layout`(126)、`test_home_logic`(110)、`test_home_interaction`(137)、`test_home_tall`(736)、`test_ad_manager`(41)、`test_ad_manager_states`(1165 + KNOWN 3)、`test_home_d20`(182)、`smoke_main_scene`;首頁畫面截圖可用 `--path game --resolution 360x640 --write-movie <路徑>.png --quit-after 240`(只能輸出 640 高);結束時的「ObjectDB leaked」是引擎背景載入造成，不是專案 bug
 
 ## 已定案(重點摘要，細節見 README)
 

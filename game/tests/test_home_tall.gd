@@ -4,17 +4,8 @@ extends SceneTree
 ##   Godot_v4.7.2-stable_win64_console.exe --headless --path game --script res://tests/test_home_tall.gd
 ## 有任何失敗時結束碼為 1。
 
-## 模擬用的首頁:畫面大小與安全區由測試指定(只在測試裡用,不影響正式程式)
-class HomeSim extends "res://scripts/home.gd":
-	var sim_view := Vector2(360, 640)
-	var sim_safe := Vector2i(24, 16)
-
-	func _view_size() -> Vector2:
-		return sim_view
-
-	func _safe_margins(_view: Vector2) -> Vector2i:
-		return sim_safe
-
+## 模擬用的首頁在 home_sim.gd(說明見該檔)
+const HOME_SIM_PATH := "res://tests/home_sim.gd"
 
 ## 640 高、T=24、B=16 時的格子中心(畫面座標,設計稿 D15 第 2 點)
 const C := [
@@ -130,7 +121,7 @@ func _make_home(h: int, t: int, b: int, w := 360) -> void:
 	root.size = Vector2i(w, h)
 	await _frames()
 	var node: Control = load("res://scenes/home.tscn").instantiate()
-	node.set_script(HomeSim)
+	node.set_script(load(HOME_SIM_PATH))
 	node.sim_view = Vector2(w, h)
 	node.sim_safe = Vector2i(t, b)
 	root.add_child(node)
@@ -156,6 +147,7 @@ func _run() -> void:
 		await _case(640, tb[0], tb[1])
 	# 比 9:16 寬:版面置中
 	await _case(640, 24, 16, 480)
+	await _test_d20_examples()
 	await _test_old_positions_dead()
 	await _test_d14_overlap()
 	await _test_resize()
@@ -270,6 +262,7 @@ func _case(h: int, t: int, b: int, w := 360) -> void:
 	_tap(Vector2(49, e.bottom + 72) + o)
 	await _frames()
 	_eq(_c("bottom0"), 1, tag + " bottom row +72 outside")
+	await _check_d20(e, h, b, o, tag)
 
 	# D02 中間文字
 	_tap(Vector2(180, e.d02 + 24) + o)
@@ -290,6 +283,44 @@ func _case(h: int, t: int, b: int, w := 360) -> void:
 	_tap(Vector2(30, e.d01 + 22) + o)
 	await _frames()
 	_eq(_c("heart"), h0 + 1, tag + " heart short tap")
+
+
+## D20 底部共用黑底:位置跟著底部列(上緣 = 底部列 − 4、344×80)、與 banner 間隔 6、
+## alpha 160、不吃觸控、圖層在 D02 之上 / 4 顆按鈕之下;同時檢查 D15 黑底 alpha 160
+func _check_d20(e: Dictionary, h: int, b: int, o: Vector2, tag: String) -> void:
+	var bg: Control = home._bottom_bg
+	_eq(Rect2(bg.position, bg.size), Rect2(8, e.bottom - 4, 344, 80), tag + " D20 rect")
+	# banner 上緣 = h − B − 50(底部列下緣 + 10),與 D20 下緣差 6
+	_eq(h - b - 50 - int(bg.position.y + bg.size.y), 6, tag + " D20 gap to banner 6")
+	_eq(home.BOTTOM_BG_COLOR, Color(0, 0, 0, 160.0 / 255.0), tag + " D20 color alpha 160")
+	_eq(map.BG_COLOR, Color(0, 0, 0, 160.0 / 255.0), tag + " D15 color alpha 160")
+	_eq(bg.mouse_filter, Control.MOUSE_FILTER_IGNORE, tag + " D20 ignores mouse")
+	var idx := bg.get_index()
+	_eq(idx > home._right.get_index(), true, tag + " D20 above D02")
+	for btn in home._bottom_buttons:
+		_eq(idx < btn.get_index(), true, tag + " D20 below bottom button")
+	_eq(idx < home._tooltip.get_index(), true, tag + " D20 below D14")
+	# 點 D20 上方 4px 留白與按鈕間縫隙:底不吃觸控,也不觸發任何按鈕
+	var before := 0
+	for i in 4:
+		before += _c("bottom%d" % i)
+	_tap(Vector2(49, e.bottom - 2) + o)
+	await _frames()
+	_tap(Vector2(92, e.bottom + 36) + o)
+	await _frames()
+	var after := 0
+	for i in 4:
+		after += _c("bottom%d" % i)
+	_eq(after, before, tag + " D20 margin / gap no trigger")
+
+
+## D20 設計稿上的具體數字(640、780、較大下安全區)
+func _test_d20_examples() -> void:
+	for c in [[640, 24, 16, 488, 568], [780, 24, 16, 628, 708], [800, 40, 30, 634, 714]]:
+		await _make_home(c[0], c[1], c[2])
+		var bg: Control = home._bottom_bg
+		_eq([bg.position.y, bg.position.y + bg.size.y], [float(c[3]), float(c[4])], "H%d B%d D20 y range" % [c[0], c[2]])
+		_eq(preload("res://scripts/home_logic.gd").home_layout(c[0], c[1], c[2]).banner, c[4] + 6, "H%d B%d banner top = D20 bottom + 6" % [c[0], c[2]])
 
 
 ## 900 高時,640 版的舊座標不應再觸發(確認觸控真的跟著移,不是兩邊都有)

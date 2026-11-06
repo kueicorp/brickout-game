@@ -2,7 +2,8 @@ extends Control
 ## 首頁:組裝各區塊並串接狀態(目前主題、選取的關卡)。
 ## 會跳到尚未存在的畫面(商城、主題選擇、道具選擇、底部 4 個畫面、補愛心提示)時只 print 一行 log。
 ## 寬固定 360、高依手機延伸(T01~T05),排版見 _apply_layout。
-## 圖層(下到上):背景頂端(補頂條 / 純色)→ 背景 → D15 → D06 → D01 → D02 → 底部列 → D14。D10 banner 區留白。
+## 圖層(下到上):背景頂端(補頂條 / 純色)→ 背景 → D15 → D06 → D01 → D02 → D20 底 → 底部列 → D14。
+## D10 banner 區留白,由 AdManager 把原生 banner 疊在上面(進入首頁顯示、離開隱藏)。
 
 const BACKGROUNDS := [
 	preload("res://assets/backgrounds/home/bg_theme01.png"),
@@ -26,6 +27,8 @@ const BOTTOM_ITEMS := [
 const LOCKED_TITLE_COLOR := Color("#B0B0B0")
 ## D14「震動一下」的長度;設計稿沒寫,自訂 50 ms
 const VIBRATE_MS := 50
+## D20 底部 4 按鈕共用黑底:#000000 alpha 160,與 D01、D15 同色
+const BOTTOM_BG_COLOR := Color(0, 0, 0, 160.0 / 255.0)
 
 var first_uncleared := FakeData.FIRST_UNCLEARED_LEVEL
 var hearts := FakeData.HEARTS
@@ -41,6 +44,8 @@ var _row_colors := {}
 var _resources: ResourceBar
 var _d01_buttons: Array[Control] = []
 var _bottom_buttons: Array[Control] = []
+## D20:底部列上下各外擴 4px 的一整塊黑底,只畫、不吃觸控
+var _bottom_bg: Control
 var _map: LevelMap
 var _start: StartButton
 var _left: ThemeBarButton
@@ -95,6 +100,15 @@ func _ready() -> void:
 	_right.arrow = ARROW
 	_right.pressed.connect(_on_arrow.bind(1))
 
+	# D20 要在 4 顆按鈕之前加入,才會畫在 icon 與文字下面
+	_bottom_bg = Control.new()
+	_bottom_bg.mouse_filter = Control.MOUSE_FILTER_IGNORE
+	_bottom_bg.position = Vector2(8, 488)
+	_bottom_bg.size = Vector2(344, 80)
+	_bottom_bg.draw.connect(func() -> void:
+		PixelBox.draw_rounded(_bottom_bg, Rect2(Vector2.ZERO, _bottom_bg.size), BOTTOM_BG_COLOR))
+	add_child(_bottom_bg)
+
 	for i in BOTTOM_ITEMS.size():
 		var item: Array = BOTTOM_ITEMS[i]
 		var button: BottomButton = _add_button(BottomButton.new(), Rect2(8 + i * 87, 492, 83, 72))
@@ -131,6 +145,12 @@ func _ready() -> void:
 
 	_apply_layout()
 	get_viewport().size_changed.connect(_apply_layout)
+	# D10:原生 banner 疊在畫面上,首頁本身只留白
+	AdManager.show_banner()
+
+
+func _exit_tree() -> void:
+	AdManager.hide_banner()
 
 
 ## 依畫面大小與安全區排版(T01~T03、T05)。上面建立節點時用的是 640 高的座標,這裡只改 y。
@@ -159,6 +179,7 @@ func _apply_layout() -> void:
 	_start.position.y = lay.d06
 	for b in _bottom_buttons:
 		b.position.y = lay.bottom
+	_bottom_bg.position.y = lay.bottom - 4
 
 
 ## headless(自動測試)沒有視窗,stretch expand 會算出 640×640 的怪尺寸,改用基準 360×640
@@ -166,17 +187,9 @@ func _view_size() -> Vector2:
 	return Vector2(360, 640) if DisplayServer.get_name() == "headless" else get_viewport_rect().size
 
 
-## 安全區 T、B(viewport px)。只在手機上讀系統 safe area;
-## 桌機的 safe area 是「螢幕扣掉工作列」,跟視窗無關,所以一律用保底值。
+## 安全區 T、B(viewport px);實作在 HomeLogic,與廣告管理器共用。測試會覆寫這個方法。
 func _safe_margins(view: Vector2) -> Vector2i:
-	if not OS.has_feature("mobile"):
-		return HomeLogic.safe_margins(0, 0, 1)
-	var win_pos := DisplayServer.window_get_position()
-	var win_size := DisplayServer.window_get_size()
-	var safe := DisplayServer.get_display_safe_area()
-	var top_px := maxi(0, safe.position.y - win_pos.y)
-	var bottom_px := maxi(0, win_pos.y + win_size.y - safe.end.y)
-	return HomeLogic.safe_margins(top_px, bottom_px, win_size.y / view.y)
+	return HomeLogic.device_safe_margins(view)
 
 
 ## 背景頂端:有補頂條就貼在原圖正上方,再往上(或沒有補頂條時)用最上面那張圖第 0 列的平均色補滿

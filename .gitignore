@@ -3,3 +3,4 @@ game/.mcp.json
 game/.beckett/
 game/.vscode/mcp.json
 game/.godot/
+game/android/build/

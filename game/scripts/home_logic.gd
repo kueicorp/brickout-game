@@ -183,6 +183,20 @@ static func safe_margins(top_px: float, bottom_px: float, scale: float) -> Vecto
 	return Vector2i(maxi(SAFE_TOP_MIN, ceili(top_px / scale)), maxi(SAFE_BOTTOM_MIN, ceili(bottom_px / scale)))
 
 
+## 讀取裝置的安全區 T、B(viewport px);view = viewport 大小。
+## 例外:這是本檔唯一讀 DisplayServer 的函式,放這裡是為了讓首頁與廣告管理器(D10 banner 位置)共用同一套算法。
+## 只在手機上讀系統 safe area;桌機的 safe area 是「螢幕扣掉工作列」,跟視窗無關,所以一律用保底值。
+static func device_safe_margins(view: Vector2) -> Vector2i:
+	if not OS.has_feature("mobile"):
+		return safe_margins(0, 0, 1)
+	var win_pos := DisplayServer.window_get_position()
+	var win_size := DisplayServer.window_get_size()
+	var safe := DisplayServer.get_display_safe_area()
+	var top_px := maxi(0, safe.position.y - win_pos.y)
+	var bottom_px := maxi(0, win_pos.y + win_size.y - safe.end.y)
+	return safe_margins(top_px, bottom_px, win_size.y / view.y)
+
+
 ## 首頁各區塊的 y(T03)。h = 畫面高,top / bottom = 安全區 T、B。
 ## 餘量 S < 0(640 高且 T + B 超過保底)時依 D15 第 11 點扣高:
 ## D02~D15 留白 12→4、D15~D06 留白 16→8、三排間隔各 26→18,最多 32px;

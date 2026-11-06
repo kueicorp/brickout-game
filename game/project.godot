@@ -17,6 +17,10 @@ boot_splash/bg_color=Color(0.09803922, 0.13725491, 0.19215687, 1)
 boot_splash/show_image=false
 config/icon="res://assets/branding/icon_play_512.png"
 
+[autoload]
+
+AdManager="*res://scripts/ad_manager.gd"
+
 [display]
 
 window/size/viewport_width=360
@@ -24,6 +28,10 @@ window/size/viewport_height=640
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 window/handheld/orientation=1
+
+[editor_plugins]
+
+enabled=PackedStringArray("res://addons/admob/plugin.cfg")
 
 [rendering]
 

@@ -15,3 +15,39 @@ static func draw_rounded(ci: CanvasItem, rect: Rect2, color: Color) -> void:
 		ci.draw_rect(Rect2(rect.position.x + inset, rect.position.y + i, w, 1), color)
 		ci.draw_rect(Rect2(rect.position.x + inset, rect.end.y - 1 - i, w, 1), color)
 	ci.draw_rect(Rect2(rect.position.x, rect.position.y + rows, rect.size.x, rect.size.y - rows * 2), color)
+
+
+# ---- 活動頁共用的小工具(event-screen D05、D16 紅點;按下 / 已領取「變暗 40%」) ----
+
+const BADGE_FILL := Color("#E74C3C")
+const BADGE_SIZE := 12
+## 12×12 圓點每列的左右內縮(白框外緣);紅色填色是外緣再內縮 1px 的範圍,-1 = 該列沒有紅色
+const BADGE_OUTER: Array[int] = [4, 2, 1, 1, 0, 0, 0, 0, 1, 1, 2, 4]
+const BADGE_INNER: Array[int] = [-1, 5, 3, 2, 2, 1, 1, 2, 2, 3, 5, -1]
+## 「變暗 40%」= RGB 乘 0.6(同首頁底部按鈕按下)
+const DARKEN := 0.6
+
+
+## RGB 變暗 40%(alpha 不變);on = false 時原色
+static func darken(color: Color, on: bool) -> Color:
+	if not on:
+		return color
+	return Color(color.r * DARKEN, color.g * DARKEN, color.b * DARKEN, color.a)
+
+
+## 紅點:12×12、1px 白框、像素階梯;pos = 左上角。dim = 跟著按鈕一起變暗
+static func draw_badge(ci: CanvasItem, pos: Vector2, dim := false) -> void:
+	for row in BADGE_SIZE:
+		var o := BADGE_OUTER[row]
+		ci.draw_rect(Rect2(pos.x + o, pos.y + row, BADGE_SIZE - o * 2, 1), darken(Color.WHITE, dim))
+		var i := BADGE_INNER[row]
+		if i >= 0:
+			ci.draw_rect(Rect2(pos.x + i, pos.y + row, BADGE_SIZE - i * 2, 1), darken(BADGE_FILL, dim))
+
+
+## 實心矩形外框(畫在 rect 內側);width = 框寬 px
+static func draw_frame(ci: CanvasItem, rect: Rect2, color: Color, width := 1) -> void:
+	ci.draw_rect(Rect2(rect.position, Vector2(rect.size.x, width)), color)
+	ci.draw_rect(Rect2(rect.position.x, rect.end.y - width, rect.size.x, width), color)
+	ci.draw_rect(Rect2(rect.position.x, rect.position.y + width, width, rect.size.y - width * 2), color)
+	ci.draw_rect(Rect2(rect.end.x - width, rect.position.y + width, width, rect.size.y - width * 2), color)

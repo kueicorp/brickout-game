@@ -1,0 +1,267 @@
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" width="1580" height="1900" viewBox="0 0 1580 1900">
+  <style>
+    @font-face { font-family: 'Cubic 11'; src: url('../../../art/fonts/Cubic_11.ttf') format('truetype'); }
+    text { font-family: 'Cubic 11', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; }
+    image { image-rendering: pixelated; }
+    rect { shape-rendering: crispEdges; }
+    .ann { font-size: 11px; fill: #fff; stroke: #000; stroke-width: 3; paint-order: stroke; text-anchor: middle; }
+    .annc { font-size: 12px; fill: #7FE9FF; stroke: #000; stroke-width: 3; paint-order: stroke; text-anchor: end; }
+    .band { fill: #FF9F1C; fill-opacity: 0.5; stroke: #FF9F1C; stroke-width: 1; stroke-dasharray: 4 3; }
+    .pan { fill: none; stroke: #00D1FF; stroke-width: 2; stroke-dasharray: 6 3; }
+    .lbl { font-size: 14px; fill: #111; }
+    .num { font-size: 12px; fill: #fff; stroke: #000; stroke-width: 2; paint-order: stroke; text-anchor: middle; }
+  </style>
+  <defs>
+    <clipPath id="c640"><rect width="360" height="640"/></clipPath>
+    <clipPath id="c780"><rect width="360" height="780"/></clipPath>
+    <clipPath id="c800"><rect width="360" height="800"/></clipPath>
+    <clipPath id="c840"><rect width="360" height="840"/></clipPath>
+
+    <g id="cS"><rect width="44" height="52" fill="#2E7D4F"/><image href="../../../art/ui/event/icon_signed.png" x="10" y="22" width="24" height="24"/></g>
+    <g id="cF"><rect width="44" height="52" fill="#2A2F3A"/><image href="../../../art/ui/resource/coin.png" x="10" y="22" width="25" height="25"/></g>
+    <g id="cN"><use href="#cF"/><rect x="1" y="1" width="42" height="50" fill="none" stroke="#F4C430" stroke-width="2"/></g>
+
+    <g id="bar">
+      <rect x="8" y="28" width="64" height="44" rx="6" fill="#000" fill-opacity="0.627"/>
+      <rect x="76" y="28" width="92" height="44" rx="6" fill="#000" fill-opacity="0.627"/>
+      <rect x="172" y="28" width="92" height="44" rx="6" fill="#000" fill-opacity="0.627"/>
+      <rect x="268" y="28" width="84" height="44" rx="6" fill="#000" fill-opacity="0.627"/>
+      <image href="../../../art/ui/resource/heart.png" x="18" y="38" width="25" height="25"/>
+      <image href="../../../art/ui/resource/plus_badge.png" x="31" y="51" width="12" height="12"/>
+      <image href="../../../art/ui/resource/coin.png" x="86" y="38" width="25" height="25"/>
+      <image href="../../../art/ui/resource/plus_badge.png" x="99" y="51" width="12" height="12"/>
+      <image href="../../../art/ui/resource/gold.png" x="182" y="38" width="25" height="25"/>
+      <image href="../../../art/ui/resource/plus_badge.png" x="195" y="51" width="12" height="12"/>
+      <image href="../../../art/ui/resource/silver.png" x="272" y="38" width="25" height="25"/>
+      <g font-size="12" fill="#fff"><text x="47" y="54">5</text><text x="115" y="54">12300</text><text x="211" y="54">50</text><text x="301" y="54">20</text></g>
+    </g>
+    <image id="back" href="../../../art/ui/home/theme-arrow_right.png" x="0" y="0" width="24" height="24" transform="translate(42,90) scale(-1,1)"/>
+    <g id="banner"><rect x="20" y="0" width="320" height="50" fill="#95A5A6"/><text x="180" y="30" font-size="14" text-anchor="middle" fill="#000">廣告 320×50</text></g>
+
+    <g id="homeBar">
+      <rect x="8" y="0" width="48" height="48" fill="#000" fill-opacity="0.627"/>
+      <rect x="60" y="0" width="240" height="48" fill="#000" fill-opacity="0.627"/>
+      <rect x="304" y="0" width="48" height="48" fill="#000" fill-opacity="0.627"/>
+      <image href="../../../art/ui/home/theme-arrow_right.png" x="0" y="0" width="24" height="24" transform="translate(44,12) scale(-1,1)"/>
+      <image href="../../../art/ui/home/theme-arrow_right.png" x="316" y="12" width="24" height="24"/>
+      <text x="180" y="22" font-size="16" text-anchor="middle" fill="#fff">晴空草原</text>
+      <text x="180" y="40" font-size="12" text-anchor="middle" fill="#B0B8C4">第 1~20 關</text>
+    </g>
+    <g id="homeMap">
+      <rect x="8" y="0" width="344" height="232" rx="6" fill="#000" fill-opacity="0.627"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_cleared.png" x="53" y="21" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_cleared.png" x="142" y="21" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_playable.png" x="231" y="21" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_locked.png" x="276" y="88" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_locked.png" x="186" y="88" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_locked.png" x="98" y="88" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_locked.png" x="8" y="88" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_locked.png" x="53" y="154" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_normal_locked.png" x="142" y="154" width="76" height="76"/>
+      <image href="../../../art/ui/home/level-map/tile_boss_locked.png" x="231" y="154" width="76" height="76"/>
+      <text class="num" x="91" y="48">1</text><text class="num" x="180" y="48">2</text><text class="num" x="269" y="48">3</text>
+      <text class="num" x="314" y="115">4</text><text class="num" x="224" y="115">5</text><text class="num" x="136" y="115">6</text><text class="num" x="46" y="115">7</text>
+      <text class="num" x="91" y="181">8</text><text class="num" x="180" y="181">9</text><text class="num" x="269" y="181">10</text>
+    </g>
+    <g id="homeStart">
+      <image href="../../../art/ui/home/start-button/start_normal.png" x="72" y="0" width="216" height="80"/>
+      <text x="180" y="36" font-size="20" text-anchor="middle" fill="#fff" stroke="#0B3D22" stroke-width="3" paint-order="stroke">開始</text>
+      <text x="180" y="58" font-size="12" text-anchor="middle" fill="#fff" stroke="#0B3D22" stroke-width="2" paint-order="stroke">第 3 關</text>
+    </g>
+    <g id="homeBottom">
+      <rect x="8" y="-4" width="344" height="80" rx="6" fill="#000" fill-opacity="0.627"/>
+      <image href="../../../art/ui/home/bottom-button/icon_event.png" x="17" y="0" width="64" height="64"/>
+      <image href="../../../art/ui/home/bottom-button/icon_shop.png" x="104" y="0" width="64" height="64"/>
+      <image href="../../../art/ui/home/bottom-button/icon_growth.png" x="191" y="0" width="64" height="64"/>
+      <image href="../../../art/ui/home/bottom-button/icon_settings.png" x="278" y="0" width="64" height="64"/>
+      <g font-size="15" fill="#fff" stroke="#000" stroke-width="2" paint-order="stroke" text-anchor="middle">
+        <text x="49.5" y="69">活動</text><text x="136.5" y="69">商城</text><text x="223.5" y="69">成長</text><text x="310.5" y="69">設定</text>
+      </g>
+    </g>
+
+    <g id="sumB">
+      <text x="14" y="18" font-size="14" fill="#fff">本月已簽 7 / 28 次</text>
+      <text x="14" y="36" font-size="12" fill="#fff">每日 1500 金幣 + 2 愛心</text>
+      <rect x="250" y="0" width="96" height="44" fill="#2ECC71"/>
+      <text x="298" y="27" font-size="14" text-anchor="middle" fill="#000">今日簽到</text>
+    </g>
+    <g id="gridB">
+      <use href="#cS" x="14" y="0"/><use href="#cS" x="62" y="0"/><use href="#cS" x="110" y="0"/><use href="#cS" x="158" y="0"/><use href="#cS" x="206" y="0"/><use href="#cS" x="254" y="0"/><use href="#cS" x="302" y="0"/>
+      <use href="#cN" x="14" y="56"/><use href="#cF" x="62" y="56"/><use href="#cF" x="110" y="56"/><use href="#cF" x="158" y="56"/><use href="#cF" x="206" y="56"/><use href="#cF" x="254" y="56"/><use href="#cF" x="302" y="56"/>
+      <use href="#cF" x="14" y="112"/><use href="#cF" x="62" y="112"/><use href="#cF" x="110" y="112"/><use href="#cF" x="158" y="112"/><use href="#cF" x="206" y="112"/><use href="#cF" x="254" y="112"/><use href="#cF" x="302" y="112"/>
+      <use href="#cF" x="14" y="168"/><use href="#cF" x="62" y="168"/><use href="#cF" x="110" y="168"/><use href="#cF" x="158" y="168"/><use href="#cF" x="206" y="168"/><use href="#cF" x="254" y="168"/><use href="#cF" x="302" y="168"/>
+      <g font-size="12" fill="#fff">
+        <text x="18" y="14">1</text><text x="66" y="14">2</text><text x="114" y="14">3</text><text x="162" y="14">4</text><text x="210" y="14">5</text><text x="258" y="14">6</text><text x="306" y="14">7</text>
+        <text x="18" y="70">8</text>
+      </g>
+      <g font-size="12" fill="#999">
+        <text x="66" y="70">9</text><text x="114" y="70">10</text><text x="162" y="70">11</text><text x="210" y="70">12</text><text x="258" y="70">13</text><text x="306" y="70">14</text>
+        <text x="18" y="126">15</text><text x="66" y="126">16</text><text x="114" y="126">17</text><text x="162" y="126">18</text><text x="210" y="126">19</text><text x="258" y="126">20</text><text x="306" y="126">21</text>
+        <text x="18" y="182">22</text><text x="66" y="182">23</text><text x="114" y="182">24</text><text x="162" y="182">25</text><text x="210" y="182">26</text><text x="258" y="182">27</text><text x="306" y="182">28</text>
+      </g>
+    </g>
+    <g id="cardsB" font-size="12" fill="#fff">
+      <g transform="translate(14,0)">
+        <rect x="1" y="1" width="78" height="135" fill="#222B3A" stroke="#F4C430" stroke-width="2"/>
+        <text x="40" y="13" text-anchor="middle">累積 7 次</text>
+        <image href="../../../art/ui/resource/coin.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">2000</text>
+        <image href="../../../art/ui/resource/silver.png" x="4" y="55" width="25" height="25"/><text x="33" y="72" font-size="11">1</text>
+        <rect x="4" y="90" width="72" height="44" fill="#2ECC71"/><text x="40" y="116" text-anchor="middle" fill="#000">領取</text>
+      </g>
+      <g transform="translate(98,0)">
+        <rect x="0.5" y="0.5" width="79" height="136" fill="#222B3A" stroke="#5D6D7E"/>
+        <text x="40" y="13" text-anchor="middle">累積 14 次</text>
+        <image href="../../../art/ui/resource/coin.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">5000</text>
+        <image href="../../../art/ui/resource/silver.png" x="4" y="55" width="25" height="25"/><text x="33" y="72" font-size="11">2</text>
+        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 7 次</text>
+      </g>
+      <g transform="translate(182,0)">
+        <rect x="0.5" y="0.5" width="79" height="136" fill="#222B3A" stroke="#5D6D7E"/>
+        <text x="40" y="13" text-anchor="middle">累積 21 次</text>
+        <image href="../../../art/ui/resource/coin.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">10000</text>
+        <image href="../../../art/ui/resource/silver.png" x="4" y="55" width="25" height="25"/><text x="33" y="72" font-size="11">5</text>
+        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 14 次</text>
+      </g>
+      <g transform="translate(266,0)">
+        <rect x="0.5" y="0.5" width="79" height="136" fill="#222B3A" stroke="#5D6D7E"/>
+        <text x="40" y="13" text-anchor="middle">累積 28 次</text>
+        <image href="../../../art/ui/resource/silver.png" x="4" y="18" width="25" height="25"/><text x="33" y="35" font-size="11">5</text>
+        <image href="../../../art/ui/event/icon_random_item_36.png" x="4" y="50" width="36" height="36"/><text x="44" y="72" font-size="11">×1</text>
+        <rect x="4" y="90" width="72" height="44" fill="#555D6B"/><text x="40" y="116" text-anchor="middle">還差 21 次</text>
+      </g>
+    </g>
+  </defs>
+
+  <rect width="1580" height="1900" fill="#ECEFF1"/>
+  <text x="20" y="24" font-size="16" fill="#111">方案 S03「等比縮留白」:首頁與每日簽到(B)在 640、780、800、840 高的樣子(真實圖檔,不縮放;安全區上 24、下 16)</text>
+  <rect x="20" y="34" width="14" height="10" class="band"/><text x="40" y="43" class="lbl" style="font-size:12px">橘:留白被延伸(括號為相對 640 版增加的像素)</text>
+  <rect x="400" y="32" width="14" height="10" class="pan"/><text x="420" y="43" class="lbl" style="font-size:12px">青:內容面板被延伸(括號為相對 640 版增加的像素)</text>
+  <text x="20" y="62" font-size="12" fill="#111">規則:每個留白段都隨 E = 高 − 24 − 16 − 600 等比縮放,640 時與已確認版完全相同;不捲動、元件尺寸不變</text>
+
+  <!-- ================= 第 1 列:首頁 ================= -->
+  <text x="20" y="76" class="lbl">首頁 · 高 640(E=0)</text>
+  <g transform="translate(20,84)">
+    <g clip-path="url(#c640)">
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="0" width="360" height="640"/>
+      <rect class="band" x="8" y="72" width="344" height="8"/><text class="ann" x="180" y="80">上 8px(+0)</text>
+      <rect class="band" x="8" y="468" width="344" height="24"/><text class="ann" x="180" y="484">下 24px(+0)</text>
+      <use href="#bar"/><use href="#homeBar" y="80"/><use href="#homeMap" y="140"/><use href="#homeStart" y="388"/><use href="#homeBottom" y="492"/><use href="#banner" y="574"/>
+    </g>
+    <rect width="360" height="640" fill="none" stroke="#37474F"/>
+  </g>
+
+  <text x="410" y="76" class="lbl">首頁 · 高 780(E=140)</text>
+  <g transform="translate(410,84)">
+    <g clip-path="url(#c780)">
+      <image href="../../../art/backgrounds/home/top/bg_theme01_top.png" x="0" y="-60" width="360" height="200"/>
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="140" width="360" height="640"/>
+      <rect class="band" x="8" y="72" width="344" height="92"/><text class="ann" x="180" y="122">上留白 92px(+84)</text>
+      <rect class="band" x="8" y="552" width="344" height="80"/><text class="ann" x="180" y="596">下留白 80px(+56)</text>
+      <use href="#bar"/><use href="#homeBar" y="164"/><use href="#homeMap" y="224"/><use href="#homeStart" y="472"/><use href="#homeBottom" y="632"/><use href="#banner" y="714"/>
+    </g>
+    <rect width="360" height="780" fill="none" stroke="#37474F"/>
+  </g>
+
+  <text x="800" y="76" class="lbl">首頁 · 高 800(E=160,基準)</text>
+  <g transform="translate(800,84)">
+    <g clip-path="url(#c800)">
+      <image href="../../../art/backgrounds/home/top/bg_theme01_top.png" x="0" y="-40" width="360" height="200"/>
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="160" width="360" height="640"/>
+      <rect class="band" x="8" y="72" width="344" height="104"/><text class="ann" x="180" y="128">上留白 104px(+96)</text>
+      <rect class="band" x="8" y="564" width="344" height="88"/><text class="ann" x="180" y="612">下留白 88px(+64)</text>
+      <use href="#bar"/><use href="#homeBar" y="176"/><use href="#homeMap" y="236"/><use href="#homeStart" y="484"/><use href="#homeBottom" y="652"/><use href="#banner" y="734"/>
+    </g>
+    <rect width="360" height="800" fill="none" stroke="#37474F"/>
+  </g>
+
+  <text x="1190" y="76" class="lbl">首頁 · 高 840(E=200)</text>
+  <g transform="translate(1190,84)">
+    <g clip-path="url(#c840)">
+      <image href="../../../art/backgrounds/home/top/bg_theme01_top.png" x="0" y="0" width="360" height="200"/>
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="200" width="360" height="640"/>
+      <rect class="band" x="8" y="72" width="344" height="128"/><text class="ann" x="180" y="140">上留白 128px(+120)</text>
+      <rect class="band" x="8" y="588" width="344" height="104"/><text class="ann" x="180" y="644">下留白 104px(+80)</text>
+      <use href="#bar"/><use href="#homeBar" y="200"/><use href="#homeMap" y="260"/><use href="#homeStart" y="508"/><use href="#homeBottom" y="692"/><use href="#banner" y="774"/>
+    </g>
+    <rect width="360" height="840" fill="none" stroke="#37474F"/>
+  </g>
+
+  <!-- ================= 第 2 列:活動頁 B ================= -->
+  <text x="20" y="984" class="lbl">每日簽到 B · 高 640(E=0,與已確認版相同)</text>
+  <g transform="translate(20,992)">
+    <g clip-path="url(#c640)">
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="0" width="360" height="640"/>
+      <use href="#bar"/><use href="#back"/>
+      <text x="60" y="108" font-size="18" fill="#fff">每日簽到</text>
+      <text class="annc" x="352" y="112">面板 434px(+0)</text>
+      <rect x="8" y="132" width="344" height="434" rx="6" fill="#000" fill-opacity="0.627"/>
+      <rect class="pan" x="8" y="132" width="344" height="434"/>
+      <use href="#sumB" y="136"/><use href="#gridB" y="194"/><use href="#cardsB" y="428"/>
+      <use href="#banner" y="574"/>
+    </g>
+    <rect width="360" height="640" fill="none" stroke="#37474F"/>
+  </g>
+
+  <text x="410" y="984" class="lbl">每日簽到 B · 高 780(E=140)</text>
+  <g transform="translate(410,992)">
+    <g clip-path="url(#c780)">
+      <image href="../../../art/backgrounds/home/top/bg_theme01_top.png" x="0" y="-60" width="360" height="200"/>
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="140" width="360" height="640"/>
+      <use href="#bar"/><use href="#back"/>
+      <text x="60" y="108" font-size="18" fill="#fff">每日簽到</text>
+      <text class="annc" x="352" y="112">面板 574px(+140)</text>
+      <rect x="8" y="132" width="344" height="574" rx="6" fill="#000" fill-opacity="0.627"/>
+      <rect class="pan" x="8" y="132" width="344" height="574"/>
+      <use href="#sumB" y="157"/><use href="#gridB" y="257"/><use href="#cardsB" y="533"/>
+      <rect class="band" x="14" y="132" width="332" height="25"/><text class="ann" x="180" y="148">上 25px(+21)</text>
+      <rect class="band" x="14" y="201" width="332" height="56"/><text class="ann" x="180" y="233">摘要與格子間 56px(+42)</text>
+      <rect class="band" x="14" y="477" width="332" height="56"/><text class="ann" x="180" y="509">格子與累積卡間 56px(+42)</text>
+      <rect class="band" x="14" y="670" width="332" height="36"/><text class="ann" x="180" y="692">下 36px(+35)</text>
+      <use href="#banner" y="714"/>
+    </g>
+    <rect width="360" height="780" fill="none" stroke="#37474F"/>
+  </g>
+
+  <text x="800" y="984" class="lbl">每日簽到 B · 高 800(E=160,基準)</text>
+  <g transform="translate(800,992)">
+    <g clip-path="url(#c800)">
+      <image href="../../../art/backgrounds/home/top/bg_theme01_top.png" x="0" y="-40" width="360" height="200"/>
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="160" width="360" height="640"/>
+      <use href="#bar"/><use href="#back"/>
+      <text x="60" y="108" font-size="18" fill="#fff">每日簽到</text>
+      <text class="annc" x="352" y="112">面板 594px(+160)</text>
+      <rect x="8" y="132" width="344" height="594" rx="6" fill="#000" fill-opacity="0.627"/>
+      <rect class="pan" x="8" y="132" width="344" height="594"/>
+      <use href="#sumB" y="160"/><use href="#gridB" y="266"/><use href="#cardsB" y="548"/>
+      <rect class="band" x="14" y="132" width="332" height="28"/><text class="ann" x="180" y="150">上 28px(+24)</text>
+      <rect class="band" x="14" y="204" width="332" height="62"/><text class="ann" x="180" y="239">摘要與格子間 62px(+48)</text>
+      <rect class="band" x="14" y="486" width="332" height="62"/><text class="ann" x="180" y="521">格子與累積卡間 62px(+48)</text>
+      <rect class="band" x="14" y="685" width="332" height="41"/><text class="ann" x="180" y="709">下 41px(+40)</text>
+      <use href="#banner" y="734"/>
+    </g>
+    <rect width="360" height="800" fill="none" stroke="#37474F"/>
+  </g>
+
+  <text x="1190" y="984" class="lbl">每日簽到 B · 高 840(E=200)</text>
+  <g transform="translate(1190,992)">
+    <g clip-path="url(#c840)">
+      <image href="../../../art/backgrounds/home/top/bg_theme01_top.png" x="0" y="0" width="360" height="200"/>
+      <image href="../../../art/backgrounds/home/bg_theme01.png" x="0" y="200" width="360" height="640"/>
+      <use href="#bar"/><use href="#back"/>
+      <text x="60" y="108" font-size="18" fill="#fff">每日簽到</text>
+      <text class="annc" x="352" y="112">面板 634px(+200)</text>
+      <rect x="8" y="132" width="344" height="634" rx="6" fill="#000" fill-opacity="0.627"/>
+      <rect class="pan" x="8" y="132" width="344" height="634"/>
+      <use href="#sumB" y="166"/><use href="#gridB" y="284"/><use href="#cardsB" y="578"/>
+      <rect class="band" x="14" y="132" width="332" height="34"/><text class="ann" x="180" y="153">上 34px(+30)</text>
+      <rect class="band" x="14" y="210" width="332" height="74"/><text class="ann" x="180" y="251">摘要與格子間 74px(+60)</text>
+      <rect class="band" x="14" y="504" width="332" height="74"/><text class="ann" x="180" y="545">格子與累積卡間 74px(+60)</text>
+      <rect class="band" x="14" y="715" width="332" height="51"/><text class="ann" x="180" y="744">下 51px(+50)</text>
+      <use href="#banner" y="774"/>
+    </g>
+    <rect width="360" height="840" fill="none" stroke="#37474F"/>
+  </g>
+
+  <text x="20" y="1856" font-size="12" fill="#111">首頁:上留白 = 8 + round(0.6E)、下留白 = 24 + E − round(0.6E)(沿用 home_layout)。B:四段留白依 15% / 30% / 30% / 25% 分配 E(上、摘要↔格子、格子↔累積卡、下),四捨五入,下段取餘數。</text>
+  <text x="20" y="1874" font-size="12" fill="#111">本檔的 800 欄與 screen-size-800-base.svg 的首頁、B 相同;三個方案的差別只在 780 與 840 欄(S04 優先保留下方留白;S05 間距固定、不夠高時面板內捲動)。</text>
+</svg>

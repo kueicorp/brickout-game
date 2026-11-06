@@ -1,0 +1,87 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1540" height="900" viewBox="0 0 1540 900">
+  <style>
+    @font-face { font-family: 'Cubic 11'; src: url('../../../art/fonts/Cubic_11.ttf') format('truetype'); }
+    text { font-family: 'Cubic 11', 'Microsoft JhengHei', 'Noto Sans TC', sans-serif; }
+    rect { shape-rendering: crispEdges; }
+    .cap { font-size: 14px; fill: #fff; }
+    .ann { font-size: 11px; fill: #fff; stroke: #000; stroke-width: 3; paint-order: stroke; text-anchor: middle; }
+    .annl { font-size: 11px; fill: #FFD27F; stroke: #000; stroke-width: 3; paint-order: stroke; }
+    .dim { fill: #000; fill-opacity: 0.627; }
+    .cell { fill: #2A2F3A; }
+    .ghost { fill: none; stroke: #FF9F1C; stroke-width: 1; stroke-dasharray: 4 3; }
+  </style>
+  <defs>
+    <g id="gridrow">
+      <rect x="14" width="44" height="52" class="cell"/><rect x="62" width="44" height="52" class="cell"/><rect x="110" width="44" height="52" class="cell"/>
+      <rect x="158" width="44" height="52" class="cell"/><rect x="206" width="44" height="52" class="cell"/><rect x="254" width="44" height="52" class="cell"/><rect x="302" width="44" height="52" class="cell"/>
+    </g>
+    <g id="chrome">
+      <rect x="8" y="28" width="344" height="44" rx="6" class="dim"/>
+      <rect x="8" y="80" width="44" height="44" rx="6" class="dim"/>
+      <text x="60" y="108" font-size="16" fill="#fff">每日簽到</text>
+    </g>
+    <g id="toast"><rect x="60" width="240" height="32" fill="#222B3A" stroke="#5D6D7E" stroke-width="1"/><text x="180" y="21" font-size="14" fill="#fff" text-anchor="middle">簽到失敗,請檢查網路後再試</text></g>
+    <g id="retry"><text x="180" y="0" font-size="14" fill="#fff" text-anchor="middle">讀取失敗</text><rect x="120" y="10" width="120" height="44" fill="#2ECC71"/><text x="180" y="38" font-size="14" fill="#000" text-anchor="middle">重試</text></g>
+  </defs>
+  <rect width="1540" height="900" fill="#0d121a"/>
+
+  <!-- 框 1:H=640,B 畫面,toast -->
+  <text x="20" y="28" class="cap">H=640:toast y 436~468(與已確認 640 版相同)</text>
+  <g transform="translate(20,40)">
+    <rect width="360" height="640" fill="#192331"/>
+    <use href="#chrome"/>
+    <rect x="8" y="132" width="344" height="434" rx="6" class="dim"/>
+    <rect x="14" y="136" width="332" height="44" fill="#2A2F3A"/>
+    <use href="#gridrow" y="194"/><use href="#gridrow" y="250"/><use href="#gridrow" y="306"/><use href="#gridrow" y="362"/>
+    <rect x="14" y="428" width="332" height="137" fill="#2A2F3A" stroke="#5D6D7E"/>
+    <text x="180" y="500" font-size="12" fill="#B0B8C4" text-anchor="middle">累積卡(領取鈕在卡內 y 468 以下)</text>
+    <rect x="20" y="574" width="320" height="50" fill="#95A5A6"/>
+    <use href="#toast" y="436"/>
+    <text x="180" y="432" class="ann">toast 436~468</text>
+  </g>
+
+  <!-- 框 2:H=800,B 畫面,toast -->
+  <text x="400" y="28" class="cap">H=800:toast y 500~532(落在格子與累積卡之間)</text>
+  <g transform="translate(400,40)">
+    <rect width="360" height="800" fill="#192331"/>
+    <use href="#chrome"/>
+    <rect x="8" y="132" width="344" height="594" rx="6" class="dim"/>
+    <rect x="14" y="160" width="332" height="44" fill="#2A2F3A"/>
+    <use href="#gridrow" y="266"/><use href="#gridrow" y="322"/><use href="#gridrow" y="378"/><use href="#gridrow" y="434"/>
+    <rect x="14" y="548" width="332" height="137" fill="#2A2F3A" stroke="#5D6D7E"/>
+    <text x="180" y="620" font-size="12" fill="#B0B8C4" text-anchor="middle">累積卡(領取鈕在卡內)</text>
+    <rect x="20" y="734" width="320" height="50" fill="#95A5A6"/>
+    <use href="#toast" y="500"/>
+    <text x="180" y="496" class="ann">toast 500~532</text>
+    <text x="14" y="542" class="annl">格子下緣 486 / 卡上緣 548</text>
+  </g>
+
+  <!-- 框 3:H=640,D14 失敗 -->
+  <text x="780" y="28" class="cap">H=640:D14 讀取失敗,重試鈕 y 352~396</text>
+  <g transform="translate(780,40)">
+    <rect width="360" height="640" fill="#192331"/>
+    <use href="#chrome"/>
+    <rect x="8" y="132" width="344" height="434" rx="6" class="dim"/>
+    <use href="#retry" y="332"/>
+    <line x1="8" y1="349" x2="352" y2="349" stroke="#7FE9FF" stroke-dasharray="4 3"/>
+    <text x="14" y="345" class="annl">面板中心 y 349</text>
+    <rect x="20" y="574" width="320" height="50" fill="#95A5A6"/>
+  </g>
+
+  <!-- 框 4:H=800,D14 失敗 -->
+  <text x="1160" y="28" class="cap">H=800:D14 置中於面板,重試鈕 y 432~476(+80)</text>
+  <g transform="translate(1160,40)">
+    <rect width="360" height="800" fill="#192331"/>
+    <use href="#chrome"/>
+    <rect x="8" y="132" width="344" height="594" rx="6" class="dim"/>
+    <use href="#retry" y="412"/>
+    <line x1="8" y1="429" x2="352" y2="429" stroke="#7FE9FF" stroke-dasharray="4 3"/>
+    <text x="14" y="425" class="annl">面板中心 y 429</text>
+    <rect x="20" y="734" width="320" height="50" fill="#95A5A6"/>
+    <rect x="60" y="500" width="240" height="32" class="ghost"/>
+    <text x="180" y="520" class="ann">toast 建議位置 500~532,與重試鈕不重疊</text>
+    <text x="180" y="545" class="ann">(D14 狀態本來也不會出現 toast)</text>
+  </g>
+
+  <text x="20" y="880" class="cap">示意圖:色塊代替實際圖片;「讀取失敗」文字與重試鈕的相對位置為示意,以現行實作為準。座標為 T=24、B=16。</text>
+</svg>

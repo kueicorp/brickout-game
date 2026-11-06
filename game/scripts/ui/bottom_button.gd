@@ -9,13 +9,25 @@ const ICON_POS := Vector2(9, 0)
 const BASELINE_NORMAL := 68.0
 const BASELINE_PRESSED := 67.0
 
+## event-screen D16 紅點:對齊 icon 右上角(格內 x 61、y 0);不吃觸控,按下時跟 icon 一起變暗
+const BADGE_POS := Vector2(61, 0)
+
 var icon: Texture2D
 var label := ""
+var badge := false
+
+
+func set_badge(value: bool) -> void:
+	if value != badge:
+		badge = value
+		queue_redraw()
 
 
 func _draw() -> void:
 	var held := is_held()
 	draw_texture(icon, ICON_POS, Color(0.6, 0.6, 0.6, 1.0) if held else Color.WHITE)
+	if badge:
+		PixelBox.draw_badge(self, BADGE_POS, held)
 	var font_size := 12 if held else 15
 	var baseline := Vector2(0, BASELINE_PRESSED if held else BASELINE_NORMAL)
 	PixelText.draw(self, baseline, label, font_size, Color.WHITE, Color.BLACK, size.x, HORIZONTAL_ALIGNMENT_CENTER)

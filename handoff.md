@@ -1,10 +1,11 @@
 # 交接文件
 
-更新日期:2026-11-06(活動頁設計全部確認之後;前一版:首頁 AdMob banner、D20 完成)
+更新日期:2026-11-07(活動頁實作與 800 基準改版完成、實機確認之後;前一版:活動頁設計全部確認)
 
 ## 目前階段
 - Godot 專案在 `game/`(Godot 4.7.2,執行檔 `E:\Godot 4\Godot_v4.7.2-stable_win64.exe`、`_console.exe`)
-- 已完成並通過 QA:載入畫面、首頁(完整互動 + 假資料)、Android 圖示設定、長螢幕版面延伸
+- 已完成並通過 QA:載入畫面、首頁(完整互動 + 假資料)、Android 圖示設定、長螢幕版面延伸、**活動頁(列表、每日簽到、首次儲值;假活動服務)**
+- **2026-11-07:設計基準改為 360×800**(比 800 矮等比縮留白),首頁與活動頁已改並實機確認
 - **2026-11-05~06 完成:10 個主題背景 + 牆壁全部換新**(Pixen 180×420 → 整數放大 2 倍，2 px 一格)
 - **2026-11-06 完成：首頁 AdMob banner(測試 ID)、D20 底部列黑底、首頁黑底統一 alpha 160**;QA 通過，使用者實體手機測試成功
 - 所有已定案內容以 `README.md` 為準;圖片原檔在 `art/`,用到的圖複製到 `game/assets/`(保留子路徑)
@@ -21,7 +22,9 @@
 | 6 | commit | 全部尚未 commit(使用者用 GitHub Desktop 操作;使用者說之後會 commit) |
 | 7 | 安全檢查 | AdMob 改動尚未做:第三方 SDK(Poing 外掛、Google ads-mobile-sdk)、INTERNET 權限、廣告 ID 收集、外掛自動下載;使用者自己另開 session |
 | 8 | AdMob 正式 ID | 使用者申請 App ID 與 banner unit ID 後交給 PM,派工程師替換 |
-| 9 | **活動頁實作** | 設計已全部確認;工程師派工草稿在「活動頁」一節,使用者確認後送出 → 回報使用者 → 使用者同意後派 QA |
+| 9 | ~~活動頁實作、800 基準改版~~ | **2026-11-07 完成**:QA 通過、使用者實機確認位置正確;詳見「活動頁與 800 基準改版」 |
+| 10 | 活動頁安全檢查 | 金流(首儲、補發訂單)、外部輸入(伺服器活動資料)、AdMob;使用者自己另開 session |
+| 11 | 其他畫面改 800 基準 | 載入畫面未納入 screen-size-800.md(現況正常);商城、成長、設定、關卡畫面設計時直接以 360×800 為基準 |
 
 ## 首頁 AdMob banner(2026-11-06)
 
@@ -139,12 +142,25 @@
 | 檔案 | `art/ui/resource/`:coin、gold、silver、heart、heart_empty(各 25×25,無 +)、plus_badge 12×12(疊在 (13,13)) |
 | 尚未做 | 首頁資源列改用這套 + 程式疊 plus_badge(工程師 → QA);關卡內金幣統一(使用者 2026-11-06 說先不做;已停止設計師規劃，未產出檔案);尚未複製到 game/assets |
 
-## 活動頁(2026-11-06 設計全部確認,尚未實作)
+## 活動頁與 800 基準改版(2026-11-06~07 完成;QA 通過;使用者實機確認位置正確)
 
 | 項目 | 內容 |
 |---|---|
-| 設計稿 | `docs/design/event/event-screen.md`:**D01~D17 全部使用者已確認**(D08 星期列已移除);Q1~Q14 全部已決定;稿內無待確認項目。項目未刪除,工程師直接讀整份稿 |
-| 預覽 | `docs/design/event/event-screen-preview.svg` 畫面 A 列表、B 簽到、C 首儲、D 月初補發 D15、E 首頁活動紅點 D16、F 已獲得提示框 D17(畫布 2300×700);最新截圖 `art/mockups/event_screen_preview_final.png`(`event_screen_preview.png` / `_x2.png` 是舊版);截圖指令 `msedge --headless=new --disable-gpu --allow-file-access-from-files --window-size=2300,700 --screenshot=<png> file:///<svg>`;`event-screen-layout.svg` 已過時 |
+| 程式 | 假活動服務 `game/scripts/event_service.gd`(日後只換這層接後端);規則 `event_logic.gd`;活動頁 `event_screen.gd` 疊在首頁上(不換場景);`ui/checkin_page.gd`、`topup_page.gd`、`reward_popup.gd`、`flat_button.gd`、`event_list_item.gd` |
+| 測試 | `game/tests/run_tests.ps1` 跑全部測試(結束碼、SCRIPT ERROR、缺 PASSED 行、逾時都算失敗);最後一次 16 檔 0 失敗 |
+| 修過的問題 | B1 補發通知改為關框才標記已看過;B2 安全區重疊;切頁收起 toast;失敗回應晚到不在新畫面顯示 toast |
+| 畫面基準 | 設計 360×800;比 800 矮採「等比縮留白」(S03);活動頁多出高度全給面板;toast 跟著長高 0.4E、讀取失敗 / 重試置中於面板(S08);規格 `docs/design/layout/screen-size-800.md`;README 第 9 行 |
+| Godot 設定 | `viewport_height=640`(expand 的最小高度,改成 800 會讓矮手機整頁縮小)+ `window_height_override=800`(只影響桌機視窗) |
+| 使用者決定維持 | toast 在 640 高時蓋住累積卡「累積 N 次」標題 2 秒;avail < 584 時返回鈕與資源列仍重疊;QA 品質備註(測試小缺口、註解)不處理 |
+| shortcut | 假資料只在記憶體、不跨日跨月;商城道具未入庫存;列表捲動未做;全域 set_quit_on_go_back(false);toast 樣式為工程師自訂 |
+| 實機 | 2026-11-07 使用者實機測試，位置正確 |
+| 未做 | 安全檢查(金流:首儲、補發訂單;外部輸入：伺服器活動資料;第三方 SDK:AdMob);真後端與 Google Play 計費 |
+| 已刪除(2026-11-07) | 淘汰方案與過時圖:B2 比較圖、800 方案 S04/S05、`event-screen-layout.svg`、`event_screen_preview.png`/`_x2.png`、活動圖示候選預覽 e01/e03/e04/list_icons |
+
+| 項目 | 內容 |
+|---|---|
+| 設計稿 | `docs/design/event/event-screen.md`:D01~D17 使用者已確認(D08 已移除);640 以外高度見 `screen-size-800.md` |
+| 預覽 | 640:`docs/design/event/event-screen-preview.svg`(截圖 `art/mockups/event_screen_preview_final.png`);800:`docs/design/layout/screen-size-800-base.svg`、`-option-s03.svg`、`-toast.svg`(截圖 `art/mockups/screen_size_800_*.png`);截圖指令 `msedge --headless=new --disable-gpu --allow-file-access-from-files --window-size=<寬>,<高> --screenshot=<png> file:///<svg>` |
 | 圖 | `art/ui/event/`:icon_checkin、icon_first_topup(48×48,列表用)、icon_random_item_36(36×36,首儲列與 28 次卡用)、icon_signed(24×24);首儲金塊、銀塊用 `art/ui/resource/gold_x2.png`、`silver_x2.png`;按鈕、紅點、格子都由程式畫,不出圖 |
 | 首頁稿 | `bottom-buttons-confirmed.md` 第 38 行已補註:活動按鈕例外有紅點(見 D16) |
 
@@ -161,16 +177,7 @@
 | 提示框 | D17「已獲得」共用框(簽到、領取、首儲、補發訂單);D15 同框換標題;多個依序:補發訂單 → 月初補發 → 玩家操作 |
 | 按鈕 | 活動頁按鈕由程式畫,不出圖 |
 
-**下一步:派工程師實作**(派工指令草稿已寫好,使用者尚未同意送出,見下方)。前提:目前**沒有後端、沒有 Google Play 計費**,所以只做前端 + 本機假活動服務。
-- 首儲以外的儲值補發內容,待商城儲值規格定案再補(D17 只寫通用排法)
-
-工程師派工草稿(送出前需使用者確認):
-- 背景:Godot 4.7.2,`game/`;首頁已完成(`home.tscn`、`home.gd`、`home_logic.gd`、`ui/*.gd`),假資料 `fake_data.gd`;無後端、無計費
-- 目標:依 `event-screen.md` D01~D17(D08 不做)、預覽 A~F、README 實作活動頁
-- 範圍:A/B/C 畫面與返回(D01~D06、D12);簽到摘要、28 格、累積卡(D07、D09、D10);首儲(D11);D14 載入/失敗;D15、D17 提示框與依序跳出;紅點 D05、D16,首頁活動按鈕進入活動頁;集中的假活動服務(已簽次數、今天是否已簽、累積已領、首儲已購、簽到/領取/購買、月初補發、補發訂單、隨機道具;可模擬延遲與失敗),日後只換這層;圖從 `art/` 複製到 `game/assets/`;沿用 pixel_box / pixel_button / pixel_text;補測試(格子判斷含 ≥28、摘要分母、累積卡狀態、紅點條件、返回、提示框依序)
-- 不要做:後端、真計費與網路、設計稿外功能或動畫、出圖、改 art 原圖、改設計稿與 README、改首頁既有版面行為(只加紅點與導覽)、新依賴、git;設計稿矛盾先回報
-- 驗收:360×640 與預覽一致、可點 ≥44×44、新舊測試全過、首頁不壞
-- 回報:檔案清單、測試指令與輸出、略過/未驗證、`shortcut:` 清單、設計稿疑問
+待補:首儲以外的儲值補發內容,待商城儲值規格定案再補(D17 只寫通用排法)
 
 ## 首頁 UI
 

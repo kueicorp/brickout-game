@@ -4,6 +4,8 @@ extends Control
 ## 寬固定 360、高依手機延伸(T01~T05),排版見 _apply_layout。
 ## 圖層(下到上):背景頂端(補頂條 / 純色)→ 背景 → D15 → D06 → D01 → D02 → D20 底 → 底部列 → D14。
 ## D10 banner 區留白,由 AdManager 把原生 banner 疊在上面(進入首頁顯示、離開隱藏)。
+## 活動頁(EventScreen)疊在首頁上顯示,共用背景、D01 資源列與 banner;最上層是共用的獲得提示框(RewardPopup)。
+## 底部「活動」按鈕紅點見 event-screen D16;返回鍵依 EventLogic.back_action。
 
 const BACKGROUNDS := [
 	preload("res://assets/backgrounds/home/bg_theme01.png"),
@@ -55,6 +57,11 @@ var _heart: PixelButton
 var _tooltip: HeartTooltip
 var _long_press: Timer
 var _tooltip_shown_this_press := false
+## 活動頁開著時才有
+var _event: EventScreen
+var _popup: RewardPopup
+## 紅點資料的請求序號:只採用最新一次請求的紅點結果
+var _badge_request := 0
 
 
 func _ready() -> void:
@@ -114,7 +121,10 @@ func _ready() -> void:
 		var button: BottomButton = _add_button(BottomButton.new(), Rect2(8 + i * 87, 492, 83, 72))
 		button.label = item[0]
 		button.icon = item[1]
-		button.pressed.connect(_log.bind("前往%s畫面" % item[0]))
+		if i == 0:
+			button.pressed.connect(_open_event)
+		else:
+			button.pressed.connect(_log.bind("前往%s畫面" % item[0]))
 		_bottom_buttons.append(button)
 
 	_tooltip = HeartTooltip.new()
@@ -136,6 +146,14 @@ func _ready() -> void:
 	add_child(countdown)
 	_update_tooltip_text()
 
+	_popup = RewardPopup.new()
+	_popup.item_closed.connect(_on_popup_item_closed)
+	_popup.all_closed.connect(_on_popups_closed)
+	add_child(_popup)
+	# 返回鍵自己處理(關提示框、活動頁回上一層);首頁沒有東西開著時照原本行為結束 App
+	# shortcut: 這是全域設定,會關掉整個 App 的返回鍵自動結束 App;日後新增場景需自行處理返回鍵(NOTIFICATION_WM_GO_BACK_REQUEST)
+	get_tree().set_quit_on_go_back(false)
+
 	# 開啟首頁:第一個未通關所在的組並選該關(Q43)
 	selected_level = HomeLogic.default_selection(first_uncleared)
 	var group := HomeLogic.group_of_level(selected_level)
@@ -147,6 +165,7 @@ func _ready() -> void:
 	get_viewport().size_changed.connect(_apply_layout)
 	# D10:原生 banner 疊在畫面上,首頁本身只留白
 	AdManager.show_banner()
+	_refresh_badge()
 
 
 func _exit_tree() -> void:
@@ -180,6 +199,10 @@ func _apply_layout() -> void:
 	for b in _bottom_buttons:
 		b.position.y = lay.bottom
 	_bottom_bg.position.y = lay.bottom - 4
+	_popup.size = Vector2(360, h)
+	if _event:
+		# 活動頁:上方貼安全區、多出的高度加在內容面板(screen-size-800 S02)
+		_event.apply_layout(h, safe.x, safe.y)
 
 
 ## headless(自動測試)沒有視窗,stretch expand 會算出 640×640 的怪尺寸,改用基準 360×640
@@ -318,6 +341,100 @@ func _notification(what: int) -> void:
 	# 系統中斷(來電、切 App)時關閉 D14
 	if what == NOTIFICATION_APPLICATION_FOCUS_OUT and _tooltip:
 		_hide_tooltip()
+	elif what == NOTIFICATION_WM_GO_BACK_REQUEST and _popup:
+		_on_back()
+	elif what == NOTIFICATION_APPLICATION_RESUMED and _popup and _event == null:
+		# D16:App 回到前景時重新取紅點資料
+		_refresh_badge()
+
+
+# ---- 活動頁(event-screen D01、D16、D17) ----
+
+## 底部活動按鈕之外,活動頁開著時要藏起來的首頁元件(D02:活動頁不顯示底部 4 按鈕)
+func _home_only_nodes() -> Array[Control]:
+	var nodes: Array[Control] = [_map, _start, _left, _title, _right, _bottom_bg]
+	nodes.append_array(_bottom_buttons)
+	return nodes
+
+
+func _open_event() -> void:
+	if _event:
+		return
+	for n in _home_only_nodes():
+		n.visible = false
+	_event = EventScreen.new()
+	_event.popup = _popup
+	_event.closed.connect(_close_event)
+	add_child(_event)
+	# 疊在首頁元件上、D14 懸浮視窗與提示框之下
+	move_child(_event, _tooltip.get_index())
+	_apply_layout()
+
+
+func _close_event() -> void:
+	if _event == null:
+		return
+	_event.queue_free()
+	_event = null
+	for n in _home_only_nodes():
+		n.visible = true
+	# D16:從活動頁返回首頁時重新取資料
+	_refresh_badge()
+
+
+## 返回鍵 / 返回手勢(event-screen D01 返回行為表)
+func _on_back() -> void:
+	var page: EventLogic.Page = _event.page if _event else EventLogic.Page.NONE
+	match EventLogic.back_action(_popup.is_open(), page):
+		EventLogic.Back.CLOSE_POPUP:
+			_popup.close_current()
+		EventLogic.Back.TO_LIST:
+			_event.show_page(EventLogic.Page.LIST)
+		EventLogic.Back.TO_HOME:
+			_close_event()
+		EventLogic.Back.QUIT:
+			get_tree().quit()
+
+
+## D16:取紅點資料;資料到達前、讀取失敗時都不顯示
+func _refresh_badge() -> void:
+	_bottom_buttons[0].set_badge(false)
+	_badge_request += 1
+	EventService.fetch_status(_on_badge_status.bind(_badge_request))
+
+
+func _on_badge_status(r: Dictionary, request: int) -> void:
+	if not r.ok:
+		return
+	# 就算這次結果已過時也要排補發框(重複的 id 由 RewardPopup 略過)
+	for p in r.popups:
+		_popup.enqueue(p)
+	if request != _badge_request or _event or _popup.is_open():
+		# 有提示框時先彈框,全部按「好」後(all_closed)再重新取資料決定紅點(D16「與 D15」)
+		return
+	_apply_wallet(r.wallet)
+	_bottom_buttons[0].set_badge(EventLogic.checkin_badge(r.signed_count, r.signed_today, r.claimed))
+
+
+## 每個提示框關閉、或首頁取得最新資料時,資源列換成伺服器的最新值(不做動畫)
+func _apply_wallet(wallet: Dictionary) -> void:
+	hearts = wallet.heart
+	_resources.set_values(wallet.heart, wallet.coin, wallet.gold, wallet.silver)
+	_update_tooltip_text()
+
+
+## 每關一個框(「好」或返回鍵):更新資源列;補發框此時才告知後端已看過(D15、D17)。
+## 回應不必處理:失敗時後端保留清單,下次取資料帶回也會被 RewardPopup 以 id 略過。
+func _on_popup_item_closed(item: Dictionary) -> void:
+	_apply_wallet(item.wallet)
+	if item.has("id"):
+		EventService.mark_popup_seen(item.id)
+
+
+## 關閉最後一個提示框後重新取紅點資料;活動頁開著時,活動頁的紅點已依最新回應更新
+func _on_popups_closed() -> void:
+	if _event == null:
+		_refresh_badge()
 
 
 func _log(message: String) -> void:

@@ -504,6 +504,11 @@ func _test_bottom_and_title() -> void:
 		_tap(Vector2(xs[i], 528))
 		await _frames()
 		_eq(_c("bottom_" + labels[i]), 1, "bottom %s tap" % labels[i])
+		# 「活動」會打開活動頁(event-screen D01),關掉再測下一顆
+		_eq(home._event != null, i == 0, "bottom %s opens event page = %s" % [labels[i], i == 0])
+		if home._event:
+			home._close_event()
+			await _frames()
 	# 按住 → is_held;移出 → 放開不觸發
 	var btn = null
 	for b in home.get_children():

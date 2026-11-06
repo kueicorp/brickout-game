@@ -259,6 +259,11 @@ func _case(h: int, t: int, b: int, w := 360) -> void:
 		_tap(Vector2(49 + i * 87, e.bottom + 36) + o)
 		await _frames()
 		_eq(_c("bottom%d" % i), 1, "%s bottom %d" % [tag, i])
+		# 「活動」會打開活動頁(event-screen D01),關掉再測下一顆
+		_eq(home._event != null, i == 0, "%s bottom %d opens event page" % [tag, i])
+		if home._event:
+			home._close_event()
+			await _frames()
 	_tap(Vector2(49, e.bottom + 72) + o)
 	await _frames()
 	_eq(_c("bottom0"), 1, tag + " bottom row +72 outside")

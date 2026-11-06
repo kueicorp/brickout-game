@@ -25,6 +25,7 @@ AdManager="*res://scripts/ad_manager.gd"
 
 window/size/viewport_width=360
 window/size/viewport_height=640
+window/size/window_height_override=800
 window/stretch/mode="viewport"
 window/stretch/aspect="expand"
 window/handheld/orientation=1

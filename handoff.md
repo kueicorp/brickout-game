@@ -1,10 +1,10 @@
 # 交接文件
 
-更新日期:2026-11-07(活動頁實作與 800 基準改版完成、實機確認之後;前一版:活動頁設計全部確認)
+更新日期:2026-11-07(商城實作 + 綠色九宮格按鈕 + 頁面頂部捷徑列完成、QA 通過、使用者實機測試通過之後;前一版：商城設計 D01~D29 確認)
 
 ## 目前階段
 - Godot 專案在 `game/`(Godot 4.7.2,執行檔 `E:\Godot 4\Godot_v4.7.2-stable_win64.exe`、`_console.exe`)
-- 已完成並通過 QA:載入畫面、首頁(完整互動 + 假資料)、Android 圖示設定、長螢幕版面延伸、**活動頁(列表、每日簽到、首次儲值;假活動服務)**
+- 已完成並通過 QA:載入畫面、首頁(完整互動 + 假資料)、Android 圖示設定、長螢幕版面延伸、活動頁(列表、每日簽到、首次儲值;假活動服務)、**商城(4 分頁 + 購買流程;假商城服務)、綠色九宮格按鈕、頁面頂部捷徑列**(2026-11-07,使用者實機測試通過)
 - **2026-11-07:設計基準改為 360×800**(比 800 矮等比縮留白),首頁與活動頁已改並實機確認
 - **2026-11-05~06 完成:10 個主題背景 + 牆壁全部換新**(Pixen 180×420 → 整數放大 2 倍，2 px 一格)
 - **2026-11-06 完成：首頁 AdMob banner(測試 ID)、D20 底部列黑底、首頁黑底統一 alpha 160**;QA 通過，使用者實體手機測試成功
@@ -14,17 +14,34 @@
 
 | 優先 | 項目 | 內容 |
 |---|---|---|
-| 1 | ~~Godot import~~ | **2026-11-06 已完成**(headless `--import`;smoke_main_scene、test_home_tall 562 通過) |
-| 2 | 實機看對比 | 各主題磚塊、資源列、牆壁是否看得清楚;最需注意：主題 10 浮島像磚塊、主題 8 黃色電光(背景閃電 + 牆壁電光)、主題 3 大石柱、主題 9/10 牆壁偏亮、主題 7 牆與下方冰原對比弱 |
-| 3 | 主題 1~5 牆壁對比 | 這 5 個是在「牆壁要跟背景對比」規則之前做的;可能有問題：主題 2(深棕樹根 vs 深棕樹幹)、主題 5(黑岩 vs 黑岩壁)。**使用者尚未決定是否回頭檢查** |
-| 4 | 牆壁進遊戲 | 程式目前沒用到牆壁;做關卡畫面時再把 `art/borders/game/` 複製到 `game/assets/`,並寫進工程師指令(見「主題、背景、牆壁」) |
-| 5 | ~~設計稿整理~~ | **2026-11-06 已完成**:`tall-screen.md` 刪除 T05、T08、T09、Q10~Q12,新增「背景現況」,307 → 59 行 |
-| 6 | commit | 全部尚未 commit(使用者用 GitHub Desktop 操作;使用者說之後會 commit) |
-| 7 | 安全檢查 | AdMob 改動尚未做:第三方 SDK(Poing 外掛、Google ads-mobile-sdk)、INTERNET 權限、廣告 ID 收集、外掛自動下載;使用者自己另開 session |
-| 8 | AdMob 正式 ID | 使用者申請 App ID 與 banner unit ID 後交給 PM,派工程師替換 |
-| 9 | ~~活動頁實作、800 基準改版~~ | **2026-11-07 完成**:QA 通過、使用者實機確認位置正確;詳見「活動頁與 800 基準改版」 |
-| 10 | 活動頁安全檢查 | 金流(首儲、補發訂單)、外部輸入(伺服器活動資料)、AdMob;使用者自己另開 session |
-| 11 | 其他畫面改 800 基準 | 載入畫面未納入 screen-size-800.md(現況正常);商城、成長、設定、關卡畫面設計時直接以 360×800 為基準 |
+| 1 | commit | 全部尚未 commit(使用者用 GitHub Desktop 操作，使用者說之後會 commit) |
+| 2 | 安全檢查 | 程式都完成後由使用者另開 session。範圍：首頁(觸控輸入、VIBRATE 權限);AdMob(第三方 SDK Poing 外掛 / Google ads-mobile-sdk、INTERNET 權限、廣告 ID 收集、外掛自動下載);活動頁(金流：首儲、補發訂單;外部輸入：伺服器活動資料);商城(金流：金塊包、移除廣告、補發訂單、金塊扣款;看廣告獎勵;外部輸入：伺服器商城資料) |
+| 3 | 商城規格缺漏 3 項 | 待使用者決定:(1) 卡片整張按下時價格鈕用 pressed 圖或跟卡片一起變暗(目前 pressed 圖)(2) 按下時文字位移(目前 (1,5))(3) D13 道具分頁在資料到之前先顯示(目前沒做) |
+| 4 | 商城設計稿 D01~D28 | 已實作、QA 通過、實機 OK;使用者決定先保留，第 3 項決定後再請設計師刪。當初派工是讓工程師直接讀設計稿(全文沒放進指令),刪之前先確認規格已在 README / 程式裡 |
+| 5 | 接真服務時要處理 | 看廣告沒有逾時(SDK 不回應會卡在商城;JEV later 0.68);App 在付款結果回來前被殺 → 訂單停在 `_paid`(啟動時用 queryPurchases 補發，屬後端設計);真 Google Play 計費、AdMob 獎勵廣告、後端都還沒接 |
+| 6 | AdMob 正式 ID | 使用者申請 App ID 與 banner unit ID 後交給 PM,派工程師替換 |
+| 7 | 實機看對比 | 各主題磚塊、資源列、牆壁是否看得清楚;最需注意：主題 10 浮島像磚塊、主題 8 黃色電光(背景閃電 + 牆壁電光)、主題 3 大石柱、主題 9/10 牆壁偏亮、主題 7 牆與下方冰原對比弱 |
+| 8 | 主題 1~5 牆壁對比 | 這 5 個是在「牆壁要跟背景對比」規則之前做的;可能有問題：主題 2(深棕樹根 vs 深棕樹幹)、主題 5(黑岩 vs 黑岩壁)。**使用者尚未決定是否回頭檢查** |
+| 9 | 牆壁進遊戲 | 程式目前沒用到牆壁;做關卡畫面時再把 `art/borders/game/` 複製到 `game/assets/`,並寫進工程師指令(見「主題、背景、牆壁」) |
+| 10 | 其他畫面 | 成長、設定、關卡畫面以 360×800 設計;頁面頂部捷徑列元件 `page_shortcut_bar.gd` 可直接套用(傳入目前頁);載入畫面未納入 screen-size-800.md(現況正常) |
+
+## 商城、綠色按鈕、頁面頂部捷徑列(2026-11-07 完成;QA 通過;使用者實機測試通過)
+
+| 項目 | 內容 |
+|---|---|
+| 狀態 | `game/tests/run_tests.ps1` 24 檔 0 失敗;尚未做安全檢查 |
+| 設計稿 | `docs/design/shop/shop-screen.md` D01~D18、`shop-purchase-flows.md` D19~D29(D29 出圖清單已全部完成);捷徑列 `docs/design/layout/page-shortcuts.md`(P01~P11 已刪，只剩決定紀錄;既有稿指向 P 編號處已補註);規格摘要在 README「商城」段落與「活動」第 5、7 點 |
+| 程式 | `shop_logic.gd`(商品表、紅點條件、D28 說明文字)、`shop_service.gd`(假服務，日後只換這層;與 EventService 共用錢包)、`shop_screen.gd`、`ui/shop_page.gd`、`ui/shop_dialog.gd`;`ui/green_button.gd`(九宮格綠鈕);`ui/page_shortcut_bar.gd`(捷徑列);`home.gd` 開關商城、切頁、紅點 |
+| 圖示 | `art/ui/shop/` 16 張 36×36(已複製到 `game/assets/ui/shop/`):remove_ads(I02)、bundle_all_items(I03)、item_extra_hp / extra_life / swap / assassinate / coating / weaken / typhoon / armor_break / greed / skill_pack(I04~I13)、free_heart_ad(I14)、chest_coin(I15)、chest_silver(I16)、chest_item(I17,直接複製簽到藍禮物 `icon_random_item_36.png`);36 版愛心 `art/ui/resource/heart_x2.png`。圖案一律畫滿 36×36 |
+| 綠色按鈕 | 不出圖，用首頁 `start_normal` / `start_pressed` / `start_disabled` 做九宮格(邊界左 22、右 12、上 20、下 11;中段重複貼不縮放);pressed 中段改用原圖 x 92~169 + 175~199(避開淺色斑點與深色短線);按下下沉 (1,5);商城價格鈕 146 → 148×44、卡內 x 7;活動頁與商城的綠鈕、重試鈕都用 GreenButton |
+| 捷徑列 | 返回鈕 (8,80) 44×44 加底板 + 4 個文字捷徑 70×44(x 60/134/208/282,y 80,黑 alpha 160、圓角 6、白字 14px、目前頁內側金框);切頁取代、返回回首頁;成長、設定點了沒反應;處理中(購買、領取含簽到、Google Play、看廣告載入中)捷徑與返回鈕停用、Android 返回鍵也無效(活動頁與商城一致);紅點只顯示在其他頁的捷徑 |
+| 修過的 bug | 商城 B1 看廣告中返回 → 沒「已獲得」框;B2 付款中返回 → 訂單卡 `_paid`;B3 按下圖平面下緣深色短線;捷徑同一幀內漏擋 |
+| D28 文字 | 強化塗層第 1 行改「抵擋 10 次敵方攻擊或負面效果」(206px);所有道具說明行去句號 |
+| 預覽 | `art/mockups/shop/shop800_full_x2.png`(色塊稿 + 全部圖示 + 九宮格鈕);實作截圖 `impl_800_screens.png`、`impl_800_dialogs.png`;購買流程預覽 `shop-p0*-preview.png` |
+| shortcut | 捲動無慣性;資料只在記憶體;每日次數不在 00:00 重置;沒有道具庫存;toast 樣式工程師自訂 |
+| 品質備註(未處理) | `flat_button.gd` 的 `set_active`、`GREEN`/`GRAY` 已無人使用(JEV 0.25,之後順便清);`shop_screen.gd` `handle_back` 與 `_is_busy()` 條件分開維護;`pixel_button.gd:8` 註解寫不做鍵盤，但捷徑列開了焦點;處理結束那一幀點擊可能沒反應;`test_shop_logic` 只強制強化塗層那行 ≤ 252px;`test_page_shortcuts` 只驗屬性、畫面靠 `qa_capture_shortcuts.gd`;QA 曾遇一次測試結束時當掉(兩個 Godot 同時跑，重跑無法重現) |
+| QA 手動腳本 | `game/tests/qa_capture_shop.gd`、`qa_capture_event_retry.gd`、`qa_capture_shortcuts.gd`、`qa_capture_d28.gd`(需非 headless 執行，不在 run_tests 內) |
+| 圖示做法摘要 | I02 PM 用字型畫原稿 → `image_to_pixelart` → Pro Flash 加禁止符號;I03 沿用活動禮物，Pro Flash inpaint 去問號、補緞帶;I04~I13 Pixen 36 畫布 + 填滿畫布提示詞;I06 依使用者參考圖，PM 加粗原稿 → `edit_image_pixen`;I08 PM 畫概念草圖 → `edit_image_pixen`;I13 改成 2 個卷軸避免像蘿蔔;I14 `heart_x2` + `plus_badge` 程式合成;I15/I16 同一個 Pixen 紅寶箱用 `edit_image_pixen` 加金幣 / 銀錠(會重畫整張，約 850 像素不同但款式一致);過程檔已刪 |
 
 ## 首頁 AdMob banner(2026-11-06)
 
@@ -38,7 +55,7 @@
 | gradle | 已開啟;`game/android/build/` 在 .gitignore;`game/android/.build_version` 會進版控,clone 後可能要重跑 `--install-android-build-template` |
 | iOS 檔 | 外掛開編輯器會自動下載 iOS binaries(約 3 MB),使用者已接受保留 |
 | 已知問題 | 手機 dp 寬 < 360(輔助功能放大顯示大小)時 banner 超出 D10;使用者決定先不處理。已查證可改 `GodotApp.java` 覆寫 density(有條件可行，未實作) |
-| 未做 | 其他 4 個畫面(活動、商城、成長、設定)、插頁、獎勵、UMP、購買系統;載入失敗不重試(shortcut);APK 92 MB 原因未查 |
+| 未做 | 成長、設定畫面;插頁、獎勵廣告、UMP、真購買系統;載入失敗不重試(shortcut);APK 92 MB 原因未查 |
 
 ## 首頁黑底統一(2026-11-06)
 - 新增 D20 底部列共用半透明黑底(x 8、y 488、344×80,跟底部列一起貼下移動);首頁黑底一律 #000000 alpha 160(D15 由 120 改);QA 通過，使用者實體手機測試成功;實際畫面 `art/mockups/home/d20_impl_640.png`;設計稿 D20 已刪除(規格在 README 與 `home.gd`)
@@ -50,7 +67,7 @@
 | 愛心按鈕 | 手指移出再移回、500 ms 內放開仍會去商城;D14 未定義此情況;JEV 判斷問使用者(0.78),尚未回答 |
 | Android package name | 仍是 `com.example.$genname`,上架前要決定 |
 | 設計稿 D 項目 | branding D01~D10、首頁 D02/D04/D06/D15 已實作，待使用者確認畫面後請設計師刪除/整理 |
-| 安全檢查 | 首頁與載入畫面已通過 QA,已告知可做安全檢查(觸控輸入、VIBRATE 權限，加上 2026-11-06 的 AdMob,見待接續 7);使用者尚未進行 |
+| 安全檢查 | 範圍見「待接續」第 2 項;使用者尚未進行 |
 
 ## 本輪決策紀錄(2026-11-05~06)
 
@@ -78,7 +95,7 @@
 | 10 虛空深淵 | 55f70b44 | 淺灰米碎石紅裂縫 d77a5019 |
 
 ## 實機未驗證
-- 2026-11-06 使用者已用 APK 實體手機測試成功(首頁 banner、D20);以下細項未逐項回報
+- 2026-11-06 使用者已用 APK 實體手機測試成功(首頁 banner、D20);2026-11-07 商城、九宮格按鈕、捷徑列實機測試通過;以下細項未逐項回報
 - S26+ 上的安全區實際值、immersive / edge_to_edge、觸控手感、震動、圖示
 - 新背景在遊戲內的效果(含 640 高螢幕裁掉頂部後的樣子)
 - 建議裝機時請工程師在畫面印出實際 viewport 尺寸，確認是 360×780
@@ -147,7 +164,7 @@
 | 項目 | 內容 |
 |---|---|
 | 程式 | 假活動服務 `game/scripts/event_service.gd`(日後只換這層接後端);規則 `event_logic.gd`;活動頁 `event_screen.gd` 疊在首頁上(不換場景);`ui/checkin_page.gd`、`topup_page.gd`、`reward_popup.gd`、`flat_button.gd`、`event_list_item.gd` |
-| 測試 | `game/tests/run_tests.ps1` 跑全部測試(結束碼、SCRIPT ERROR、缺 PASSED 行、逾時都算失敗);最後一次 16 檔 0 失敗 |
+| 測試 | `game/tests/run_tests.ps1` 跑全部測試(結束碼、SCRIPT ERROR、缺 PASSED 行、逾時都算失敗);2026-11-07 最後一次 24 檔 0 失敗(含商城、捷徑列) |
 | 修過的問題 | B1 補發通知改為關框才標記已看過;B2 安全區重疊;切頁收起 toast;失敗回應晚到不在新畫面顯示 toast |
 | 畫面基準 | 設計 360×800;比 800 矮採「等比縮留白」(S03);活動頁多出高度全給面板;toast 跟著長高 0.4E、讀取失敗 / 重試置中於面板(S08);規格 `docs/design/layout/screen-size-800.md`;README 第 9 行 |
 | Godot 設定 | `viewport_height=640`(expand 的最小高度,改成 800 會讓矮手機整頁縮小)+ `window_height_override=800`(只影響桌機視窗) |
@@ -175,7 +192,7 @@
 | 紅點 | 列表「每日簽到」(今天未簽或有可領累積獎勵)、首頁「活動」按鈕;首儲不亮;資料未到或失敗不亮 |
 | 列表排序 | 固定,新增活動由使用者決定位置 |
 | 提示框 | D17「已獲得」共用框(簽到、領取、首儲、補發訂單);D15 同框換標題;多個依序:補發訂單 → 月初補發 → 玩家操作 |
-| 按鈕 | 活動頁按鈕由程式畫,不出圖 |
+| 按鈕 | 2026-11-07 起改用綠色九宮格按鈕 GreenButton(見「商城、綠色按鈕、頁面頂部捷徑列」);頁面標題改為捷徑列 |
 
 待補:首儲以外的儲值補發內容,待商城儲值規格定案再補(D17 只寫通用排法)
 
@@ -232,7 +249,17 @@ D15 地圖：一次 10 關、每主題 2 組、左右滑動;蛇形 3+4+3;格子�
 | 小圖要跟舊圖一致(如 24×24 勾) | Pixen 兩次都畫成黃綠細勾;改 Pro Flash + style_image 成功。**style_image 不可大於畫布**,先從舊圖裁出 ≤ 畫布的區塊(不縮放)再上傳;24×24 約 5 generations |
 | 去掉圖內角標(如資源 icon 的 +) | Pro Flash inpaint 最小 32×32、需 4 的倍數:把 25×25 原圖平移放進 32×32 透明畫布(不縮放)+ 遮罩,inpaint 後裁回;5 generations,遮罩外逐像素不變 |
 | 圖示畫滿畫布 | Pixen 提示詞加「large, filling the entire canvas edge to edge」有效(E02 37→46 px) |
+| 圖示內要寫英文字(如 AD) | Pixen 兩次:一次畫成漢字「孜」、一次字黏在一起;**有效做法**:PM 用電腦字型(Arial Black)畫 4 倍大原稿(144×144,透明底)→ `image_to_pixelart` faithful=true、強度 200、輸出 36×36(1 generation,但背景會變不透明灰)→ Pro Flash 編輯去背(可順便加元素,約 $0.023) |
+| 36×36 小圖去掉局部物件 | `inpaint_image_pro_flash` 可直接用 36×36 原圖 + 同尺寸逐像素黑白遮罩(白=重畫,遮罩只蓋物件 + 外圍 1 px);5 generations,遮罩外逐像素不變。直接用 edit 改提示詞去不掉(I04 金屬條) |
+| 沿用舊圖去掉局部圖案 | 去掉後要檢查原本被擋住的結構是否接得上(I03 去問號後左側面緞帶斷掉);可再用一次逐像素遮罩 inpaint 補畫,約 $0.023 |
+| 圖示要畫滿 36×36 | Pixen 36 畫布 + 「large, filling the entire canvas edge to edge」:I04 得 35×30(有效);Pixen 40 畫布會畫到 40 寬(超出不能用);Pro Flash 編輯「畫大到碰邊」會切掉邊緣黑框。Pixen 小細節(小箭頭)容易漏畫 |
+| Pixen 假透明格 | Pixen 偶爾把透明棋盤格畫成不透明深灰格(I05);下載後要檢查邊緣像素，PM 可用程式從四邊 flood fill 把相連灰格改透明(免費) |
+| 傳圖給 PixelLab | **一律不要讓設計師轉貼 base64**(1.2~2 KB 的 PNG 都走樣被拒過 2 次)。PM 用 `get_upload_url`(免費)+ `curl.exe -F "file=@路徑"` 上傳，拿到 `upload:<id>` 給設計師填 `image_url`;或用上一個 job 的下載網址 |
+| 照參考圖畫圖示 | Pixen 純文字對多物件構圖常畫錯(I06 畫成角色臉);改用 `edit_image_pixen`:輸入 144×144 原稿、輸出 36×36,會照原稿外形重畫。Pixen 編輯改得了顏色、改不了粗細/外形,要改外形先由 PM 用程式改原稿 |
+| 設計師自檢 | 會只看縮圖就說「已移除 / 符合」,不可信;PM 一律下載放大 8 倍再判斷 |
 | 尺寸 | Pixen 每邊 16~768、面積 ≤512²、4 的倍數;Pixflux 每邊 ≤400;Pro Flash ≤256 |
+| 同款系列圖(如三種寶箱) | 先出一張乾淨的基底，之後都用 `edit_image_pixen` + 基底的下載網址「只加箱上物件」;會整張重畫(約 850 像素不同)但款式一致;每張約 $0.008~0.01 |
+| 多種尺寸的按鈕 | 不要每種尺寸各出一張:拿現有按鈕圖做九宮格(程式處理，免費、尺寸精確、外觀一致);設計尺寸要配合 Pixen 時寬高取 4 的倍數 |
 
 做法與注意:
 - 像素圖**不可非整數倍放大**,也不可放大舊圖再修;整數倍放大可以(使用者已採用)
@@ -243,14 +270,15 @@ D15 地圖：一次 10 關、每主題 2 組、左右滑動;蛇形 3+4+3;格子�
 - 預覽、裁切、合成腳本都在 scratchpad,會隨 session 消失(本輪的 `wall_process.ps1`、`wall_install.ps1` 需要時重寫：下載 → 2 倍 → 裁外框 → 合成預覽 / 舊檔移走 → 複製新檔)
 
 ## PixelLab 額度
-- 2026-11-06 本輪結束:credits 約 **$5.86**(本輪約 $0.36);訂閱 generations 已用完(49/40),每日額度用完扣 credits
+- 2026-11-07 本輪結束:credits **$5.33**(本輪約 $0.53,商城圖示 I02~I17);訂閱 generations 已用完(65/40),每日額度用完直接扣 credits
+- 2026-11-06:credits 約 $5.86
 - 參考:Pixen 約 $0.007~0.01;Pixflux 約 $0.008;Pro Flash 256 級約 $0.04(9 generations)
 
 ## 工作流程備忘
 - 判斷性問題交給 JEV(`~/.claude/jev/ask.ps1`),請求檔放 scratchpad;confidence 偏低時問使用者
 - 定案後直接更新 README,不必再問
 - git 由使用者用 GitHub Desktop 操作，不要執行 git 指令
-- 圖片交給設計師用 PixelLab 產生，每張都要使用者先同意、一次一張(使用者說「做主題 N」即視為同意出 1 張);圖片不經 QA
+- 圖片交給設計師用 PixelLab 產生，每張都要使用者先同意、一次一張(使用者說「做主題 N」即視為同意出 1 張;**1 次同意 = 1 張 = 1 次請求,不出 3 選 1**,2026-11-07 使用者重申);圖片不經 QA
 - 回報圖片時每張都寫實際像素尺寸;放大預覽註明原圖尺寸與倍率
 - 設計師無法存圖，由 PM 下載後複製到專案;檔名不加 dNN_ 代號
 - PM 不親自出圖(程式合成、裁切、放大不算出圖)
@@ -263,3 +291,5 @@ D15 地圖：一次 10 關、每主題 2 組、左右滑動;蛇形 3+4+3;格子�
 | 2026-11-04 | 舊背景 20 張、舊牆壁、`art/not-in-use/` d23_border 39 張、`art/source/home/export/` border 來源 |
 | 2026-11-05 | `art/ui/home/` 舊首頁圖 33 張、底板 2 張、32×32 底部 icon 4 張;另 185 個:`art/mockups/home/candidates/`(129)、首頁過程示意圖 33、`art/mockups/` 根目錄舊版面 7、`art/source/home/` 12、`art/backgrounds/game/` meadow 4 |
 | 2026-11-06 | 122 張:`art/not-in-use/` 整個資料夾(舊主題背景 12、舊牆壁 40、舊玩法圖 d12~d28 共 69)、`art/mockups/home/d14_tooltip_theme01.png` |
+
+| 2026-11-07 | 54 個:`art/mockups/shop/` 商城圖示過程檔 i02_*~i17_* 46 個與 `item_icons_strip_x4.png`、過時預覽 `shop800_icons_x2.png`、`shop_preview_640/800/800_alt.png`、`docs/design/shop/shop-screen-preview-640.svg`、`shop-screen-preview-800-alt.svg`(未採用方案 B)、`art/mockups/page_shortcuts_preview.png`;設計稿 `page-shortcuts.md` P01~P11 刪除(內容已寫進工程師派工指令) |

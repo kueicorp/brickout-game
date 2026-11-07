@@ -1,5 +1,6 @@
 extends SceneTree
-## QA 重測:toast 切頁收起、失敗回應晚到不顯示 toast、成功回應晚到不退步、快速連續操作。執行:
+## QA 重測:toast 切頁收起、失敗回應晚到不顯示 toast、成功回應晚到不退步、快速連續操作。
+## 2026-11-07 依新規格更新:處理中不能用返回鈕 / 返回鍵 / 捷徑離開(先驗證被擋),「切走後晚到」改用 show_page 模擬。執行:
 ##   Godot_v4.7.2-stable_win64_console.exe --headless --path game --script res://tests/test_qa_toast_retest.gd
 ## 有任何失敗時結束碼為 1。
 
@@ -256,6 +257,24 @@ func _test_old_timer_does_not_cut_new_toast() -> void:
 	_eq(ev.toast_text, "", "new toast hidden after its own 2 s")
 
 
+## 2026-11-07 規格變更(README 活動第 7 點、page-shortcuts P04):請求處理中返回鈕、捷徑停用,返回鍵也無效。
+## 處理中先實際按返回鈕 / 返回鍵,確認「不離開」;再用 show_page 直接切頁,保留「切走後晚到的回應」的覆蓋
+## (介面上已觸發不到,但防護邏輯 _visit 仍在,日後若新增可在處理中切頁的路徑仍有效)。
+func _leave_while_busy(ev, how: String, label: String) -> void:
+	var page0 = ev.page
+	_eq([ev.is_busy(), ev.shortcuts.back.disabled], [true, true], label + ": busy, back button disabled")
+	if how == "back":
+		await _tapf(BACK_BTN)
+	else:
+		await _back_key()
+	_eq([home._event == ev, ev.page], [true, page0], label + ": %s ignored while busy" % how)
+	# 捷徑也點不動(商城)
+	await _tapf(ev.shortcuts.keys[PageShortcutBar.Page.SHOP].get_global_rect().get_center())
+	_eq([home._event == ev, home._shop], [true, null], label + ": shop shortcut ignored while busy")
+	ev.show_page(L.Page.LIST)
+	await _frames()
+
+
 ## 重測 3:三種操作的失敗回應晚到
 func _late_case(label: String, enter: Vector2, act: Vector2, after_switch: Array, expect_page) -> void:
 	await _fresh(14)
@@ -269,10 +288,8 @@ func _late_case(label: String, enter: Vector2, act: Vector2, after_switch: Array
 	await _frames()
 	S.delay_sec = DELAY
 	for p in after_switch:
-		if p is String and p == "back":
-			await _tapf(BACK_BTN)
-		elif p is String and p == "key":
-			await _back_key()
+		if p is String:
+			await _leave_while_busy(ev, p, label)
 		else:
 			await _tapf(p)
 	_eq(ev.page, expect_page, label + ": page before response")
@@ -334,7 +351,7 @@ func _test_late_failure_does_not_override_new_toast() -> void:
 	_tap(CLAIM14)
 	await _frames()
 	S.delay_sec = DELAY
-	await _tapf(BACK_BTN)
+	await _leave_while_busy(ev, "back", "late does not override")
 	await _tapf(ITEM_TOPUP)
 	S.fail_next = 1
 	_tap(BUY_BTN)
@@ -346,10 +363,12 @@ func _test_late_failure_does_not_override_new_toast() -> void:
 	_eq(ev.toast_text, "", "new toast timer not restarted by old failure")
 
 
-## 回首頁後回應才到:節點已釋放,不報錯
+## 處理中連按返回鍵 / 返回鈕:不離開,結果在原畫面顯示(新規格);結果回來後才能回首頁。
+## 回首頁後回應才到(節點已釋放不報錯):介面上已觸發不到,改用 _close_event 直接關頁模擬
 func _test_late_failure_after_close() -> void:
 	print("-- late after close")
 	await _fresh(14)
+	var ev = _ev()
 	await _tapf(ITEM_CHECKIN)
 	S.delay_sec = SLOW
 	S.fail_next = 1
@@ -358,7 +377,26 @@ func _test_late_failure_after_close() -> void:
 	S.delay_sec = DELAY
 	await _back_key()
 	await _back_key()
-	_eq(home._event, null, "closed before response")
+	await _tapf(BACK_BTN)
+	await _tapf(BACK_BTN)
+	_eq([home._event == ev, ev.page], [true, L.Page.CHECKIN], "busy: 2x back key + 2x back button stay on B")
+	await _wait(SLOW + 0.1)
+	_eq([ev.is_busy(), ev.toast_text, ev.shortcuts.back.disabled], [false, T_CHECKIN, false], "result shown on same page, enabled")
+	await _back_key()
+	await _back_key()
+	_eq(home._event, null, "after result: back key x2 -> home")
+	# 模擬:處理中節點被關掉,失敗晚到
+	await _open_event()
+	ev = _ev()
+	await _tapf(ITEM_CHECKIN)
+	S.delay_sec = SLOW
+	S.fail_next = 1
+	_tap(CHECKIN_BTN)
+	await _frames()
+	S.delay_sec = DELAY
+	home._close_event()
+	await _frames()
+	_eq(home._event, null, "simulated close before response")
 	await _wait(SLOW + 0.1)
 	_eq(home._popup.is_open(), false, "no popup after late failure on home")
 	await _open_event()
@@ -384,7 +422,7 @@ func _test_late_success() -> void:
 		S.delay_sec = DELAY
 		for p in c[3]:
 			if p is String:
-				await _tapf(BACK_BTN)
+				await _leave_while_busy(ev, p, c[0] + " late success")
 			else:
 				await _tapf(p)
 		await _wait(SLOW + 0.1)

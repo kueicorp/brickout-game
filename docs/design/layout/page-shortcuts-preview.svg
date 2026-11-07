@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1240" height="880" viewBox="0 0 1240 880">
+  <title>頁面頂部捷徑列預覽(方案 A):活動頁、商城各一張 360x800,背景為淺色天空與白雲</title>
+  <style>
+    .t{font-family:"Cubic 11","Microsoft JhengHei","Noto Sans TC",sans-serif;fill:#fff;font-size:14px}
+    .t18{font-size:18px}
+    .k{fill:#000}
+    .cap{font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:14px;fill:#222}
+    .note{font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:12px;fill:#222}
+    .plate{fill:#000;fill-opacity:0.627}
+  </style>
+  <defs>
+    <!-- 淺色背景:天空 + 白雲(白雲正好壓在捷徑列後面,是最差情況) -->
+    <g id="sky">
+      <rect width="360" height="800" fill="#BFE3F5"/>
+      <rect x="40" y="76" width="300" height="56" fill="#FFFFFF"/>
+      <rect x="24" y="92" width="332" height="24" fill="#FFFFFF"/>
+      <rect x="0" y="20" width="120" height="40" fill="#FFFFFF"/>
+      <rect x="250" y="20" width="110" height="40" fill="#FFFFFF"/>
+      <rect x="0" y="600" width="360" height="200" fill="#F2E6C8"/>
+    </g>
+    <!-- 資源列:同首頁,黑底 alpha 160 -->
+    <g id="res">
+      <rect class="plate" x="8" y="28" width="64" height="44" rx="6"/>
+      <rect class="plate" x="76" y="28" width="92" height="44" rx="6"/>
+      <rect class="plate" x="172" y="28" width="92" height="44" rx="6"/>
+      <rect class="plate" x="268" y="28" width="84" height="44" rx="6"/>
+      <rect x="18" y="38" width="25" height="25" fill="#E74C3C"/>
+      <rect x="86" y="38" width="25" height="25" fill="#F4D03F"/>
+      <rect x="182" y="38" width="25" height="25" fill="#E6A817"/>
+      <rect x="272" y="38" width="25" height="25" fill="#A9B2BC"/>
+      <text class="t" style="font-size:12px" x="47" y="54">20</text>
+      <text class="t" style="font-size:12px" x="115" y="54">12,345</text>
+      <text class="t" style="font-size:12px" x="211" y="54">300</text>
+      <text class="t" style="font-size:12px" x="301" y="54">50</text>
+    </g>
+    <!-- 返回鈕 P07:加底板 44x44 -->
+    <g id="back">
+      <rect class="plate" x="8" y="80" width="44" height="44" rx="6"/>
+      <text class="t" x="30" y="108" text-anchor="middle" style="font-size:18px">&lt;</text>
+    </g>
+    <!-- 紅點 12x12,#E74C3C + 1px 白框 -->
+    <g id="dot"><rect x="0.5" y="0.5" width="11" height="11" fill="#E74C3C" stroke="#fff"/></g>
+    <!-- 單一捷徑 70x44,原點在左上;現在頁 = 金框 -->
+    <g id="tabN"><rect class="plate" width="70" height="44" rx="6"/></g>
+    <g id="tabC"><rect class="plate" width="70" height="44" rx="6"/><rect x="1" y="1" width="68" height="42" rx="5" fill="none" stroke="#F4C430" stroke-width="2"/></g>
+    <!-- 面板與 banner -->
+    <g id="panel"><rect class="plate" x="8" y="132" width="344" height="594" rx="6"/></g>
+    <g id="banner"><rect x="20" y="734" width="320" height="50" fill="#3A3F4A"/><text class="t" style="fill:#B0B8C4;font-size:12px" x="180" y="763" text-anchor="middle">banner (20,734) 320x50</text></g>
+  </defs>
+
+  <!-- 畫面 1:活動頁 -->
+  <text class="cap" x="20" y="26">畫面 1:活動頁(目前頁 = 活動);商城捷徑有紅點</text>
+  <g transform="translate(20,40)">
+    <use href="#sky"/><use href="#res"/><use href="#back"/>
+    <!-- 4 個捷徑 x 60 / 134 / 208 / 282,y 80 -->
+    <g transform="translate(60,80)"><use href="#tabC"/><text class="t" x="35" y="27" text-anchor="middle">活動</text></g>
+    <g transform="translate(134,80)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">商城</text><g transform="translate(56,2)"><use href="#dot"/></g></g>
+    <g transform="translate(208,80)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">成長</text></g>
+    <g transform="translate(282,80)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">設定</text></g>
+    <use href="#panel"/>
+    <rect x="14" y="138" width="332" height="72" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="26" y="180">每日簽到</text>
+    <rect x="14" y="218" width="332" height="72" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="26" y="260">首次儲值</text>
+    <use href="#banner"/>
+  </g>
+  <text class="note" x="20" y="858">捷徑 70x44、間隔 4、x 60 起、y 80;返回鈕 44x44 也加底板</text>
+
+  <!-- 畫面 2:商城 -->
+  <text class="cap" x="400" y="26">畫面 2:商城(目前頁 = 商城);活動捷徑有紅點</text>
+  <g transform="translate(400,40)">
+    <use href="#sky"/><use href="#res"/><use href="#back"/>
+    <g transform="translate(60,80)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">活動</text><g transform="translate(56,2)"><use href="#dot"/></g></g>
+    <g transform="translate(134,80)"><use href="#tabC"/><text class="t" x="35" y="27" text-anchor="middle">商城</text></g>
+    <g transform="translate(208,80)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">成長</text></g>
+    <g transform="translate(282,80)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">設定</text></g>
+    <use href="#panel"/>
+    <rect x="14" y="138" width="80" height="44" fill="#F4C430"/><text class="t k" x="54" y="165" text-anchor="middle">儲值</text>
+    <rect x="98" y="138" width="80" height="44" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="138" y="165" text-anchor="middle">道具</text>
+    <rect x="182" y="138" width="80" height="44" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="222" y="165" text-anchor="middle">愛心金幣</text>
+    <rect x="266" y="138" width="80" height="44" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="306" y="165" text-anchor="middle">免費</text>
+    <g transform="translate(334,138)"><use href="#dot"/></g>
+    <rect x="14" y="186" width="332" height="2" fill="#5D6D7E"/>
+    <rect x="14" y="190" width="162" height="104" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="54" y="218">30 金塊</text>
+    <rect x="184" y="190" width="162" height="104" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="224" y="218">90 金塊</text>
+    <use href="#banner"/>
+  </g>
+  <text class="note" x="400" y="858">商城內的免費分頁紅點(D18)不變;目前頁的捷徑不顯示紅點</text>
+
+  <!-- 狀態表:2 倍放大 -->
+  <text class="cap" x="800" y="26">捷徑狀態(放大 2 倍,背景為淺色天空)</text>
+  <g transform="translate(800,40)">
+    <rect width="420" height="680" fill="#BFE3F5"/>
+    <rect x="0" y="0" width="420" height="40" fill="#FFFFFF"/>
+    <!-- 預設 -->
+    <g transform="translate(20,40) scale(2)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">商城</text></g>
+    <text class="note" x="180" y="80">預設:黑底 alpha 160、白字 14px</text>
+    <!-- 目前頁 -->
+    <g transform="translate(20,150) scale(2)"><use href="#tabC"/><text class="t" x="35" y="27" text-anchor="middle">活動</text></g>
+    <text class="note" x="180" y="190">目前頁:加 2px 金框 #F4C430,文字仍白</text>
+    <!-- 按下 -->
+    <g transform="translate(20,260) scale(2)"><rect x="0" y="0" width="70" height="44" rx="6" fill="#000" fill-opacity="0.8"/><text class="t" style="fill:#999" x="35" y="27" text-anchor="middle">成長</text></g>
+    <text class="note" x="180" y="300">按下:整個捷徑變暗 40%</text>
+    <!-- 停用 -->
+    <g transform="translate(20,370) scale(2)" opacity="0.5"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">設定</text></g>
+    <text class="note" x="180" y="410">停用:整個捷徑透明度 50%(購買處理中)</text>
+    <!-- 紅點 -->
+    <g transform="translate(20,480) scale(2)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">活動</text><g transform="translate(56,2)"><use href="#dot"/></g></g>
+    <text class="note" x="180" y="510">紅點:12x12,捷徑內 (56,2),不吃觸控</text>
+    <!-- 焦點 -->
+    <g transform="translate(20,590) scale(2)"><use href="#tabN"/><text class="t" x="35" y="27" text-anchor="middle">商城</text><rect x="-1" y="-1" width="72" height="46" rx="7" fill="none" stroke="#fff" stroke-width="1"/></g>
+    <text class="note" x="180" y="620">鍵盤焦點:外加白色框(捷徑外 2px)</text>
+  </g>
+  <text class="note" x="800" y="780">灰白底(#5F5F5F 級)上白字對比約 6.5:1;金框對底板約 3.9:1</text>
+</svg>

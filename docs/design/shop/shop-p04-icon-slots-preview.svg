@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="360" height="800" viewBox="0 0 360 800">
+  <title>商城 P04 圖示格位預覽(360x800;16 張新圖 36x36,置中於 48x48 圖示格;4 張沿用 25x25;只有色塊,不出圖)</title>
+  <style>
+    .t{font-family:"Cubic 11","Microsoft JhengHei","Noto Sans TC",sans-serif;fill:#fff;font-size:14px}
+    .s{font-family:"Cubic 11","Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:12px;fill:#B0B8C4}
+    .h{font-family:"Cubic 11","Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:12px;fill:#F4C430}
+  </style>
+  <rect width="360" height="800" fill="#192331"/>
+  <!-- 新圖 36x36(虛線框 = 畫布 36x36;外層實線框 = 48x48 圖示格,圖示在格內偏移 6,6) -->
+  <g>
+    <rect x="12.5" y="16.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="22.5" width="35" height="35" fill="#C0504D" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="36">移除廣告</text><text class="s" x="66" y="54">36x36 新圖</text>
+    <rect x="186.5" y="16.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="22.5" width="35" height="35" fill="#8E6BB5" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="36">綜合禮包</text><text class="s" x="240" y="54">36x36 新圖</text>
+
+    <rect x="12.5" y="92.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="98.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="112">額外血量</text><text class="s" x="66" y="130">36x36 新圖</text>
+    <rect x="186.5" y="92.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="98.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="112">額外生命</text><text class="s" x="240" y="130">36x36 新圖</text>
+
+    <rect x="12.5" y="168.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="174.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="188">替換</text><text class="s" x="66" y="206">36x36 新圖</text>
+    <rect x="186.5" y="168.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="174.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="188">暗殺</text><text class="s" x="240" y="206">36x36 新圖</text>
+
+    <rect x="12.5" y="244.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="250.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="264">強化塗層</text><text class="s" x="66" y="282">36x36 新圖</text>
+    <rect x="186.5" y="244.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="250.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="264">衰弱</text><text class="s" x="240" y="282">36x36 新圖</text>
+
+    <rect x="12.5" y="320.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="326.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="340">颱風</text><text class="s" x="66" y="358">36x36 新圖</text>
+    <rect x="186.5" y="320.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="326.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="340">破甲</text><text class="s" x="240" y="358">36x36 新圖</text>
+
+    <rect x="12.5" y="396.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="402.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="416">貪婪</text><text class="s" x="66" y="434">36x36 新圖</text>
+    <rect x="186.5" y="396.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="402.5" width="35" height="35" fill="#6B5B95" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="416">技能大禮包</text><text class="s" x="240" y="434">36x36 新圖</text>
+
+    <rect x="12.5" y="472.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="478.5" width="35" height="35" fill="#E74C3C" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="492">看廣告得愛心</text><text class="s" x="66" y="510">36x36 新圖</text>
+    <rect x="186.5" y="472.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="478.5" width="35" height="35" fill="#8E6E53" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="492">金幣寶箱</text><text class="s" x="240" y="510">36x36 新圖</text>
+
+    <rect x="12.5" y="548.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="18.5" y="554.5" width="35" height="35" fill="#8E6E53" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="66" y="568">銀塊寶箱</text><text class="s" x="66" y="586">36x36 新圖</text>
+    <rect x="186.5" y="548.5" width="47" height="47" fill="none" stroke="#5D6D7E"/><rect x="192.5" y="554.5" width="35" height="35" fill="#8E6E53" stroke="#fff" stroke-dasharray="3 2"/><text class="t" x="240" y="568">道具寶箱</text><text class="s" x="240" y="586">36x36 新圖</text>
+  </g>
+  <!-- 沿用 25x25 -->
+  <text class="h" x="12" y="632">沿用既有圖(不新畫)</text>
+  <rect x="12" y="644" width="25" height="25" fill="#E6A817"/><text class="t" x="44" y="662">金塊</text><text class="s" x="44" y="678">gold.png 25x25</text>
+  <rect x="186" y="644" width="25" height="25" fill="#A9B2BC"/><text class="t" x="218" y="662">銀塊</text><text class="s" x="218" y="678">silver.png 25x25</text>
+  <rect x="12" y="700" width="25" height="25" fill="#F4D03F"/><text class="t" x="44" y="718">金幣</text><text class="s" x="44" y="734">coin.png 25x25</text>
+  <rect x="186" y="700" width="25" height="25" fill="#E74C3C"/><text class="t" x="218" y="718">愛心</text><text class="s" x="218" y="734">heart.png 25x25</text>
+  <text class="s" x="12" y="780">虛線框 = 36x36 畫布;實線框 = 48x48 圖示格;色塊只是佔位</text>
+</svg>

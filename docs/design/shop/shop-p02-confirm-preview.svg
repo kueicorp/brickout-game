@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="1920" height="940" viewBox="0 0 1920 940">
+  <title>商城 P02 用金塊購買的確認框(5 個狀態,每格 360x800 基準,色塊預覽)</title>
+  <style>
+    .t{font-family:"Cubic 11","Microsoft JhengHei","Noto Sans TC",sans-serif;fill:#fff;font-size:14px}
+    .b{font-size:16px}
+    .h18{font-size:18px}
+    .s{font-size:12px;fill:#B0B8C4}
+    .k{fill:#000}
+    .g{fill:#F4C430}
+    .cap{font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:15px;fill:#111;font-weight:bold}
+    .note{font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:12px;fill:#333}
+  </style>
+  <defs>
+    <g id="skel">
+      <rect width="360" height="800" fill="#192331"/>
+      <rect x="8" y="28" width="64" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="76" y="28" width="92" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="172" y="28" width="92" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="268" y="28" width="84" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="18" y="38" width="25" height="25" fill="#E74C3C"/>
+      <rect x="86" y="38" width="25" height="25" fill="#F4D03F"/>
+      <rect x="182" y="38" width="25" height="25" fill="#E6A817"/>
+      <rect x="272" y="38" width="25" height="25" fill="#A9B2BC"/>
+      <rect x="31" y="51" width="12" height="12" fill="#2ECC71"/>
+      <rect x="99" y="51" width="12" height="12" fill="#2ECC71"/>
+      <rect x="195" y="51" width="12" height="12" fill="#2ECC71"/>
+      <rect x="8" y="80" width="44" height="44" fill="#3A4556"/>
+      <text class="t b" x="30" y="108" text-anchor="middle">&lt;</text>
+      <text class="t h18" x="60" y="109">商城</text>
+      <rect x="8" y="132" width="344" height="594" rx="6" fill="#000" fill-opacity="0.63"/>
+    </g>
+    <g id="banner"><rect x="20" y="734" width="320" height="50" fill="#3A3F4A"/><text class="t s" x="180" y="763" text-anchor="middle">banner 320x50</text></g>
+    <g id="mask"><rect width="360" height="800" fill="#000" fill-opacity="0.63"/></g>
+    <g id="tabsItems">
+      <rect x="14.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="54" y="165" text-anchor="middle">儲值</text>
+      <rect x="98" y="138" width="80" height="44" fill="#F4C430"/><text class="t k" x="138" y="165" text-anchor="middle">道具</text>
+      <rect x="182.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="222" y="165" text-anchor="middle">愛心金幣</text>
+      <rect x="266.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="306" y="165" text-anchor="middle">免費</text>
+      <rect x="334.5" y="138.5" width="11" height="11" fill="#E74C3C" stroke="#fff"/>
+      <rect x="14" y="186" width="332" height="2" fill="#5D6D7E"/>
+    </g>
+    <g id="tabsHC">
+      <rect x="14.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="54" y="165" text-anchor="middle">儲值</text>
+      <rect x="98.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="138" y="165" text-anchor="middle">道具</text>
+      <rect x="182" y="138" width="80" height="44" fill="#F4C430"/><text class="t k" x="222" y="165" text-anchor="middle">愛心金幣</text>
+      <rect x="266.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="306" y="165" text-anchor="middle">免費</text>
+      <rect x="334.5" y="138.5" width="11" height="11" fill="#E74C3C" stroke="#fff"/>
+      <rect x="14" y="186" width="332" height="2" fill="#5D6D7E"/>
+    </g>
+    <g id="irow">
+      <rect x="0.5" y="0.5" width="331" height="63" fill="#222B3A" stroke="#5D6D7E"/>
+      <rect x="12" y="8" width="48" height="48" fill="#6B5B95"/>
+      <rect x="156" y="8" width="80" height="48" fill="#2ECC71"/>
+      <rect x="240" y="8" width="80" height="48" fill="#2ECC71"/>
+      <text class="t k" x="196" y="27" text-anchor="middle" style="font-size:12px">單買</text><text class="t k" x="196" y="44" text-anchor="middle" style="font-size:12px">30 金塊</text>
+      <text class="t k" x="280" y="27" text-anchor="middle" style="font-size:12px">11 個</text><text class="t k" x="280" y="44" text-anchor="middle" style="font-size:12px">300 金塊</text>
+    </g>
+    <g id="itemsPage">
+      <g transform="translate(14,190)">
+        <rect x="1" y="1" width="330" height="78" fill="#222B3A" stroke="#F4C430" stroke-width="2"/>
+        <rect x="12" y="16" width="48" height="48" fill="#6B5B95"/>
+        <rect x="228" y="18" width="96" height="44" fill="#2ECC71"/>
+        <text class="t b" x="72" y="34">道具綜合禮包</text><text class="t s" x="72" y="56">全部 10 種道具各 2 個</text>
+        <text class="t k" x="276" y="45" text-anchor="middle">540 金塊</text></g>
+      <g transform="translate(14,278)"><use href="#irow"/><text class="t" x="68" y="30">額外血量</text></g>
+      <g transform="translate(14,350)"><use href="#irow"/><text class="t" x="68" y="30">額外生命</text></g>
+      <g transform="translate(14,422)"><use href="#irow"/><text class="t" x="68" y="30">替換</text></g>
+      <g transform="translate(14,494)"><use href="#irow"/><text class="t" x="68" y="30">暗殺</text></g>
+      <g transform="translate(14,566)"><use href="#irow"/><text class="t" x="68" y="30">強化塗層</text></g>
+      <g transform="translate(14,638)"><use href="#irow"/><text class="t" x="68" y="30">衰弱</text></g>
+    </g>
+    <g id="hcard">
+      <rect x="0.5" y="0.5" width="161" height="87" fill="#222B3A" stroke="#5D6D7E"/>
+      <rect x="7" y="36" width="148" height="44" fill="#2ECC71"/>
+    </g>
+    <g id="hcPage">
+      <text class="t g" x="14" y="205">愛心</text><rect x="14" y="213" width="332" height="1" fill="#5D6D7E"/>
+      <g transform="translate(14,218)"><use href="#hcard"/><rect x="8" y="6" width="25" height="25" fill="#E74C3C"/><text class="t b" x="40" y="26">1 愛心</text><text class="t k" x="81" y="63" text-anchor="middle">30 金塊</text></g>
+      <g transform="translate(184,218)"><use href="#hcard"/><rect x="8" y="6" width="25" height="25" fill="#E74C3C"/><text class="t b" x="40" y="26">5 愛心</text><text class="t k" x="81" y="63" text-anchor="middle">120 金塊</text></g>
+      <g transform="translate(14,314)"><use href="#hcard"/><rect x="8" y="6" width="25" height="25" fill="#E74C3C"/><text class="t b" x="40" y="26">10 愛心</text><text class="t k" x="81" y="63" text-anchor="middle">240 金塊</text></g>
+      <g transform="translate(184,314)"><use href="#hcard"/><rect x="8" y="6" width="25" height="25" fill="#E74C3C"/><text class="t b" x="40" y="26">20 愛心</text><text class="t k" x="81" y="63" text-anchor="middle">480 金塊</text></g>
+      <text class="t g" x="14" y="425">金幣</text><rect x="14" y="433" width="332" height="1" fill="#5D6D7E"/>
+      <g transform="translate(14,438)"><use href="#hcard"/><rect x="8" y="6" width="25" height="25" fill="#F4D03F"/><text class="t b" x="40" y="26">1000 金幣</text><text class="t k" x="81" y="63" text-anchor="middle">30 金塊</text></g>
+      <g transform="translate(184,438)"><use href="#hcard"/><rect x="8" y="6" width="25" height="25" fill="#F4D03F"/><text class="t b" x="40" y="26">5000 金幣</text><text class="t k" x="81" y="63" text-anchor="middle">120 金塊</text></g>
+    </g>
+  </defs>
+
+  <rect width="1920" height="940" fill="#D5D9DF"/>
+
+  <!-- ===== 格 1:道具單買,銀塊夠付 ===== -->
+  <text class="cap" x="20" y="28">1. 確認框:道具單買(銀塊夠付)</text>
+  <text class="note" x="20" y="44">D23:框 296x270,y 265;只扣銀塊 → 只有 1 列扣款</text>
+  <svg x="20" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">250</text><text class="t s" x="302" y="54">50</text>
+    <use href="#tabsItems"/><use href="#itemsPage"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="265.5" width="295" height="269" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="302" text-anchor="middle">確認購買</text>
+    <rect x="48" y="321" width="48" height="48" fill="#6B5B95"/>
+    <text class="t b" x="108" y="343">額外血量</text>
+    <text class="t s" x="108" y="363">×1</text>
+    <rect x="48" y="381" width="264" height="1" fill="#5D6D7E"/>
+    <text class="t s" x="48" y="405" style="font-size:14px">價格</text><text class="t" x="312" y="405" text-anchor="end">30 金塊</text>
+    <text class="t s" x="48" y="427">扣款:先扣銀塊,不足再扣金塊</text>
+    <rect x="48" y="437" width="25" height="25" fill="#A9B2BC"/>
+    <text class="t" x="81" y="454">銀塊</text><text class="t" x="222" y="454" text-anchor="end">−30</text><text class="t s" x="312" y="454" text-anchor="end">剩 20</text>
+    <rect x="48.5" y="475.5" width="127" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="112" y="502" text-anchor="middle">取消</text>
+    <rect x="184" y="475" width="128" height="44" fill="#2ECC71"/><text class="t k" x="248" y="502" text-anchor="middle">購買</text>
+  </svg>
+
+  <!-- ===== 格 2:綜合禮包,銀塊 + 金塊混扣 ===== -->
+  <text class="cap" x="400" y="28">2. 確認框:綜合禮包(銀塊 + 金塊混扣)</text>
+  <text class="note" x="400" y="44">D23:框 296x298,y 251;持有銀塊 200、金塊 500,價格 540</text>
+  <svg x="400" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">500</text><text class="t s" x="302" y="54">200</text>
+    <use href="#tabsItems"/><use href="#itemsPage"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="251.5" width="295" height="297" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="288" text-anchor="middle">確認購買</text>
+    <rect x="48" y="307" width="48" height="48" fill="#6B5B95"/>
+    <text class="t b" x="108" y="329">道具綜合禮包</text>
+    <text class="t s" x="108" y="349">全部 10 種道具各 2 個</text>
+    <rect x="48" y="367" width="264" height="1" fill="#5D6D7E"/>
+    <text class="t s" x="48" y="391" style="font-size:14px">價格</text><text class="t" x="312" y="391" text-anchor="end">540 金塊</text>
+    <text class="t s" x="48" y="413">扣款:先扣銀塊,不足再扣金塊</text>
+    <rect x="48" y="423" width="25" height="25" fill="#A9B2BC"/>
+    <text class="t" x="81" y="440">銀塊</text><text class="t" x="222" y="440" text-anchor="end">−200</text><text class="t s" x="312" y="440" text-anchor="end">剩 0</text>
+    <rect x="48" y="451" width="25" height="25" fill="#E6A817"/>
+    <text class="t" x="81" y="468">金塊</text><text class="t" x="222" y="468" text-anchor="end">−340</text><text class="t s" x="312" y="468" text-anchor="end">剩 160</text>
+    <rect x="48.5" y="489.5" width="127" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="112" y="516" text-anchor="middle">取消</text>
+    <rect x="184" y="489" width="128" height="44" fill="#2ECC71"/><text class="t k" x="248" y="516" text-anchor="middle">購買</text>
+  </svg>
+
+  <!-- ===== 格 3:愛心,只有金塊 ===== -->
+  <text class="cap" x="780" y="28">3. 確認框:愛心 ×5(只扣金塊,附持有量變化)</text>
+  <text class="note" x="780" y="44">D23:框 296x270,y 265;持有愛心 92 → 97</text>
+  <svg x="780" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">92</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">0</text>
+    <use href="#tabsHC"/><use href="#hcPage"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="265.5" width="295" height="269" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="302" text-anchor="middle">確認購買</text>
+    <rect x="59" y="333" width="25" height="25" fill="#E74C3C"/>
+    <text class="t b" x="108" y="343">愛心</text>
+    <text class="t s" x="108" y="363">×5  愛心 92 → 97</text>
+    <rect x="48" y="381" width="264" height="1" fill="#5D6D7E"/>
+    <text class="t s" x="48" y="405" style="font-size:14px">價格</text><text class="t" x="312" y="405" text-anchor="end">120 金塊</text>
+    <text class="t s" x="48" y="427">扣款:先扣銀塊,不足再扣金塊</text>
+    <rect x="48" y="437" width="25" height="25" fill="#E6A817"/>
+    <text class="t" x="81" y="454">金塊</text><text class="t" x="222" y="454" text-anchor="end">−120</text><text class="t s" x="312" y="454" text-anchor="end">剩 180</text>
+    <rect x="48.5" y="475.5" width="127" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="112" y="502" text-anchor="middle">取消</text>
+    <rect x="184" y="475" width="128" height="44" fill="#2ECC71"/><text class="t k" x="248" y="502" text-anchor="middle">購買</text>
+  </svg>
+
+  <!-- ===== 格 4:處理中 ===== -->
+  <text class="cap" x="1160" y="28">4. 確認框:處理中(按下購買後)</text>
+  <text class="note" x="1160" y="44">D23:兩顆鈕都不可點;購買鈕灰 #555D6B、文字「處理中…」;返回鍵無效</text>
+  <svg x="1160" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">92</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">0</text>
+    <use href="#tabsHC"/><use href="#hcPage"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="265.5" width="295" height="269" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="302" text-anchor="middle">確認購買</text>
+    <rect x="59" y="333" width="25" height="25" fill="#E74C3C"/>
+    <text class="t b" x="108" y="343">愛心</text>
+    <text class="t s" x="108" y="363">×5  愛心 92 → 97</text>
+    <rect x="48" y="381" width="264" height="1" fill="#5D6D7E"/>
+    <text class="t s" x="48" y="405" style="font-size:14px">價格</text><text class="t" x="312" y="405" text-anchor="end">120 金塊</text>
+    <text class="t s" x="48" y="427">扣款:先扣銀塊,不足再扣金塊</text>
+    <rect x="48" y="437" width="25" height="25" fill="#E6A817"/>
+    <text class="t" x="81" y="454">金塊</text><text class="t" x="222" y="454" text-anchor="end">−120</text><text class="t s" x="312" y="454" text-anchor="end">剩 180</text>
+    <rect x="48.5" y="475.5" width="127" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="112" y="502" text-anchor="middle" style="fill:#7B8494">取消</text>
+    <rect x="184" y="475" width="128" height="44" fill="#555D6B"/><text class="t" x="248" y="502" text-anchor="middle">處理中…</text>
+  </svg>
+
+  <!-- ===== 格 5:成功 ===== -->
+  <text class="cap" x="1540" y="28">5. 成功:道具 11 個(已獲得框)</text>
+  <text class="note" x="1540" y="44">D26:只有文字行時框 296x150,y 325;愛心 / 金幣有圖示列,框 168</text>
+  <svg x="1540" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">500</text><text class="t s" x="302" y="54">200</text>
+    <use href="#tabsItems"/><use href="#itemsPage"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="325.5" width="295" height="149" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="362" text-anchor="middle">已獲得</text>
+    <text class="t" x="48" y="397">額外血量 ×11</text>
+    <rect x="72" y="415" width="216" height="44" fill="#2ECC71"/><text class="t k" x="180" y="442" text-anchor="middle">好</text>
+  </svg>
+</svg>

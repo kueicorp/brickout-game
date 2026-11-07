@@ -459,6 +459,10 @@ func _test_heart() -> void:
 	await _frames()
 	_eq(home._tooltip.visible, false, "short press no tooltip")
 	_eq(_c("heart_pressed") == shop0 + 1 and not home._tooltip_shown_this_press, true, "short press -> shop")
+	_eq(home._shop != null, true, "short press opens shop")
+	if home._shop:
+		home._close_shop()
+		await _frames()
 	# 長按 → D14,放開不去商城
 	_hover(HEART)
 	_button(HEART, true)
@@ -504,10 +508,14 @@ func _test_bottom_and_title() -> void:
 		_tap(Vector2(xs[i], 528))
 		await _frames()
 		_eq(_c("bottom_" + labels[i]), 1, "bottom %s tap" % labels[i])
-		# 「活動」會打開活動頁(event-screen D01),關掉再測下一顆
+		# 「活動」會打開活動頁(event-screen D01)、「商城」打開商城(shop-screen D01),關掉再測下一顆
 		_eq(home._event != null, i == 0, "bottom %s opens event page = %s" % [labels[i], i == 0])
+		_eq(home._shop != null, i == 1, "bottom %s opens shop = %s" % [labels[i], i == 1])
 		if home._event:
 			home._close_event()
+			await _frames()
+		if home._shop:
+			home._close_shop()
 			await _frames()
 	# 按住 → is_held;移出 → 放開不觸發
 	var btn = null

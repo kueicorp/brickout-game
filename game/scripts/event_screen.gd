@@ -8,12 +8,13 @@ extends Control
 ## 上方貼安全區、多出的高度全部加在面板(B、C 再分進面板內留白)。
 
 signal closed
+## 點了其他頁的捷徑(page-shortcuts P04),由首頁換頁
+signal switch_requested(page: PageShortcutBar.Page)
 
 enum Load { LOADING, LOADED, FAILED }
 
 const ICON_CHECKIN := preload("res://assets/ui/event/icon_checkin.png")
 const ICON_TOPUP := preload("res://assets/ui/event/icon_first_topup.png")
-const ARROW := preload("res://assets/ui/home/theme-arrow_right.png")
 ## 640 高(E = 0)時的面板;實際面板見 _panel
 const PANEL := Rect2(8, 132, 344, 434)
 const PANEL_COLOR := Color(0, 0, 0, 160.0 / 255.0)
@@ -21,11 +22,6 @@ const TOAST_BG := Color("#222B3A")
 const TOAST_BORDER := Color("#5D6D7E")
 const TOAST_SEC := 2.0
 const NO_OUTLINE := Color.TRANSPARENT
-const TITLES := {
-	EventLogic.Page.LIST: "活動",
-	EventLogic.Page.CHECKIN: "每日簽到",
-	EventLogic.Page.TOPUP: "首次儲值",
-}
 const SUB_CHECKIN := "每日 1500 金幣 + 2 愛心"
 const SUB_TOPUP := "限購 1 次"
 const SUB_BOUGHT := "已購買"
@@ -40,9 +36,12 @@ var load_state := Load.LOADING
 var status := {}
 var toast_text := ""
 
+## 頁面捷徑列(返回鈕 + 4 個捷徑);首頁設定「商城」捷徑的紅點
+var shortcuts: PageShortcutBar
+
 var _body: Control
-var _back: FlatButton
-## 返回鈕與標題的下移量(apply_layout 設定)
+var _back: PageShortcutBar.ShortcutButton
+## 返回鈕與捷徑列的下移量(apply_layout 設定)
 var _header_shift := 0
 ## 目前的面板(_body 座標;高 = 434 + 面板加高量,apply_layout 設定)
 var _panel := PANEL
@@ -52,7 +51,7 @@ var _items: Array[EventListItem] = []
 var _checkin: CheckinPage
 var _topup: TopupPage
 var _state_view: Control
-var _retry: FlatButton
+var _retry: GreenButton
 var _toast: Control
 var _toast_timer: Timer
 ## 畫面造訪序號:每次 show_page 加 1。請求發出時記下,回應晚到且序號已變(切走過,含切回同一頁)就不顯示失敗 toast
@@ -65,14 +64,11 @@ func _ready() -> void:
 	_body = _add_layer(self)
 	_body.draw.connect(_draw_body)
 
-	_back = FlatButton.new()
-	_back.position = Vector2(8, 80)
-	_back.size = Vector2(44, 44)
-	_back.icon = ARROW
-	_back.icon_size = Vector2(24, 24)
-	_back.flip_icon = true
-	_back.pressed.connect(go_back)
-	_body.add_child(_back)
+	shortcuts = PageShortcutBar.new(PageShortcutBar.Page.EVENT)
+	shortcuts.back_pressed.connect(go_back)
+	shortcuts.page_pressed.connect(_on_shortcut)
+	_body.add_child(shortcuts)
+	_back = shortcuts.back
 
 	# shortcut: 只有 2 個活動,D05「超過完整顯示項數才捲動、4px 捲軸」沒有做(完整顯示項數 = floor((430 + E) ÷ 80),
 	# 640 高為 5);新增到第 6 個活動時改成可捲動的列表
@@ -98,7 +94,7 @@ func _ready() -> void:
 
 	_state_view = _add_layer(_body)
 	_state_view.draw.connect(_draw_state_view)
-	_retry = FlatButton.new()
+	_retry = GreenButton.new()
 	_retry.position = Vector2(120, 352)
 	_retry.size = Vector2(120, 44)
 	_retry.set_active("重試", true)
@@ -121,13 +117,13 @@ func apply_layout(h: int, top: int, bottom: int) -> void:
 	var lay := EventLogic.event_layout(h, top, bottom)
 	_body.position.y = lay.offset
 	_header_shift = lay.header_shift
-	_back.position.y = 80 + _header_shift
+	shortcuts.set_shift(_header_shift)
 	_panel = Rect2(PANEL.position, PANEL.size + Vector2(0, lay.extra))
 	_extra = lay.extra
 	_checkin.set_extra(lay.extra)
 	_topup.set_extra(lay.extra)
 	# 各圖層跟著畫面高,高螢幕往下移的按鈕才在父節點範圍內
-	for c: Control in [self, _body, _checkin, _topup, _state_view, _toast]:
+	for c: Control in [self, _body, shortcuts, _checkin, _topup, _state_view, _toast]:
 		c.size = Vector2(360, h)
 	_retry.position.y = 352 + EventLogic.state_shift(_extra)
 	_body.queue_redraw()
@@ -143,12 +139,36 @@ func show_page(p: EventLogic.Page) -> void:
 	_refresh()
 
 
-## D04 返回鈕(返回鍵由首頁處理,結果相同):B、C 回 A;A 回首頁
+## D04 返回鈕(返回鍵由首頁處理,結果相同):B、C 回 A;A 回首頁。
+## 處理中不反應:停用外觀靠每幀同步,同一幀內「開始處理」後的點擊會比停用早到,所以點下時直接再檢查
 func go_back() -> void:
+	if is_busy():
+		return
 	if page == EventLogic.Page.LIST:
 		closed.emit()
 	else:
 		show_page(EventLogic.Page.LIST)
+
+
+## page-shortcuts P03:目前頁「活動」在 A 沒反應、在 B / C 回 A;其他頁交給首頁換頁。處理中不反應(理由同 go_back)
+func _on_shortcut(p: PageShortcutBar.Page) -> void:
+	if is_busy():
+		return
+	if p != PageShortcutBar.Page.EVENT:
+		switch_requested.emit(p)
+	elif page != EventLogic.Page.LIST:
+		show_page(EventLogic.Page.LIST)
+
+
+## 簽到、領取、首儲購買的請求是否處理中;捷徑列停用與首頁的返回鍵保護(README 活動第 7 點)共用此條件
+func is_busy() -> bool:
+	return not _checkin.busy.is_empty() or _topup.busy
+
+
+## P04:請求處理中,返回鈕與捷徑停用。
+## 用每幀同步而不是在各請求起訖處設定:請求狀態分散在 B、C 兩個子頁,逐處呼叫容易漏
+func _process(_delta: float) -> void:
+	shortcuts.set_disabled(is_busy())
 
 
 func _add_layer(parent: Control) -> Control:
@@ -280,7 +300,6 @@ func _hide_toast() -> void:
 
 func _draw_body() -> void:
 	PixelBox.draw_rounded(_body, _panel, PANEL_COLOR)
-	PixelText.draw(_body, Vector2(60, 108 + _header_shift), TITLES[page], 18, Color.WHITE, NO_OUTLINE)
 
 
 ## D14:面板內置中「載入中…」;失敗時「讀取失敗」+ 重試鈕。面板加高時整組下移 round(E ÷ 2)(S08),重試鈕在 apply_layout 移

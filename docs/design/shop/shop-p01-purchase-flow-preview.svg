@@ -1,0 +1,170 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" width="2300" height="940" viewBox="0 0 2300 940">
+  <title>商城 P01 金塊包與移除廣告購買流程(6 個狀態,每格 360x800 基準,色塊預覽)</title>
+  <style>
+    .t{font-family:"Cubic 11","Microsoft JhengHei","Noto Sans TC",sans-serif;fill:#fff;font-size:14px}
+    .b{font-size:16px}
+    .h18{font-size:18px}
+    .s{font-size:12px;fill:#B0B8C4}
+    .k{fill:#000}
+    .g{fill:#F4C430}
+    .cap{font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:15px;fill:#111;font-weight:bold}
+    .note{font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:12px;fill:#333}
+    .sys{font-family:"Microsoft JhengHei","Noto Sans TC",sans-serif;font-size:14px;fill:#333}
+  </style>
+  <defs>
+    <!-- 骨架(D01~D05):背景、資源列(只畫格與 icon 色塊)、返回鈕、標題、面板 -->
+    <g id="skel">
+      <rect width="360" height="800" fill="#192331"/>
+      <rect x="8" y="28" width="64" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="76" y="28" width="92" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="172" y="28" width="92" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="268" y="28" width="84" height="44" rx="6" fill="#000" fill-opacity="0.63"/>
+      <rect x="18" y="38" width="25" height="25" fill="#E74C3C"/>
+      <rect x="86" y="38" width="25" height="25" fill="#F4D03F"/>
+      <rect x="182" y="38" width="25" height="25" fill="#E6A817"/>
+      <rect x="272" y="38" width="25" height="25" fill="#A9B2BC"/>
+      <rect x="31" y="51" width="12" height="12" fill="#2ECC71"/>
+      <rect x="99" y="51" width="12" height="12" fill="#2ECC71"/>
+      <rect x="195" y="51" width="12" height="12" fill="#2ECC71"/>
+      <rect x="8" y="80" width="44" height="44" fill="#3A4556"/>
+      <text class="t b" x="30" y="108" text-anchor="middle">&lt;</text>
+      <text class="t h18" x="60" y="109">商城</text>
+      <rect x="8" y="132" width="344" height="594" rx="6" fill="#000" fill-opacity="0.63"/>
+    </g>
+    <g id="banner"><rect x="20" y="734" width="320" height="50" fill="#3A3F4A"/><text class="t s" x="180" y="763" text-anchor="middle">banner 320x50</text></g>
+    <g id="bannerGone"><rect x="20.5" y="734.5" width="319" height="49" fill="none" stroke="#5D6D7E" stroke-dasharray="4 3"/><text class="t s" x="180" y="763" text-anchor="middle">banner 區留白(已移除廣告)</text></g>
+    <!-- 資源列數字(依各格狀態另寫) -->
+    <!-- 分頁籤 D06:儲值選中 -->
+    <g id="tabsStore">
+      <rect x="14" y="138" width="80" height="44" fill="#F4C430"/><text class="t k" x="54" y="165" text-anchor="middle">儲值</text>
+      <rect x="98.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="138" y="165" text-anchor="middle">道具</text>
+      <rect x="182.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="222" y="165" text-anchor="middle">愛心金幣</text>
+      <rect x="266.5" y="138.5" width="79" height="43" fill="#222B3A" stroke="#5D6D7E"/><text class="t" x="306" y="165" text-anchor="middle">免費</text>
+      <rect x="334.5" y="138.5" width="11" height="11" fill="#E74C3C" stroke="#fff"/>
+      <rect x="14" y="186" width="332" height="2" fill="#5D6D7E"/>
+    </g>
+    <g id="card">
+      <rect x="0.5" y="0.5" width="161" height="103" fill="#222B3A" stroke="#5D6D7E"/>
+      <rect x="8" y="10" width="25" height="25" fill="#E6A817"/>
+      <rect x="7" y="52" width="148" height="44" fill="#2ECC71"/>
+    </g>
+    <!-- 儲值頁 D08 8 卡 -->
+    <g id="store">
+      <g transform="translate(14,190)"><use href="#card"/><text class="t b" x="40" y="28">30 金塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 30</text></g>
+      <g transform="translate(184,190)"><use href="#card"/><text class="t b" x="40" y="28">90 金塊</text><text class="t s" x="8" y="47">贈 9 銀塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 90</text></g>
+      <g transform="translate(14,302)"><use href="#card"/><text class="t b" x="40" y="28">150 金塊</text><text class="t s" x="8" y="47">贈 30 銀塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 150</text></g>
+      <g transform="translate(184,302)"><use href="#card"/><text class="t b" x="40" y="28">300 金塊</text><text class="t s" x="8" y="47">贈 60 銀塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 300</text></g>
+      <g transform="translate(14,414)"><use href="#card"/><text class="t b" x="40" y="28">590 金塊</text><text class="t s" x="8" y="47">贈 177 銀塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 590</text></g>
+      <g transform="translate(184,414)"><use href="#card"/><text class="t b" x="40" y="28">890 金塊</text><text class="t s" x="8" y="47">贈 312 銀塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 890</text></g>
+      <g transform="translate(14,526)"><use href="#card"/><text class="t b" x="40" y="28">1490 金塊</text><text class="t s" x="8" y="47">贈 596 銀塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 1490</text></g>
+      <g transform="translate(184,526)"><use href="#card"/><text class="t b" x="40" y="28">2990 金塊</text><text class="t s" x="8" y="47">贈 1346 銀塊</text><text class="t k" x="81" y="79" text-anchor="middle">TWD 2990</text></g>
+    </g>
+    <g id="adsRow" transform="translate(14,638)">
+      <rect x="0.5" y="0.5" width="331" height="71" fill="#222B3A" stroke="#5D6D7E"/>
+      <rect x="12" y="12" width="48" height="48" fill="#C0504D"/>
+      <rect x="228" y="14" width="96" height="44" fill="#2ECC71"/>
+      <text class="t b" x="72" y="26">移除廣告</text><text class="t s" x="72" y="44">贈 100 銀塊</text>
+      <text class="t k" x="276" y="41" text-anchor="middle">TWD 300</text>
+    </g>
+    <g id="adsRowBought" transform="translate(14,638)">
+      <rect x="0.5" y="0.5" width="331" height="71" fill="#222B3A" stroke="#5D6D7E"/>
+      <rect x="12" y="12" width="48" height="48" fill="#C0504D"/>
+      <rect x="228" y="14" width="96" height="44" fill="#555D6B"/>
+      <text class="t b" x="72" y="26">移除廣告</text><text class="t s" x="72" y="44">贈 100 銀塊</text>
+      <text class="t" x="276" y="41" text-anchor="middle">已購買</text>
+      <rect width="332" height="72" fill="#000" fill-opacity="0.4"/>
+    </g>
+    <g id="mask"><rect width="360" height="800" fill="#000" fill-opacity="0.63"/></g>
+  </defs>
+
+  <rect width="2300" height="940" fill="#D5D9DF"/>
+
+  <!-- ========== 格 1:點卡片後,Google Play 付款畫面 ========== -->
+  <text class="cap" x="20" y="28">1. 點卡片 → Google Play 付款畫面(系統畫面)</text>
+  <text class="note" x="20" y="44">D19:卡片按下變暗 40%,放開後立刻叫出 Google Play;遊戲這時不顯示任何東西</text>
+  <svg x="20" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">50</text>
+    <use href="#tabsStore"/><use href="#store"/><use href="#adsRow"/><use href="#banner"/>
+    <!-- 被點的卡:90 金塊,變暗 40% -->
+    <rect x="184" y="190" width="162" height="104" fill="#000" fill-opacity="0.4"/>
+    <rect width="360" height="800" fill="#000" fill-opacity="0.5"/>
+    <!-- Google Play 付款畫面(系統,不設計) -->
+    <rect x="0.5" y="400.5" width="359" height="399" fill="#F1F3F4" stroke="#888" stroke-dasharray="6 4"/>
+    <text class="sys" x="180" y="520" text-anchor="middle" style="font-weight:bold">Google Play 付款畫面</text>
+    <text class="sys" x="180" y="548" text-anchor="middle">系統畫面,由 Google 繪製,不設計</text>
+    <text class="sys" x="180" y="572" text-anchor="middle">顯示商品、價格、付款方式與確認鈕</text>
+    <text class="sys" x="180" y="610" text-anchor="middle" style="font-size:12px">玩家按「取消」或返回 → 回到商城,什麼都不顯示</text>
+  </svg>
+
+  <!-- ========== 格 2:處理中 ========== -->
+  <text class="cap" x="400" y="28">2. 處理中(付款完成,等後端驗證)</text>
+  <text class="note" x="400" y="44">D20:遮罩 + 小框,無按鈕,返回鍵無效</text>
+  <svg x="400" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">50</text>
+    <use href="#tabsStore"/><use href="#store"/><use href="#adsRow"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="356.5" width="295" height="87" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="394" text-anchor="middle">處理中…</text>
+    <text class="t s" x="180" y="418" text-anchor="middle">請稍候,不要關閉遊戲</text>
+    <text class="note" x="32" y="470" style="fill:#fff">框 296x88,x 32、y 356(垂直置中)</text>
+  </svg>
+
+  <!-- ========== 格 3:成功(金塊包) ========== -->
+  <text class="cap" x="780" y="28">3. 成功:金塊包(例 90 金塊 + 贈 9 銀塊)</text>
+  <text class="note" x="780" y="44">D21:沿用「已獲得」提示框;框 296x168,y 316</text>
+  <svg x="780" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">50</text>
+    <use href="#tabsStore"/><use href="#store"/><use href="#adsRow"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="316.5" width="295" height="167" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="353" text-anchor="middle">已獲得</text>
+    <rect x="48" y="380" width="25" height="25" fill="#E6A817"/><text class="t" x="77" y="398">×90</text>
+    <rect x="142" y="380" width="25" height="25" fill="#A9B2BC"/><text class="t" x="171" y="398">×9</text>
+    <rect x="72" y="424" width="216" height="44" fill="#2ECC71"/><text class="t k" x="180" y="451" text-anchor="middle">好</text>
+  </svg>
+
+  <!-- ========== 格 4:成功(移除廣告) ========== -->
+  <text class="cap" x="1160" y="28">4. 成功:移除廣告</text>
+  <text class="note" x="1160" y="44">D21:框 296x190,y 305;關閉後 D09 變「已購買」、banner 區留白</text>
+  <svg x="1160" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">50</text>
+    <use href="#tabsStore"/><use href="#store"/><use href="#adsRowBought"/><use href="#bannerGone"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="305.5" width="295" height="189" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="342" text-anchor="middle">已獲得</text>
+    <rect x="48" y="369" width="25" height="25" fill="#A9B2BC"/><text class="t" x="77" y="387">×100</text>
+    <text class="t" x="48" y="417">廣告已移除</text>
+    <rect x="72" y="435" width="216" height="44" fill="#2ECC71"/><text class="t k" x="180" y="462" text-anchor="middle">好</text>
+  </svg>
+
+  <!-- ========== 格 5:失敗 ========== -->
+  <text class="cap" x="1540" y="28">5. 失敗(沒有扣款)</text>
+  <text class="note" x="1540" y="44">D19:toast 2 秒(位置沿用 D13 / S08 方案 B,800 高 y 500);取消則無任何提示</text>
+  <svg x="1540" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">50</text>
+    <use href="#tabsStore"/><use href="#store"/><use href="#adsRow"/><use href="#banner"/>
+    <rect x="98" y="500" width="164" height="32" fill="#000" fill-opacity="0.8" stroke="#5D6D7E"/>
+    <text class="t" x="180" y="521" text-anchor="middle">購買失敗,請稍後再試</text>
+    <text class="note" x="20" y="470" style="fill:#fff">toast 高 32、寬依文字、水平置中</text>
+  </svg>
+
+  <!-- ========== 格 6:付款成功但未發放 ========== -->
+  <text class="cap" x="1920" y="28">6. 付款成功但未發放</text>
+  <text class="note" x="1920" y="44">D22 (a)(b):框 296x150,y 325(內文 1 行);之後連線由後端補發,再跳「已獲得」(補發訂單)</text>
+  <svg x="1920" y="52" width="360" height="800" viewBox="0 0 360 800">
+    <use href="#skel"/>
+    <text class="t s" x="48" y="54">20</text><text class="t s" x="116" y="54">12,345</text><text class="t s" x="212" y="54">300</text><text class="t s" x="302" y="54">50</text>
+    <use href="#tabsStore"/><use href="#store"/><use href="#adsRow"/><use href="#banner"/>
+    <use href="#mask"/>
+    <rect x="32.5" y="325.5" width="295" height="149" fill="#222B3A" stroke="#5D6D7E"/>
+    <text class="t h18" x="180" y="362" text-anchor="middle">付款處理中</text>
+    <text class="t" x="48" y="397">付款已完成,獎勵還在確認中。</text>
+    <rect x="72" y="415" width="216" height="44" fill="#2ECC71"/><text class="t k" x="180" y="442" text-anchor="middle">好</text>
+  </svg>
+</svg>

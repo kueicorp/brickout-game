@@ -33,7 +33,7 @@ var summary_y := 136
 var grid_y := 194
 var card_y := CARD_Y
 
-var _checkin: FlatButton
+var _checkin: GreenButton
 var _claims := {}
 
 
@@ -45,7 +45,6 @@ func _ready() -> void:
 		var tier := EventLogic.TIERS[i]
 		var b := _add_button(Rect2(_card_x(i) + 4, CARD_Y + 90, 72, 44))
 		b.font_size = 12
-		b.baseline = 26
 		b.pressed.connect(func() -> void: claim_pressed.emit(tier))
 		_claims[tier] = b
 	_refresh()
@@ -78,8 +77,8 @@ func set_busy(key, on: bool) -> void:
 	_refresh()
 
 
-func _add_button(rect: Rect2) -> FlatButton:
-	var b := FlatButton.new()
+func _add_button(rect: Rect2) -> GreenButton:
+	var b := GreenButton.new()
 	b.position = rect.position
 	b.size = rect.size
 	add_child(b)
@@ -101,7 +100,7 @@ func _refresh() -> void:
 	else:
 		_checkin.set_active("今日簽到", true)
 	for tier in _claims:
-		var b: FlatButton = _claims[tier]
+		var b: GreenButton = _claims[tier]
 		match EventLogic.card_state(tier, signed_count, claimed):
 			EventLogic.Card.CLAIMED:
 				b.set_active("已領取", false)

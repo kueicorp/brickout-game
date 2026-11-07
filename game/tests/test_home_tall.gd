@@ -259,10 +259,14 @@ func _case(h: int, t: int, b: int, w := 360) -> void:
 		_tap(Vector2(49 + i * 87, e.bottom + 36) + o)
 		await _frames()
 		_eq(_c("bottom%d" % i), 1, "%s bottom %d" % [tag, i])
-		# 「活動」會打開活動頁(event-screen D01),關掉再測下一顆
+		# 「活動」會打開活動頁(event-screen D01)、「商城」打開商城(shop-screen D01),關掉再測下一顆
 		_eq(home._event != null, i == 0, "%s bottom %d opens event page" % [tag, i])
+		_eq(home._shop != null, i == 1, "%s bottom %d opens shop" % [tag, i])
 		if home._event:
 			home._close_event()
+			await _frames()
+		if home._shop:
+			home._close_shop()
 			await _frames()
 	_tap(Vector2(49, e.bottom + 72) + o)
 	await _frames()
@@ -288,6 +292,10 @@ func _case(h: int, t: int, b: int, w := 360) -> void:
 	_tap(Vector2(30, e.d01 + 22) + o)
 	await _frames()
 	_eq(_c("heart"), h0 + 1, tag + " heart short tap")
+	_eq(home._shop != null and home._shop.tab == 2, true, tag + " heart short tap opens shop 愛心金幣")
+	if home._shop:
+		home._close_shop()
+		await _frames()
 
 
 ## D20 底部共用黑底:位置跟著底部列(上緣 = 底部列 − 4、344×80)、與 banner 間隔 6、

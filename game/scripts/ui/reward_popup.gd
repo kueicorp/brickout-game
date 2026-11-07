@@ -27,7 +27,7 @@ const SLOTS := [[16, 45], [110, 139]]
 const NO_OUTLINE := Color.TRANSPARENT
 
 var _queue: Array[Dictionary] = []
-var _ok: FlatButton
+var _ok: GreenButton
 ## 排過的補發框 id:補發清單在玩家關框前每次取資料都會帶回(首頁與活動頁可能同時取),同一 id 只彈一次
 var _seen_ids := {}
 
@@ -35,7 +35,7 @@ var _seen_ids := {}
 func _ready() -> void:
 	visible = false
 	mouse_filter = Control.MOUSE_FILTER_STOP
-	_ok = FlatButton.new()
+	_ok = GreenButton.new()
 	_ok.size = Vector2(216, 44)
 	_ok.set_active("好", true)
 	_ok.pressed.connect(close_current)

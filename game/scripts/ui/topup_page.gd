@@ -22,16 +22,15 @@ var title_y := 138
 var rows_y := 188
 var note_y := 400
 
-var _buy: FlatButton
+var _buy: GreenButton
 
 
 func _ready() -> void:
 	mouse_filter = Control.MOUSE_FILTER_IGNORE
-	_buy = FlatButton.new()
+	_buy = GreenButton.new()
 	_buy.position = Vector2(72, 476)
 	_buy.size = Vector2(216, 56)
 	_buy.font_size = 18
-	_buy.baseline = 34
 	_buy.pressed.connect(func() -> void: buy_pressed.emit())
 	add_child(_buy)
 	_refresh()

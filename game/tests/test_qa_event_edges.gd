@@ -317,6 +317,10 @@ func _test_mask_blocks_resource_bar() -> void:
 	_tap(Vector2(30, 50))
 	await _frames()
 	_eq(_heart_presses, n0 + 1, "heart works after popup closed")
+	# 愛心短按會打開商城(shop-screen D02),關掉再接後面的測試
+	if home._shop:
+		home._close_shop()
+		await _frames()
 
 
 func _set_and_refetch(c: int, s: bool, claimed: Array) -> void:

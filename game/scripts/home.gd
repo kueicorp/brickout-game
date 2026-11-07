@@ -1,10 +1,10 @@
 extends Control
 ## 首頁:組裝各區塊並串接狀態(目前主題、選取的關卡)。
-## 會跳到尚未存在的畫面(商城、主題選擇、道具選擇、底部 4 個畫面、補愛心提示)時只 print 一行 log。
+## 會跳到尚未存在的畫面(主題選擇、道具選擇、成長、設定、補愛心提示)時只 print 一行 log。
 ## 寬固定 360、高依手機延伸(T01~T05),排版見 _apply_layout。
 ## 圖層(下到上):背景頂端(補頂條 / 純色)→ 背景 → D15 → D06 → D01 → D02 → D20 底 → 底部列 → D14。
 ## D10 banner 區留白,由 AdManager 把原生 banner 疊在上面(進入首頁顯示、離開隱藏)。
-## 活動頁(EventScreen)疊在首頁上顯示,共用背景、D01 資源列與 banner;最上層是共用的獲得提示框(RewardPopup)。
+## 活動頁(EventScreen)與商城(ShopScreen)疊在首頁上顯示,共用背景、D01 資源列與 banner;最上層是共用的獲得提示框(RewardPopup)。
 ## 底部「活動」按鈕紅點見 event-screen D16;返回鍵依 EventLogic.back_action。
 
 const BACKGROUNDS := [
@@ -59,9 +59,12 @@ var _long_press: Timer
 var _tooltip_shown_this_press := false
 ## 活動頁開著時才有
 var _event: EventScreen
+## 商城開著時才有
+var _shop: ShopScreen
 var _popup: RewardPopup
-## 紅點資料的請求序號:只採用最新一次請求的紅點結果
+## 紅點資料的請求序號:只採用最新一次請求的紅點結果(活動、商城各一個)
 var _badge_request := 0
+var _shop_badge_request := 0
 
 
 func _ready() -> void:
@@ -93,9 +96,9 @@ func _ready() -> void:
 	_heart.pressed.connect(_on_heart_pressed)
 	_d01_buttons.append(_heart)
 	_d01_buttons.append(_add_button(PixelButton.new(), Rect2(76, 28, 44, 44)))
-	_d01_buttons[1].pressed.connect(_log.bind("前往商城(金幣)"))
+	_d01_buttons[1].pressed.connect(_go_shop.bind(ShopLogic.Tab.HEART_COIN, "前往商城(金幣)"))
 	_d01_buttons.append(_add_button(PixelButton.new(), Rect2(172, 28, 44, 44)))
-	_d01_buttons[2].pressed.connect(_log.bind("前往商城(金塊)"))
+	_d01_buttons[2].pressed.connect(_go_shop.bind(ShopLogic.Tab.TOPUP, "前往商城(金塊)"))
 
 	_left = _add_button(ThemeBarButton.new(), Rect2(8, 80, 48, 48))
 	_left.arrow = ARROW
@@ -123,6 +126,10 @@ func _ready() -> void:
 		button.icon = item[1]
 		if i == 0:
 			button.pressed.connect(_open_event)
+		elif i == 1:
+			# shop-screen D17:紅點貼購物袋圖案右上角
+			button.badge_pos = Vector2(52, 2)
+			button.pressed.connect(_open_shop.bind(ShopLogic.Tab.TOPUP))
 		else:
 			button.pressed.connect(_log.bind("前往%s畫面" % item[0]))
 		_bottom_buttons.append(button)
@@ -203,6 +210,8 @@ func _apply_layout() -> void:
 	if _event:
 		# 活動頁:上方貼安全區、多出的高度加在內容面板(screen-size-800 S02)
 		_event.apply_layout(h, safe.x, safe.y)
+	if _shop:
+		_shop.apply_layout(h, safe.x, safe.y)
 
 
 ## headless(自動測試)沒有視窗,stretch expand 會算出 640×640 的怪尺寸,改用基準 360×640
@@ -317,7 +326,7 @@ func _on_long_press() -> void:
 
 func _on_heart_pressed() -> void:
 	if HomeLogic.heart_release_goes_to_shop(_tooltip_shown_this_press, true):
-		_log("前往商城(愛心)")
+		_go_shop(ShopLogic.Tab.HEART_COIN, "前往商城(愛心)")
 
 
 func _hide_tooltip() -> void:
@@ -343,8 +352,8 @@ func _notification(what: int) -> void:
 		_hide_tooltip()
 	elif what == NOTIFICATION_WM_GO_BACK_REQUEST and _popup:
 		_on_back()
-	elif what == NOTIFICATION_APPLICATION_RESUMED and _popup and _event == null:
-		# D16:App 回到前景時重新取紅點資料
+	elif what == NOTIFICATION_APPLICATION_RESUMED and _popup:
+		# D16:App 回到前景時重新取紅點資料(活動頁 / 商城開著時是捷徑列的紅點,page-shortcuts P06)
 		_refresh_badge()
 
 
@@ -365,10 +374,13 @@ func _open_event() -> void:
 	_event = EventScreen.new()
 	_event.popup = _popup
 	_event.closed.connect(_close_event)
+	_event.switch_requested.connect(_switch_page)
 	add_child(_event)
 	# 疊在首頁元件上、D14 懸浮視窗與提示框之下
 	move_child(_event, _tooltip.get_index())
 	_apply_layout()
+	# page-shortcuts P06:進入頁面時取捷徑列紅點
+	_refresh_badge()
 
 
 func _close_event() -> void:
@@ -382,8 +394,37 @@ func _close_event() -> void:
 	_refresh_badge()
 
 
-## 返回鍵 / 返回手勢(event-screen D01 返回行為表)
+## page-shortcuts P04 / P05:捷徑切頁 —— 新頁取代目前的頁(不疊上去),之後返回直接回首頁;
+## 新頁照從首頁進入的方式重新載入(商城回「儲值」、活動回 A)。成長、設定還沒有畫面,同底部列只記 log
+func _switch_page(p: PageShortcutBar.Page) -> void:
+	match p:
+		PageShortcutBar.Page.EVENT:
+			_free_screens()
+			_open_event()
+		PageShortcutBar.Page.SHOP:
+			_free_screens()
+			_open_shop(ShopLogic.Tab.TOPUP)
+		_:
+			_log("前往%s畫面" % PageShortcutBar.LABELS[p])
+
+
+## 換頁用:直接移除活動頁 / 商城,首頁元件維持隱藏、不取首頁紅點(_open_* 會再取)
+func _free_screens() -> void:
+	for s: Control in [_event, _shop]:
+		if s:
+			s.queue_free()
+	_event = null
+	_shop = null
+
+
+## 返回鍵 / 返回手勢(event-screen D01 返回行為表;商城:先關獲得提示框,再交給商城)
 func _on_back() -> void:
+	if _shop and not _popup.is_open():
+		_shop.handle_back()
+		return
+	# 活動頁請求處理中返回鍵無效(同商城);提示框開著時仍照原規則先關提示框
+	if _event and _event.is_busy() and not _popup.is_open():
+		return
 	var page: EventLogic.Page = _event.page if _event else EventLogic.Page.NONE
 	match EventLogic.back_action(_popup.is_open(), page):
 		EventLogic.Back.CLOSE_POPUP:
@@ -396,11 +437,39 @@ func _on_back() -> void:
 			get_tree().quit()
 
 
-## D16:取紅點資料;資料到達前、讀取失敗時都不顯示
+## D16(活動)、shop-screen D17(商城):取紅點資料;資料到達前、讀取失敗時都不顯示。
+## 活動頁 / 商城開著時只取「其他頁」的資料,給捷徑列紅點(page-shortcuts P06);目前頁的資料由頁面自己取
 func _refresh_badge() -> void:
 	_bottom_buttons[0].set_badge(false)
-	_badge_request += 1
-	EventService.fetch_status(_on_badge_status.bind(_badge_request))
+	_bottom_buttons[1].set_badge(false)
+	if _event:
+		_event.shortcuts.set_badge(PageShortcutBar.Page.SHOP, false)
+	if _shop:
+		_shop.shortcuts.set_badge(PageShortcutBar.Page.EVENT, false)
+	if _event == null:
+		_badge_request += 1
+		EventService.fetch_status(_on_badge_status.bind(_badge_request))
+	if _shop == null:
+		_shop_badge_request += 1
+		ShopService.fetch_status(_on_shop_badge_status.bind(_shop_badge_request))
+
+
+## D17:免費分頁任一項今天還有次數就亮;同時排商城的補發框(D22)、套用已買移除廣告
+func _on_shop_badge_status(r: Dictionary, request: int) -> void:
+	if not r.ok:
+		return
+	for p in r.popups:
+		_popup.enqueue(p)
+	if r.remove_ads_bought:
+		_on_ads_removed()
+	if request != _shop_badge_request:
+		return
+	var badge := ShopLogic.free_badge(r.free_left)
+	if _event:
+		_event.shortcuts.set_badge(PageShortcutBar.Page.SHOP, badge)
+	elif _shop == null and not _popup.is_open():
+		# 同活動紅點:有提示框時先彈框,全部關閉後(all_closed)重新取資料
+		_bottom_buttons[1].set_badge(badge)
 
 
 func _on_badge_status(r: Dictionary, request: int) -> void:
@@ -409,11 +478,16 @@ func _on_badge_status(r: Dictionary, request: int) -> void:
 	# 就算這次結果已過時也要排補發框(重複的 id 由 RewardPopup 略過)
 	for p in r.popups:
 		_popup.enqueue(p)
-	if request != _badge_request or _event or _popup.is_open():
-		# 有提示框時先彈框,全部按「好」後(all_closed)再重新取資料決定紅點(D16「與 D15」)
+	if request != _badge_request:
 		return
-	_apply_wallet(r.wallet)
-	_bottom_buttons[0].set_badge(EventLogic.checkin_badge(r.signed_count, r.signed_today, r.claimed))
+	var badge := EventLogic.checkin_badge(r.signed_count, r.signed_today, r.claimed)
+	if _shop:
+		# 商城開著:只亮捷徑列紅點,資源列沿用目前數字(P04)
+		_shop.shortcuts.set_badge(PageShortcutBar.Page.EVENT, badge)
+	elif _event == null and not _popup.is_open():
+		# 有提示框時先彈框,全部按「好」後(all_closed)再重新取資料決定紅點(D16「與 D15」)
+		_apply_wallet(r.wallet)
+		_bottom_buttons[0].set_badge(badge)
 
 
 ## 每個提示框關閉、或首頁取得最新資料時,資源列換成伺服器的最新值(不做動畫)
@@ -428,13 +502,68 @@ func _apply_wallet(wallet: Dictionary) -> void:
 func _on_popup_item_closed(item: Dictionary) -> void:
 	_apply_wallet(item.wallet)
 	if item.has("id"):
-		EventService.mark_popup_seen(item.id)
+		if item.id.begins_with(ShopService.ID_PREFIX):
+			ShopService.mark_popup_seen(item.id)
+		else:
+			EventService.mark_popup_seen(item.id)
 
 
-## 關閉最後一個提示框後重新取紅點資料;活動頁開著時,活動頁的紅點已依最新回應更新
+## 關閉最後一個提示框後重新取紅點資料;活動頁 / 商城開著時,它們的紅點已依最新回應更新
 func _on_popups_closed() -> void:
-	if _event == null:
+	if _event == null and _shop == null:
 		_refresh_badge()
+
+
+# ---- 商城(shop-screen D01、D02、D17) ----
+
+## 資源列 icon 與首頁「商城」按鈕:商城開著時切分頁(不重開,D02);首頁時打開商城並停在 tab。
+## 活動頁開著時維持原本只記 log(活動頁的資源列捷徑沒有規格)
+func _go_shop(tab: int, message: String) -> void:
+	if _shop:
+		_shop.select_tab(tab)
+	elif _event:
+		_log(message)
+	else:
+		_open_shop(tab)
+
+
+func _open_shop(tab: int) -> void:
+	if _shop or _event:
+		return
+	for n in _home_only_nodes():
+		n.visible = false
+	_shop = ShopScreen.new()
+	_shop.popup = _popup
+	_shop.tab = tab
+	_shop.closed.connect(_close_shop)
+	_shop.wallet_refreshed.connect(_apply_wallet)
+	_shop.ads_removed.connect(_on_ads_removed)
+	_shop.switch_requested.connect(_switch_page)
+	add_child(_shop)
+	# 同活動頁:疊在首頁元件上、D14 懸浮視窗與提示框之下
+	move_child(_shop, _tooltip.get_index())
+	_apply_layout()
+	# page-shortcuts P06:進入頁面時取捷徑列紅點
+	_refresh_badge()
+
+
+func _close_shop() -> void:
+	if _shop == null:
+		return
+	_shop.queue_free()
+	_shop = null
+	for n in _home_only_nodes():
+		n.visible = true
+	# D17:從商城返回首頁時重新取資料
+	_refresh_badge()
+
+
+## 已買移除廣告(README「移除廣告」):之後不再顯示 banner,區塊留白不收合
+func _on_ads_removed() -> void:
+	if FakeData.ads_removed:
+		return
+	AdManager.hide_banner()
+	FakeData.ads_removed = true
 
 
 func _log(message: String) -> void:

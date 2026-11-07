@@ -17,6 +17,29 @@ static func draw_rounded(ci: CanvasItem, rect: Rect2, color: Color) -> void:
 	ci.draw_rect(Rect2(rect.position.x, rect.position.y + rows, rect.size.x, rect.size.y - rows * 2), color)
 
 
+## 沿圓角形狀的外框(page-shortcuts P02 目前頁金框、焦點外框):rect 的圓角矩形扣掉 rect.grow(-width) 的圓角矩形,
+## 逐列畫左右兩段;外框才會貼著圓角,不會在四角露出直角。rect 需為整數座標。
+static func draw_rounded_frame(ci: CanvasItem, rect: Rect2, color: Color, width: int) -> void:
+	var h := int(rect.size.y)
+	var inner_h := h - width * 2
+	for r in h:
+		var o := _row_inset(r, h)
+		var y := rect.position.y + r
+		var ir := r - width
+		if ir < 0 or ir >= inner_h:
+			ci.draw_rect(Rect2(rect.position.x + o, y, rect.size.x - o * 2, 1), color)
+			continue
+		var i := _row_inset(ir, inner_h) + width
+		ci.draw_rect(Rect2(rect.position.x + o, y, i - o, 1), color)
+		ci.draw_rect(Rect2(rect.end.x - i, y, i - o, 1), color)
+
+
+## 圓角矩形第 r 列(共 h 列)的左右內縮
+static func _row_inset(r: int, h: int) -> int:
+	var edge := mini(r, h - 1 - r)
+	return CORNER_INSETS[edge] if edge < CORNER_INSETS.size() else 0
+
+
 # ---- 活動頁共用的小工具(event-screen D05、D16 紅點;按下 / 已領取「變暗 40%」) ----
 
 const BADGE_FILL := Color("#E74C3C")

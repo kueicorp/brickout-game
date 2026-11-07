@@ -111,6 +111,7 @@ func _run() -> void:
 	await _test_toasts()
 	await _test_toast_page_switch()
 	await _test_late_failure_toast()
+	await _test_busy_back_key()
 	await _test_topup()
 	await _test_popup_sequence()
 	await _test_over_28()
@@ -135,7 +136,8 @@ func _test_home_badge_and_enter() -> void:
 	_eq(act.badge, false, "home badge hidden before data")
 	await _wait()
 	_eq(act.badge, true, "home badge on: today not signed")
-	for i in range(1, 4):
+	# 商城(1)有自己的紅點(shop-screen D17),成長、設定沒有
+	for i in range(2, 4):
 		_eq(home._bottom_buttons[i].badge, false, "other bottom buttons never badge %d" % i)
 	await _open_event()
 	_eq(_ev() != null, true, "tap 活動 opens event page")
@@ -319,7 +321,9 @@ func _test_toast_page_switch() -> void:
 	_eq(_ev().toast_text, "", "reopened event has no toast")
 
 
-## 失敗回應晚到:發出請求的那次畫面已切走(含切回同一頁)就不顯示 toast;按鈕狀態照常恢復
+## 失敗回應晚到:發出請求的那次畫面已切走(含切回同一頁)就不顯示 toast;按鈕狀態照常恢復。
+## 處理中返回鈕、捷徑停用,返回鍵也無效(README 活動第 7 點),玩家已無法在處理中切走;
+## 這裡直接呼叫 show_page 切頁,保留防護邏輯本身的覆蓋(日後若新增可在處理中切頁的路徑仍有效)
 func _test_late_failure_toast() -> void:
 	var ev = _ev()
 	const SLOW := 0.3
@@ -330,7 +334,7 @@ func _test_late_failure_toast() -> void:
 	S.fail_next = 1
 	_tap(Vector2(138, CLAIM_Y))
 	await _frames()
-	_tap(BACK_BTN)
+	ev.show_page(L.Page.LIST)
 	await _frames()
 	_eq(ev.page, L.Page.LIST, "late claim: switched to A before response")
 	await _wait(SLOW + 0.1)
@@ -342,7 +346,7 @@ func _test_late_failure_toast() -> void:
 	S.fail_next = 1
 	_tap(CHECKIN_BTN)
 	await _frames()
-	_tap(BACK_BTN)
+	ev.show_page(L.Page.LIST)
 	await _frames()
 	_tap(ITEM_CHECKIN)
 	await _frames()
@@ -363,13 +367,59 @@ func _test_late_failure_toast() -> void:
 	S.fail_next = 1
 	_tap(BUY_BTN)
 	await _frames()
-	_tap(BACK_BTN)
+	ev.show_page(L.Page.LIST)
 	await _frames()
 	_eq(ev.page, L.Page.LIST, "late buy: switched to A before response")
 	await _wait(SLOW + 0.1)
 	_eq(ev.toast_text, "", "late buy failure: no toast on A")
 	_eq(ev._topup._buy.text, "TWD 300 購買", "late buy failure: button restored")
 	S.delay_sec = DELAY
+
+
+## README 活動第 7 點:B、C 請求處理中返回鍵無效(與捷徑列停用同時);結果回來照原流程,之後返回鍵恢復
+func _test_busy_back_key() -> void:
+	var ev = _ev()
+	var popup = home._popup
+	# B 簽到(成功):處理中返回鍵不離開 → 跳「已獲得」→ 返回鍵先關提示框 → 再按回 A
+	_tap(ITEM_CHECKIN)
+	await _frames()
+	_tap(CHECKIN_BTN)
+	await _frames()
+	_eq([ev.is_busy(), ev.shortcuts.back.disabled], [true, true], "busy checkin: shortcuts disabled")
+	await _back_key()
+	_eq([home._event, ev.page], [ev, L.Page.CHECKIN], "busy checkin: back key ignored")
+	await _wait()
+	_eq([ev.is_busy(), ev.shortcuts.back.disabled, popup.is_open()], [false, false, true], "checkin done: popup, shortcuts enabled")
+	await _back_key()
+	_eq([popup.is_open(), ev.page], [false, L.Page.CHECKIN], "checkin done: back key closes popup first")
+	await _back_key()
+	_eq(ev.page, L.Page.LIST, "checkin done: back key B -> A")
+	# B 領取(失敗):處理中返回鍵不離開 → toast → 返回鍵回 A
+	_tap(ITEM_CHECKIN)
+	await _frames()
+	S.fail_next = 1
+	_tap(Vector2(138, CLAIM_Y))
+	await _frames()
+	_eq(ev.is_busy(), true, "busy claim")
+	await _back_key()
+	_eq(ev.page, L.Page.CHECKIN, "busy claim: back key ignored")
+	await _wait()
+	_eq([ev.is_busy(), ev.toast_text], [false, "領取失敗,請檢查網路後再試"], "claim failure: toast after busy")
+	await _back_key()
+	_eq(ev.page, L.Page.LIST, "claim done: back key B -> A")
+	# C 購買(失敗,保持未購買給後續測試):處理中返回鍵不離開 → toast → 返回鍵回 A
+	_tap(ITEM_TOPUP)
+	await _frames()
+	S.fail_next = 1
+	_tap(BUY_BTN)
+	await _frames()
+	_eq(ev.is_busy(), true, "busy buy")
+	await _back_key()
+	_eq(ev.page, L.Page.TOPUP, "busy buy: back key ignored")
+	await _wait()
+	_eq([ev.is_busy(), ev.toast_text], [false, "購買失敗,請稍後再試"], "buy failure: toast after busy")
+	await _back_key()
+	_eq(ev.page, L.Page.LIST, "buy done: back key C -> A")
 
 
 func _test_topup() -> void:

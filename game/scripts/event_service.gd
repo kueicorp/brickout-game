@@ -143,6 +143,12 @@ static func simulate_pending_order() -> void:
 	pending_orders.append({"product": "first_topup", "id": _new_popup_id("order")})
 
 
+## 假商城服務(ShopService)與活動共用同一個錢包(模擬同一個後端帳號)
+static func shared_wallet() -> Dictionary:
+	_ensure_init()
+	return wallet
+
+
 ## 等機率抽 1 種商城道具(Q8)
 static func draw_item() -> String:
 	return EventLogic.SHOP_ITEMS.pick_random()
